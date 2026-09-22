@@ -86,6 +86,13 @@ class KmapStoreApp {
         this.initDatabase();
         this.bindEvents();
         this.initSession();
+
+        // Track known order IDs to prevent false order notifications on startup or sync
+        this.knownOrderIds = new Set();
+        try {
+            const initialOrders = JSON.parse(safeLocalStorage.getItem('kmap_orders') || '[]');
+            initialOrders.forEach(o => this.knownOrderIds.add(o.id));
+        } catch(e) {}
         
         // Start polling for Vercel KV updates
         setInterval(() => this.syncDownstream(), 5000);
@@ -100,6 +107,17 @@ class KmapStoreApp {
                 let updated = false;
                 for (const key of Object.keys(data)) {
                     if (data[key]) {
+                        // Filter out legacy test data from incoming cloud sync if still present in KV
+                        if (key === 'kmap_orders' && Array.isArray(data[key])) {
+                            data[key] = data[key].filter(o => o.id !== 'ORD-8932' && o.id !== 'ORD-7612' && o.clientName !== 'Kwame Mensah' && o.clientName !== 'Ama Serwaa');
+                        }
+                        if (key === 'kmap_hire_purchase' && Array.isArray(data[key])) {
+                            data[key] = data[key].filter(h => h.id !== 'HP-001' && h.clientName !== 'Kwame Mensah');
+                        }
+                        if (key === 'kmap_users' && Array.isArray(data[key])) {
+                            data[key] = data[key].filter(u => u.username !== '0241234567' && u.name !== 'Kwame Mensah');
+                        }
+
                         const cloudVal = JSON.stringify(data[key]);
                         const localVal = safeLocalStorage.getItem(key);
                         if (cloudVal !== localVal) {
@@ -110,6 +128,12 @@ class KmapStoreApp {
                     }
                 }
                 if (updated) {
+                    // Update known order IDs
+                    try {
+                        const currentOrders = JSON.parse(safeLocalStorage.getItem('kmap_orders') || '[]');
+                        currentOrders.forEach(o => this.knownOrderIds.add(o.id));
+                    } catch(e) {}
+
                     // Update active views immediately
                     this.renderClientCatalog();
                     this.renderPromotions();
@@ -390,53 +414,12 @@ class KmapStoreApp {
 
         const defaultUsers = [
             { username: 'superadmin', role: 'superadmin', name: 'Super Administrator', password: 'super123' },
-            { username: 'admin', role: 'admin', name: 'Admin Manager', password: 'admin123' },
-            { username: '0241234567', role: 'client', name: 'Kwame Mensah', password: 'client123', phone: '0241234567' }
+            { username: 'admin', role: 'admin', name: 'Admin Manager', password: 'admin123' }
         ];
 
-        const defaultOrders = [
-            { 
-                id: 'ORD-8932', 
-                clientName: 'Kwame Mensah', 
-                phone: '0241234567', 
-                items: [{ id: 'PROD-001', name: 'Hp Zbook 15u G6', price: 7000, qty: 1 }], 
-                total: 7000, 
-                claimMethod: 'delivery', 
-                address: 'East Legon, Accra', 
-                date: new Date(Date.now() - 3600000 * 24 * 2).toISOString(), // 2 days ago
-                status: 'completed' 
-            },
-            { 
-                id: 'ORD-7612', 
-                clientName: 'Ama Serwaa', 
-                phone: '0247654321', 
-                items: [{ id: 'PROD-002', name: 'HP Probook x360 435 G7', price: 4800, qty: 1 }], 
-                total: 4800, 
-                claimMethod: 'walk_in', 
-                address: '', 
-                date: new Date(Date.now() - 3600000 * 4).toISOString(), // 4 hours ago
-                status: 'pending' 
-            }
-        ];
+        const defaultOrders = [];
 
-        const defaultHP = [
-            {
-                id: 'HP-001',
-                clientName: 'Kwame Mensah',
-                phone: '0241234567',
-                machine: 'Hp Zbook 15u G6',
-                price: 7000,
-                deposit: 2500,
-                months: 3,
-                startDate: new Date(Date.now() - 3600000 * 24 * 28).toISOString(), // 28 days ago
-                installments: [
-                    { month: 1, dueDate: new Date(Date.now() - 3600000 * 24 * 28 + 3600000 * 24 * 30).toISOString(), amount: 1500, status: 'pending' },
-                    { month: 2, dueDate: new Date(Date.now() - 3600000 * 24 * 28 + 3600000 * 24 * 60).toISOString(), amount: 1500, status: 'pending' },
-                    { month: 3, dueDate: new Date(Date.now() - 3600000 * 24 * 28 + 3600000 * 24 * 90).toISOString(), amount: 1500, status: 'pending' }
-                ],
-                status: 'active'
-            }
-        ];
+        const defaultHP = [];
 
         // Check if database reset is needed (to migration to these 20 laptops)
         const existingProducts = safeLocalStorage.getItem('kmap_products');
@@ -461,6 +444,37 @@ class KmapStoreApp {
             safeLocalStorage.setItem('kmap_logs', JSON.stringify([]), true);
             safeLocalStorage.setItem('kmap_promos', JSON.stringify([]), true);
             safeLocalStorage.setItem('kmap_hire_purchase', JSON.stringify(defaultHP), true);
+        }
+
+        // Clean out any legacy seeded test orders, hire purchases, and test client accounts from local storage & cloud
+        try {
+            const currentOrders = JSON.parse(safeLocalStorage.getItem('kmap_orders') || '[]');
+            const cleanedOrders = currentOrders.filter(o => o.id !== 'ORD-8932' && o.id !== 'ORD-7612' && o.clientName !== 'Kwame Mensah' && o.clientName !== 'Ama Serwaa');
+            if (cleanedOrders.length !== currentOrders.length || !safeLocalStorage.getItem('kmap_orders')) {
+                safeLocalStorage.setItem('kmap_orders', JSON.stringify(cleanedOrders));
+            }
+        } catch(e) {
+            safeLocalStorage.setItem('kmap_orders', JSON.stringify([]));
+        }
+
+        try {
+            const currentHP = JSON.parse(safeLocalStorage.getItem('kmap_hire_purchase') || '[]');
+            const cleanedHP = currentHP.filter(h => h.id !== 'HP-001' && h.clientName !== 'Kwame Mensah');
+            if (cleanedHP.length !== currentHP.length || !safeLocalStorage.getItem('kmap_hire_purchase')) {
+                safeLocalStorage.setItem('kmap_hire_purchase', JSON.stringify(cleanedHP));
+            }
+        } catch(e) {
+            safeLocalStorage.setItem('kmap_hire_purchase', JSON.stringify([]));
+        }
+
+        try {
+            const currentUsers = JSON.parse(safeLocalStorage.getItem('kmap_users') || '[]');
+            const cleanedUsers = currentUsers.filter(u => u.username !== '0241234567' && u.name !== 'Kwame Mensah');
+            if (cleanedUsers.length !== currentUsers.length || !safeLocalStorage.getItem('kmap_users')) {
+                safeLocalStorage.setItem('kmap_users', JSON.stringify(cleanedUsers.length > 0 ? cleanedUsers : defaultUsers));
+            }
+        } catch(e) {
+            safeLocalStorage.setItem('kmap_users', JSON.stringify(defaultUsers));
         }
 
         this.db = {
@@ -628,15 +642,19 @@ class KmapStoreApp {
             if (e.key === 'kmap_orders') {
                 try {
                     const oldOrders = JSON.parse(e.oldValue || '[]');
-                    const newOrders = JSON.parse(e.newValue || '[]');
+                    const newOrders = JSON.parse(e.newValue || safeLocalStorage.getItem('kmap_orders') || '[]');
                     
-                    // Show notification to Admin/Superadmin on new client order
-                    if (newOrders.length > oldOrders.length && this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role)) {
-                        const addedOrders = newOrders.filter(no => !oldOrders.some(oo => oo.id === no.id));
-                        addedOrders.forEach(o => {
+                    // Show notification to Admin/Superadmin on genuinely new client order
+                    if (this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role)) {
+                        const genuinelyNewOrders = newOrders.filter(no => !this.knownOrderIds.has(no.id));
+                        genuinelyNewOrders.forEach(o => {
+                            this.knownOrderIds.add(o.id);
                             this.showToast(`🔔 New Order Received: ${o.id} - GHS ${o.total.toLocaleString()} from ${o.clientName}!`);
                         });
                     }
+
+                    // Update known order IDs
+                    newOrders.forEach(o => this.knownOrderIds.add(o.id));
 
                     // Show notification when an order is removed (cancelled/reverted)
                     if (newOrders.length < oldOrders.length) {
