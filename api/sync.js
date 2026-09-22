@@ -12,7 +12,7 @@ export default async function handler(request, response) {
       }
       return response.status(200).json(data);
     } else if (request.method === 'POST') {
-      const { updates } = request.body;
+      const { updates } = request.body; // Expecting { updates: { kmap_users: [...], kmap_orders: [...] } }
       if (!updates || typeof updates !== 'object') {
         return response.status(400).json({ error: 'Invalid payload' });
       }

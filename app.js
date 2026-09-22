@@ -732,18 +732,50 @@ class KmapStoreApp {
             this.renderAdminInventory();
         });
 
-        // File upload image handler
+        // File upload image handler (with compression to prevent KV crashing)
         document.getElementById('form-product-file-upload').addEventListener('change', (e) => {
             const files = Array.from(e.target.files);
             const urlInputs = Array.from(document.querySelectorAll('.product-img-url'));
             
             files.forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    const emptyInput = urlInputs.find(input => !input.value.trim());
-                    if (emptyInput) {
-                        emptyInput.value = event.target.result;
-                    }
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 500;
+                        const MAX_HEIGHT = 500;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Compress to 70% quality JPEG to save KV space
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+                        const emptyInput = urlInputs.find(input => !input.value.trim());
+                        if (emptyInput) {
+                            emptyInput.value = compressedBase64;
+                        }
+                    };
+                    img.src = event.target.result;
                 };
                 reader.readAsDataURL(file);
             });
