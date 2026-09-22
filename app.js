@@ -732,53 +732,47 @@ class KmapStoreApp {
             this.renderAdminInventory();
         });
 
-        // File upload image handler (with compression to prevent KV crashing)
-        document.getElementById('form-product-file-upload').addEventListener('change', (e) => {
-            const files = Array.from(e.target.files);
-            const urlInputs = Array.from(document.querySelectorAll('.product-img-url'));
-            
-            files.forEach(file => {
-                if (!file.type.startsWith('image/')) return;
-                
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 500;
-                        const MAX_HEIGHT = 500;
-                        let width = img.width;
-                        let height = img.height;
+        // Enhanced image compression & live preview handler
+        const fileInput = document.getElementById('form-product-file-upload');
+        if (fileInput) {
+            fileInput.addEventListener('change', async (e) => {
+                const files = Array.from(e.target.files);
+                if (files.length === 0) return;
 
-                        if (width > height) {
-                            if (width > MAX_WIDTH) {
-                                height *= MAX_WIDTH / width;
-                                width = MAX_WIDTH;
-                            }
-                        } else {
-                            if (height > MAX_HEIGHT) {
-                                width *= MAX_HEIGHT / height;
-                                height = MAX_HEIGHT;
-                            }
-                        }
+                const statusEl = document.getElementById('img-upload-status');
+                if (statusEl) statusEl.innerText = `Processing ${files.length} photo(s)...`;
 
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        // Compress to 70% quality JPEG to save KV space
-                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                const urlInputs = Array.from(document.querySelectorAll('.product-img-url'));
 
+                for (const file of files) {
+                    try {
+                        const base64 = await this.compressImageFile(file);
                         const emptyInput = urlInputs.find(input => !input.value.trim());
                         if (emptyInput) {
-                            emptyInput.value = compressedBase64;
+                            emptyInput.value = base64;
+                        } else {
+                            // If all 6 inputs filled, replace the last one
+                            urlInputs[urlInputs.length - 1].value = base64;
                         }
-                    };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
+                    } catch (err) {
+                        console.error('Image processing failed:', err);
+                    }
+                }
+
+                if (statusEl) {
+                    statusEl.innerText = '✓ Ready to save!';
+                    setTimeout(() => { if (statusEl) statusEl.innerText = ''; }, 3000);
+                }
+
+                this.refreshModalImagePreviews();
+                // Reset file input so re-selecting same file triggers change
+                fileInput.value = '';
             });
+        }
+
+        // Also update previews if someone types/pastes a URL directly
+        document.querySelectorAll('.product-img-url').forEach(input => {
+            input.addEventListener('input', () => this.refreshModalImagePreviews());
         });
 
         // Touch swipe gestures for lightbox swiping
@@ -2091,12 +2085,17 @@ class KmapStoreApp {
             products = products.filter(p => p.stock <= 3);
         }
         products.forEach(p => {
+            const hasImg = p.images && p.images.length > 0 && p.images[0];
+            const iconOrImg = hasImg 
+                ? `<img src="${p.images[0]}" style="width:36px; height:36px; object-fit:contain; border-radius:4px; border:1px solid var(--border); background:#fff;">` 
+                : `<span style="font-size: 20px;">${p.icon || '💻'}</span>`;
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><code>${p.id}</code></td>
                 <td>
                     <div style="display:flex; align-items:center; gap:8px;">
-                        <span>${p.icon}</span>
+                        ${iconOrImg}
                         <strong>${p.name}</strong>
                     </div>
                 </td>
@@ -2124,6 +2123,81 @@ class KmapStoreApp {
         }
     }
 
+    // Helper: compress any image file to clean thumbnail JPEG
+    compressImageFile(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onerror = reject;
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onerror = reject;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 500;
+                    const MAX_HEIGHT = 500;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = Math.round(width);
+                    canvas.height = Math.round(height);
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    // Standardize to clean, lightweight JPEG
+                    const base64 = canvas.toDataURL('image/jpeg', 0.75);
+                    resolve(base64);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    refreshModalImagePreviews() {
+        const container = document.getElementById('modal-image-previews');
+        if (!container) return;
+
+        const urlInputs = Array.from(document.querySelectorAll('.product-img-url'));
+        const images = urlInputs.map(input => input.value.trim()).filter(v => v.length > 0);
+
+        if (images.length === 0) {
+            container.innerHTML = `<span style="font-size: 12px; color: var(--text-light); padding: 4px 8px;">No images uploaded yet. Select files below.</span>`;
+            return;
+        }
+
+        container.innerHTML = '';
+        images.forEach((imgSrc, idx) => {
+            const thumb = document.createElement('div');
+            thumb.style.cssText = 'position: relative; width: 60px; height: 60px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); background: #fff;';
+            thumb.innerHTML = `
+                <img src="${imgSrc}" style="width: 100%; height: 100%; object-fit: contain;">
+                <button type="button" onclick="app.removeModalImage(${idx})" style="position: absolute; top: 2px; right: 2px; background: rgba(220,38,38,0.85); color: #fff; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+            `;
+            container.appendChild(thumb);
+        });
+    }
+
+    removeModalImage(index) {
+        const urlInputs = Array.from(document.querySelectorAll('.product-img-url'));
+        const currentImages = urlInputs.map(input => input.value.trim()).filter(v => v.length > 0);
+        currentImages.splice(index, 1);
+        urlInputs.forEach((input, idx) => {
+            input.value = currentImages[idx] || '';
+        });
+        this.refreshModalImagePreviews();
+    }
+
     openProductModal(productId = null) {
         const modal = document.getElementById('modal-product-form');
         const title = document.getElementById('product-modal-title');
@@ -2132,6 +2206,9 @@ class KmapStoreApp {
         
         const urls = document.querySelectorAll('.product-img-url');
         urls.forEach(u => u.value = '');
+
+        const fileInput = document.getElementById('form-product-file-upload');
+        if (fileInput) fileInput.value = '';
 
         if (productId) {
             title.innerText = "Edit Product Details";
@@ -2156,6 +2233,8 @@ class KmapStoreApp {
             title.innerText = "Add New Product";
             document.getElementById('form-product-id').value = '';
         }
+        
+        this.refreshModalImagePreviews();
         modal.classList.add('active');
     }
 
