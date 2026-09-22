@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script>
+        window.onerror = function (msg, url, line) {
+            alert("Error: " + msg + "\nURL: " + url + "\nLine: " + line);
+            return false;
+        };
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kmap Computers | Sunyani, Ghana</title>
+    <meta name="description"
+        content="Kmap Computers - Laptop Sales, Repairs and Computer Accessories in Sunyani. Building between Tasty Joint and Izwe opposite Regional Court.">
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for Sales Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF for Report Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Unified Toast Container for Real-time Notifications -->
+    <div id="toast-container"></div>
+
+    <!-- 1. Unified Login Container -->
+    <div id="login-screen" class="login-container">
+        <div class="login-card">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="font-size: 40px; color: var(--primary); margin-bottom: 12px;"><i
+                        class="fa-solid fa-laptop-code"></i></div>
+                <h1 style="color: var(--primary); font-weight: 800;">KMAP COMPUTERS</h1>
+                <p style="color: var(--text-light); font-size: 14px;"></p>
+            </div>
+
+            <div id="login-error-msg"
+                style="color: var(--error); margin-bottom: 16px; text-align: center; display: none; font-size: 14px; font-weight: 600;">
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-username">Username or Phone</label>
+                    <input type="text" id="login-username" class="form-control"
+                        placeholder="admin, superadmin, or client phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div style="position: relative;">
+                        <input type="password" id="login-password" class="form-control" placeholder="••••••••" required style="padding-right: 40px;">
+                        <i class="fa-solid fa-eye" id="toggle-login-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);" onclick="app.togglePasswordVisibility('login-password', 'toggle-login-password')"></i>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; margin-top: 12px;">
+                    <i class="fa-solid fa-right-to-bracket"></i> Sign In
+                </button>
+
+                <div style="text-align: center; margin-top: 16px;">
+                    <span style="font-size: 13px; color: var(--text-dark);">Don't have an account? </span>
+                    <a href="#" id="link-show-signup"
+                        style="font-size: 13px; color: var(--secondary); font-weight: 700; text-decoration: none;">Sign
+                        Up</a>
+                </div>
+            </form>
+
+            <!-- Signup Form (Hidden by default) -->
+            <form id="signup-form" style="display: none;">
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" class="form-control" placeholder="Enter Your Full Name"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-username">Phone Number</label>
+                    <input type="text" id="signup-username" class="form-control" placeholder="Enter Your Mobile Number"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <div style="position: relative;">
+                        <input type="password" id="signup-password" class="form-control" placeholder="Enter Password" required style="padding-right: 40px;">
+                        <i class="fa-solid fa-eye" id="toggle-signup-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);" onclick="app.togglePasswordVisibility('signup-password', 'toggle-signup-password')"></i>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-secondary" style="width: 100%; height: 48px; margin-top: 12px;">
+                    <i class="fa-solid fa-user-plus"></i> Register & Login
+                </button>
+
+                <div style="text-align: center; margin-top: 16px;">
+                    <span style="font-size: 13px; color: var(--text-dark);">Already have an account? </span>
+                    <a href="#" id="link-show-login"
+                        style="font-size: 13px; color: var(--primary); font-weight: 700; text-decoration: none;">Sign
+                        In</a>
+                </div>
+            </form>
+
+            <div
+                style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+                <button type="button" id="btn-guest-browse" class="btn btn-outline"
+                    style="width: 100%; height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-eye" style="color: var(--secondary);"></i> Browse as Guest
+                </button>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- 2. Main Store / Admin Workspace (Hidden on Load) -->
+    <div id="app-root" style="display: none;">
+        <!-- Sidebar Backdrop overlay -->
+        <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="app.toggleSidebar()"></div>
+        <!-- Sidebar Navigation (Responsive dynamically updated on role) -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <i class="fa-solid fa-laptop-code" style="color: var(--accent); font-size: 24px;"></i>
+                <h2>KMAP <span>COMPUTERS</span></h2>
+            </div>
+            <nav class="sidebar-nav" id="sidebar-nav-container">
+                <!-- Dynamic Navigation Buttons Injected Here -->
+            </nav>
+            <div class="sidebar-footer" style="display: flex; flex-direction: column; gap: 8px;">
+                <button class="nav-item" id="sidebar-change-pwd-btn" onclick="app.openChangePasswordModal()"
+                    style="color: var(--accent);">
+                    <i class="fa-solid fa-key"></i> Change Password
+                </button>
+                <button class="nav-item" id="sidebar-logout-btn" onclick="app.logout()" style="color: var(--error);">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <main class="main-content">
+            <!-- Header bar -->
+            <header class="main-header">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button id="hamburger-btn" class="btn btn-outline" style="padding: 8px 14px; display: inline-flex;"
+                        onclick="app.toggleSidebar()">
+                        <i class="fa-solid fa-bars" style="font-size: 20px;"></i>
+                    </button>
+                    <!-- Header Navigation History Controls -->
+                    <div style="display: flex; gap: 4px;">
+                        <button class="btn btn-outline" id="header-back-btn" onclick="app.goBack()" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border-radius: 50%;" title="Go Back">
+                            <i class="fa-solid fa-chevron-left" style="font-size: 14px;"></i>
+                        </button>
+                        <button class="btn btn-outline" id="header-forward-btn" onclick="app.goForward()" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border-radius: 50%;" title="Go Forward">
+                            <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
+                        </button>
+                    </div>
+                    <div>
+                        <h1 id="page-title" style="font-weight: 800; color: var(--primary);">Storefront</h1>
+                        <p style="color: var(--text-light); font-size: 14px;" id="page-subtitle">Welcome to Kmap
+                            Computers</p>
+                    </div>
+                </div>
+                <div class="user-profile" onclick="app.openUserProfileModal()" style="cursor: pointer;" title="View Profile">
+                    <div style="text-align: right;">
+                        <div style="font-weight: 700; font-size: 14px;" id="profile-name">Client User</div>
+                    </div>
+                    <div class="user-avatar" id="profile-avatar">C</div>
+                </div>
+            </header>
+
+            <!-- Dynamic View Containers -->
+
+            <!-- VIEW A: Client Storefront -->
+            <section id="view-client-store" class="app-view" style="display: none;">
+                <div style="display: flex; gap: 24px; flex-wrap: wrap; width: 100%;">
+
+                    <!-- Left: Catalog & Search -->
+                    <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 20px;">
+                        <div class="card"
+                            style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; position: sticky; top: 72px; z-index: 99; background-color: var(--white); width: 100%;">
+                            <div style="flex: 1; min-width: 250px; position: relative;">
+                                <input type="text" id="client-search" class="form-control"
+                                    placeholder="Search laptops,accessories..." style="padding-left: 40px;">
+                                <i class="fa-solid fa-magnifying-glass"
+                                    style="position: absolute; left: 16px; top: 14px; color: var(--text-light);"></i>
+                            </div>
+                            <div
+                                style="flex: 1; min-width: 250px; display: flex; gap: 8px; align-items: center; justify-content: flex-end;">
+                                <select id="client-category-select" class="form-control"
+                                    style="flex-grow: 1; max-width: 100%;"></select>
+                                <button class="btn btn-outline" onclick="app.switchView('client-cart')"
+                                    title="View Shopping Cart"
+                                    style="height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; flex-shrink: 0;">
+                                    <i class="fa-solid fa-cart-shopping"
+                                        style="font-size: 16px; color: var(--primary);"></i>
+                                    <span class="cart-count badge-count"
+                                        style="background: var(--error); color: white; border-radius: 50%; font-size: 10px; font-weight: 700; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;">0</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-3" id="products-catalog-grid">
+                            <!-- Product Cards injected dynamically -->
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- VIEW A.2: Client Mobile Cart -->
+            <section id="view-client-cart" class="app-view" style="display: none; width: 100%;">
+                <div class="card" style="width: 100%; max-width: 600px; margin: 0 auto;">
+                    <h3 class="card-title"><i class="fa-solid fa-cart-shopping"></i> Shopping Cart</h3>
+                    <div id="mobile-cart-empty-msg"
+                        style="text-align: center; color: var(--text-light); padding: 24px 0;">
+                        Your cart is empty
+                    </div>
+                    <div id="mobile-cart-items-container"
+                        style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;"></div>
+
+                    <div id="mobile-cart-summary"
+                        style="border-top: 1px solid var(--border); margin-top: 16px; padding-top: 16px; display: none;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span>Subtotal</span>
+                            <span style="font-weight: 600;" id="mobile-cart-subtotal">GH₵ 0.00</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                            <strong>Total</strong>
+                            <strong style="color: var(--accent); font-size: 18px;" id="mobile-cart-total">GH₵
+                                0.00</strong>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Claiming Option</label>
+                            <select id="mobile-checkout-claim-method" class="form-control"
+                                onchange="app.handleMobileClaimChange(this.value)">
+                                <option value="walk_in">Walk-in Pick up</option>
+                                <option value="delivery">Home/Office Delivery</option>
+                                <option value="hire_purchase">Hire Purchase (Available at Shop Only)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="mobile-delivery-address-group" style="display: none;">
+                            <label>Delivery Address</label>
+                            <input type="text" id="mobile-checkout-address" class="form-control"
+                                placeholder="Enter delivery location details">
+                        </div>
+
+                        <button class="btn btn-accent" style="width: 100%; height: 44px;"
+                            onclick="app.checkoutCart(true)">
+                            <i class="fa-solid fa-phone-volume"></i> Pay & Order Now
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW B: Client Order History -->
+            <section id="view-client-orders" class="app-view" style="display: none;">
+                <div class="card"
+                    style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; position: sticky; top: 72px; z-index: 99; background-color: var(--white); width: 100%; margin-bottom: 20px;">
+                    <div style="flex: 1; min-width: 250px; position: relative;">
+                        <input type="text" id="order-search" class="form-control"
+                            placeholder="Search Order ID or laptop/machine model..." style="padding-left: 40px;">
+                        <i class="fa-solid fa-magnifying-glass"
+                            style="position: absolute; left: 16px; top: 14px; color: var(--text-light);"></i>
+                    </div>
+                    <div style="flex: 1; min-width: 250px; display: flex; gap: 8px; align-items: center; justify-content: flex-end;">
+                        <button class="btn btn-secondary"
+                            onclick="app.downloadSelectedInvoices('.client-order-select')">
+                            <i class="fa-solid fa-file-pdf"></i> Download Selected
+                        </button>
+                        <button class="btn btn-outline" onclick="app.switchView('client-cart')"
+                            title="View Shopping Cart"
+                            style="height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; flex-shrink: 0;">
+                            <i class="fa-solid fa-cart-shopping"
+                                style="font-size: 16px; color: var(--primary);"></i>
+                            <span class="cart-count badge-count"
+                                style="background: var(--error); color: white; border-radius: 50%; font-size: 10px; font-weight: 700; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;">0</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 class="card-title" style="margin-bottom: 0;">My Orders</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px; text-align: center;"><input type="checkbox"
+                                            id="client-order-select-all"
+                                            onchange="app.toggleSelectAll('.client-order-select', this.checked)"></th>
+                                    <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Items</th>
+                                    <th>Method</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="client-orders-tbody">
+                                <!-- Client orders table body -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW B.2: Client Find Us -->
+            <section id="view-client-find-us" class="app-view" style="display: none;">
+                <div class="grid grid-2">
+                    <!-- Location Info Card -->
+                    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <h3 class="card-title"><i class="fa-solid fa-map-location-dot"
+                                    style="color: var(--secondary);"></i> Our Location</h3>
+                            <p style="font-size: 16px; margin-bottom: 24px; color: var(--text-dark); line-height: 1.6;">
+                                KMAP Computers is conveniently located in Sunyani. Visit our physical store for laptop
+                                sales, repair, and computing accessories.
+                            </p>
+
+                            <div style="display: flex; flex-direction: column; gap: 20px;">
+                                <div style="display: flex; align-items: flex-start; gap: 16px;">
+                                    <div
+                                        style="background: rgba(46, 125, 100, 0.1); padding: 12px; border-radius: var(--radius-sm); color: var(--secondary); display: flex; align-items: center; justify-content: center; width: 44px; height: 44px;">
+                                        <i class="fa-solid fa-location-dot" style="font-size: 20px;"></i>
+                                    </div>
+                                    <div>
+                                        <h4 style="font-weight: 700; color: var(--primary);">Physical Address</h4>
+                                        <p
+                                            style="color: var(--text-dark); font-size: 14px; margin-top: 4px; font-weight: 700;">
+                                            Opposite Sunyani Regional Court</p>
+                                        <p
+                                            style="color: var(--secondary); font-size: 13px; margin-top: 2px; font-weight: 600;">
+                                            (Building between Tasty Joint and Izwe)</p>
+                                        <p style="color: var(--text-light); font-size: 13px; margin-top: 2px;">Sunyani,
+                                            Bono Region, Ghana</p>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; align-items: flex-start; gap: 16px;">
+                                    <div
+                                        style="background: rgba(245, 166, 35, 0.1); padding: 12px; border-radius: var(--radius-sm); color: var(--accent); display: flex; align-items: center; justify-content: center; width: 44px; height: 44px;">
+                                        <i class="fa-solid fa-phone" style="font-size: 18px;"></i>
+                                    </div>
+                                    <div>
+                                        <h4 style="font-weight: 700; color: var(--primary);">Phone & Inquiries</h4>
+                                        <p style="color: var(--text-dark); font-size: 14px; margin-top: 4px;">Call or
+                                            WhatsApp us directly</p>
+                                        <a href="tel:+233240000000"
+                                            style="color: var(--secondary); font-weight: 700; font-size: 16px; text-decoration: none; display: inline-block; margin-top: 2px;">+233
+                                            24 000 0000</a>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; align-items: flex-start; gap: 16px;">
+                                    <div
+                                        style="background: rgba(30, 58, 95, 0.1); padding: 12px; border-radius: var(--radius-sm); color: var(--primary); display: flex; align-items: center; justify-content: center; width: 44px; height: 44px;">
+                                        <i class="fa-solid fa-clock" style="font-size: 18px;"></i>
+                                    </div>
+                                    <div>
+                                        <h4 style="font-weight: 700; color: var(--primary);">Business Hours</h4>
+                                        <p style="color: var(--text-dark); font-size: 14px; margin-top: 4px;">Monday -
+                                            Friday: 8:30 AM - 7:30 PM</p>
+                                        <p style="color: var(--text-light); font-size: 13px;">Saturday: 9:00 AM - 7:30
+                                            PM (Closed on Sundays)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            style="margin-top: 32px; border-top: 1px solid var(--border); padding-top: 20px; display: flex; gap: 12px;">
+                            <a href="tel:+233240000000" class="btn btn-secondary"
+                                style="text-decoration: none; flex: 1;">
+                                <i class="fa-solid fa-phone"></i> Call Store
+                            </a>
+                            <a href="https://wa.me/233240000000" target="_blank" class="btn btn-outline"
+                                style="text-decoration: none; flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: #25D366; border-color: #25D366;">
+                                <i class="fa-brands fa-whatsapp" style="font-size: 16px;"></i> WhatsApp
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Actual Google Map Aerial View -->
+                    <div class="card"
+                        style="padding: 0; overflow: hidden; min-height: 350px; border-color: var(--border);">
+                        <div class="map-iframe-container">
+                            <iframe
+                                src="https://maps.google.com/maps?q=KMAP%20Computers%20Sunyani&t=k&z=18&ie=UTF8&iwloc=&output=embed"
+                                width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW C: Admin Dashboard Overview -->
+            <section id="view-admin-dashboard" class="app-view" style="display: none;">
+                <!-- Quick Stats Grid -->
+                <div class="analytics-summary">
+                    <div class="stat-card" onclick="app.switchView('admin-reports')" style="cursor: pointer;" title="View Reports">
+                        <span class="stat-desc">Total Sales Revenue</span>
+                        <div class="stat-val" id="stat-revenue">GH₵ 0.00</div>
+                    </div>
+                    <div class="stat-card" onclick="app.showActiveOrders()" style="cursor: pointer;" title="View Active Orders">
+                        <span class="stat-desc">Active Orders</span>
+                        <div class="stat-val" id="stat-active-orders">0</div>
+                    </div>
+                    <div class="stat-card" onclick="app.showPendingOrders()" style="cursor: pointer;" title="View Pending Confirmations">
+                        <span class="stat-desc">Pending Confirmations</span>
+                        <div class="stat-val" id="stat-pending-orders" style="color: var(--warning);">0</div>
+                    </div>
+                    <div class="stat-card" onclick="app.showLowStockItems()" style="cursor: pointer;" title="View Low Stock Items">
+                        <span class="stat-desc">Low Stock Items</span>
+                        <div class="stat-val" id="stat-low-stock" style="color: var(--error);">0</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-2">
+                    <!-- Sales Trend Chart -->
+                    <div class="card">
+                        <h3 class="card-title">Sales Analytics</h3>
+                        <canvas id="salesChart" style="max-height: 250px;"></canvas>
+                    </div>
+                    <!-- Recent Orders -->
+                    <div class="card">
+                        <h3 class="card-title">Recent Customer Orders</h3>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-orders-tbody">
+                                    <!-- Recent orders rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW D: Admin Orders Management -->
+            <section id="view-admin-orders" class="app-view" style="display: none;">
+                <div class="card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+                        <h3 class="card-title" style="margin-bottom: 0;">Manage System Orders</h3>
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <select id="admin-order-status-filter" class="form-control" style="width: 160px;"
+                                onchange="app.searchOrders()">
+                                <option value="all">All Statuses</option>
+                                <option value="active_all">Active Orders</option>
+                                <option value="pending">Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="in_transit">In Transit</option>
+                                <option value="completed">Completed</option>
+                                <option value="void">Void</option>
+                            </select>
+                            <input type="text" id="admin-order-search" class="form-control"
+                                placeholder="Search by Order ID or Client..." style="width: 250px;">
+                            <button class="btn btn-primary" onclick="app.searchOrders()"><i
+                                    class="fa-solid fa-magnifying-glass"></i> Find</button>
+                            <button class="btn btn-secondary"
+                                onclick="app.downloadSelectedInvoices('.admin-order-select')"><i
+                                    class="fa-solid fa-file-pdf"></i> Download Selected</button>
+                            <button class="btn btn-secondary" onclick="app.downloadAllInvoices()"><i
+                                    class="fa-solid fa-file-pdf"></i> Export All</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px; text-align: center;"><input type="checkbox"
+                                            id="admin-order-select-all"
+                                            onchange="app.toggleSelectAll('.admin-order-select', this.checked)"></th>
+                                    <th>Order ID</th>
+                                    <th>Customer Details</th>
+                                    <th>Items Ordered</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-orders-tbody">
+                                <!-- Order List for management -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW E: Admin Product/Inventory Management -->
+            <section id="view-admin-inventory" class="app-view" style="display: none;">
+                <div class="card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+                        <h3 class="card-title" style="margin-bottom: 0;">Product Inventory</h3>
+                        <button class="btn btn-secondary" onclick="app.openProductModal()"><i
+                                class="fa-solid fa-plus"></i> Add New Product</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product ID</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-inventory-tbody">
+                                <!-- Inventory table body -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW F: Sales Report & Generation -->
+            <section id="view-admin-reports" class="app-view" style="display: none;">
+                <div class="card">
+                    <h3 class="card-title">Sales & Financial Reporting</h3>
+
+                    <div class="report-header-controls">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Preset Ranges</label>
+                            <select id="report-preset" class="form-control" style="width: 180px;"
+                                onchange="app.handleReportPresetChange()">
+                                <option value="today">Today</option>
+                                <option value="yesterday">Yesterday</option>
+                                <option value="this_week">This Week</option>
+                                <option value="this_month">This Month</option>
+                                <option value="this_year">This Year</option>
+                                <option value="custom">Custom Date Range</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="report-start-date-group" style="margin-bottom: 0; display: none;">
+                            <label>Start Date</label>
+                            <input type="date" id="report-start-date" class="form-control">
+                        </div>
+                        <div class="form-group" id="report-end-date-group" style="margin-bottom: 0; display: none;">
+                            <label>End Date</label>
+                            <input type="date" id="report-end-date" class="form-control">
+                        </div>
+                        <button class="btn btn-primary" onclick="app.generateSalesReport()"><i
+                                class="fa-solid fa-chart-line"></i> Generate Report</button>
+                        <button class="btn btn-secondary" onclick="app.downloadReportPDF()"><i
+                                class="fa-solid fa-file-pdf"></i> Save as PDF</button>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border); padding-top: 24px;">
+                        <h4 style="color: var(--primary); margin-bottom: 16px;" id="report-subtitle">Report Assessment
+                        </h4>
+                        <div class="analytics-summary">
+                            <div class="stat-card">
+                                <span class="stat-desc">Total Sales Revenue</span>
+                                <div class="stat-val" id="report-stat-revenue">GH₵ 0.00</div>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-desc">Total Orders Processed</span>
+                                <div class="stat-val" id="report-stat-count">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-desc">Average Order Size</span>
+                                <div class="stat-val" id="report-stat-average">GH₵ 0.00</div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table id="sales-report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Order ID</th>
+                                        <th>Client Name</th>
+                                        <th>Claim Method</th>
+                                        <th>Status</th>
+                                        <th style="text-align: right;">Total Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-orders-tbody">
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; color: var(--text-light);">No data
+                                            generated for this range yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW G: Daily Backup & System Settings (Super Admin + Backup panel) -->
+            <section id="view-admin-backups" class="app-view" style="display: none;">
+                <div class="grid grid-2">
+                    <div class="card">
+                        <h3 class="card-title"><i class="fa-solid fa-database"></i> Database Management & Backups</h3>
+                        <p style="color: var(--text-light); font-size: 14px; margin-bottom: 20px;">
+                            Ensure data integrity with daily localized backups. Super Admin / Admin can export the
+                            entire system state (orders, clients, logs, inventory) as a encrypted JSON backup.
+                        </p>
+
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                                <div>
+                                    <strong>Download Complete Local Backup</strong>
+                                    <div style="font-size: 12px; color: var(--text-light);" id="backup-timestamp">Last
+                                        backup: Never</div>
+                                </div>
+                                <button class="btn btn-primary" onclick="app.downloadBackup()">
+                                    <i class="fa-solid fa-download"></i> Backup Now
+                                </button>
+                            </div>
+
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                                <div>
+                                    <strong>Restore Backup File</strong>
+                                    <div style="font-size: 12px; color: var(--text-light);">Restore previous JSON export
+                                    </div>
+                                </div>
+                                <label class="btn btn-outline" style="cursor: pointer;">
+                                    <i class="fa-solid fa-upload"></i> Restore <input type="file" id="restore-db-file"
+                                        style="display: none;" onchange="app.restoreBackup(this)">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Super Admin View: Staff/Admin User Creation -->
+                    <div class="card" id="superadmin-user-card" style="display: none;">
+                        <h3 class="card-title"><i class="fa-solid fa-users-gear"></i> System Staff Directory</h3>
+                        <p style="color: var(--text-light); font-size: 14px; margin-bottom: 16px;">
+                            Manage user profiles and system administrators.
+                        </p>
+                        <form id="create-staff-form" style="margin-bottom: 24px;">
+                            <div class="grid grid-2" style="gap: 12px;">
+                                <div class="form-group">
+                                    <label>Username</label>
+                                    <input type="text" id="staff-username" class="form-control"
+                                        placeholder="e.g. staff_elorm" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Role</label>
+                                    <select id="staff-role" class="form-control" required>
+                                        <option value="admin">Admin</option>
+                                        <option value="superadmin">Super Admin</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" id="staff-password" class="form-control" placeholder="••••••••"
+                                    required>
+                            </div>
+                            <button type="submit" class="btn btn-secondary" style="width: 100%;">
+                                <i class="fa-solid fa-user-plus"></i> Add Account
+                            </button>
+                        </form>
+
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Role</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="staff-list-tbody">
+                                    <!-- Dynamic list of admins -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW H: Admin Promotions Management -->
+            <section id="view-admin-promos" class="app-view" style="display: none;">
+                <div class="grid grid-2">
+                    <!-- Create Promotion Card -->
+                    <div class="card">
+                        <h3 class="card-title"><i class="fa-solid fa-tag"></i> Create Promotion</h3>
+                        <form id="create-promo-form">
+                            <div class="form-group">
+                                <label>Target Scope</label>
+                                <select id="promo-scope" class="form-control" onchange="app.handlePromoScopeChange()">
+                                    <option value="category">Category-wide</option>
+                                    <option value="product">Specific Product</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" id="promo-category-group">
+                                <label>Target Category</label>
+                                <select id="promo-category" class="form-control">
+                                    <option value="Laptops">Laptops</option>
+                                    <option value="Accessories">Accessories</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" id="promo-product-group" style="display: none;">
+                                <label>Target Product</label>
+                                <select id="promo-product" class="form-control">
+                                    <!-- Options populated dynamically -->
+                                </select>
+                            </div>
+
+                            <div class="grid grid-2" style="gap: 12px;">
+                                <div class="form-group">
+                                    <label>Discount Type</label>
+                                    <select id="promo-type" class="form-control">
+                                        <option value="percent">Percentage Off (%)</option>
+                                        <option value="amount">Fixed Amount Off (GH₵)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Discount Value</label>
+                                    <input type="number" id="promo-value" class="form-control"
+                                        placeholder="e.g. 10 or 150" required min="1">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-secondary" style="width: 100%;">
+                                <i class="fa-solid fa-plus"></i> Apply Promotion
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Active Promotions Card -->
+                    <div class="card">
+                        <h3 class="card-title">Active Promotions</h3>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Target</th>
+                                        <th>Discount</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="promos-list-tbody">
+                                    <!-- Dynamic list of promotions -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW F: Admin Hire Purchase Management -->
+            <section id="view-admin-hp" class="app-view" style="display: none;">
+                <div class="card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+                        <h3 class="card-title" style="margin-bottom: 0;">Hire Purchase Records</h3>
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <select id="admin-hp-status-filter" class="form-control" style="width: 150px;"
+                                onchange="app.renderHP()">
+                                <option value="all">All Agreements</option>
+                                <option value="active">Active</option>
+                                <option value="overdue">Overdue</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                            <input type="text" id="admin-hp-search" class="form-control"
+                                placeholder="Search client name, phone..." style="width: 250px;"
+                                oninput="app.renderHP()">
+                            <button class="btn btn-secondary" onclick="app.openNewHPModal()"><i
+                                    class="fa-solid fa-plus"></i> New Hire Purchase</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Client Details</th>
+                                    <th>Item Details</th>
+                                    <th>Total Price</th>
+                                    <th>Deposit</th>
+                                    <th>Outstanding</th>
+                                    <th>Paid Installments</th>
+                                    <th>Next Due Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-hp-tbody">
+                                <!-- HP rows injected dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Sidebar Backdrop for Mobile -->
+        <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="app.toggleSidebar()"></div>
+    </div>
+
+    <!-- 3. Modal for Ordering & Delivery Details (Clients) -->
+    <div id="modal-checkout-call" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="color: var(--primary); font-weight: 800; font-size: 22px; margin-bottom: 12px;">
+                <i class="fa-solid fa-phone-volume"></i> Complete Your Order
+            </h3>
+
+            <div
+                style="background: rgba(46, 125, 100, 0.1); border-left: 4px solid var(--secondary); padding: 16px; border-radius: var(--radius-sm); margin-bottom: 20px;">
+                <strong style="color: var(--secondary);">Order Receipt & Unique ID generated:</strong>
+                <p id="modal-order-id"
+                    style="font-family: monospace; font-size: 18px; font-weight: 700; margin-top: 8px; color: var(--primary);">
+                </p>
+            </div>
+
+            <p style="font-size: 14px; margin-bottom: 20px;">
+                Please click the button below to dial our support line and finalize your order. An administrator has
+                been notified.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <a href="tel:+233240000000" class="btn btn-secondary" style="text-decoration: none; height: 48px;">
+                    <i class="fa-solid fa-phone"></i> Call +233 24 000 0000
+                </a>
+                <button class="btn btn-outline" onclick="app.closeModal()">Close & View Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Modal for Product Add/Edit (Admins) -->
+    <div id="modal-product-form" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <h3 id="product-modal-title"
+                style="color: var(--primary); font-weight: 800; font-size: 22px; margin-bottom: 16px;">
+                Add New Product
+            </h3>
+            <form id="product-details-form">
+                <input type="hidden" id="form-product-id">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" id="form-product-name" class="form-control" placeholder="e.g. EliteBook Pro 15"
+                        required>
+                </div>
+                <div class="grid grid-3" style="gap: 12px;">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="form-product-category" class="form-control" required>
+                            <option value="Laptops">Laptops</option>
+                            <option value="Accessories">Accessories</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Price (GH₵)</label>
+                        <input type="number" id="form-product-price" class="form-control" placeholder="8500" required
+                            min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Stock Qty</label>
+                        <input type="number" id="form-product-stock" class="form-control" placeholder="15" required
+                            min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Specifications</label>
+                    <input type="text" id="form-product-spec" class="form-control"
+                        placeholder="e.g. Intel i7, 16GB RAM, 512GB SSD" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Product Images (Up to 6 URLs / Upload Files)</label>
+                    <div class="image-input-grid" id="form-images-container">
+                        <input type="text" class="form-control product-img-url" placeholder="Image URL 1"
+                            style="font-size: 12px; padding: 6px 10px;">
+                        <input type="text" class="form-control product-img-url" placeholder="Image URL 2"
+                            style="font-size: 12px; padding: 6px 10px;">
+                        <input type="text" class="form-control product-img-url" placeholder="Image URL 3"
+                            style="font-size: 12px; padding: 6px 10px;">
+                        <input type="text" class="form-control product-img-url" placeholder="Image URL 4"
+                            style="font-size: 12px; padding: 6px 10px;">
+                        <input type="text" class="form-control product-img-url" placeholder="Image URL 5"
+                            style="font-size: 12px; padding: 6px 10px;">
+                        <input type="text" class="form-control product-img-url" placeholder="Image URL 6"
+                            style="font-size: 12px; padding: 6px 10px;">
+                    </div>
+                    <div style="margin-top: 8px;">
+                        <span style="font-size: 11px; color: var(--text-light);">Or upload local files directly (first
+                            selected fills empty slots):</span>
+                        <input type="file" id="form-product-file-upload" class="form-control"
+                            style="font-size: 12px; padding: 4px;" multiple accept="image/*">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-secondary" style="flex: 1;">Save Product</button>
+                    <button type="button" class="btn btn-outline" onclick="app.closeProductModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. Modal for Product Inspection Gallery (Clients) -->
+    <div id="modal-product-inspect" class="modal-overlay">
+        <div class="modal-content" style="max-width: 950px; padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                <div>
+                    <h3 id="inspect-product-name" style="color: var(--primary); font-weight: 800; font-size: 22px;">
+                        Product Details</h3>
+                    <span id="inspect-product-category" class="badge badge-primary"
+                        style="margin-top: 4px;">Laptops</span>
+                </div>
+                <button onclick="app.closeInspectModal()" class="btn btn-outline"
+                    style="padding: 6px 12px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-2" style="gap: 20px; align-items: start;">
+                <!-- Gallery Section -->
+                <div class="inspect-gallery">
+                    <div class="inspect-main-img">
+                        <img id="inspect-img-display" src="" alt="Product view" onclick="app.openLightbox(this.src)"
+                            style="cursor: zoom-in;">
+                    </div>
+                    <div class="inspect-thumbnails" id="inspect-thumbnails-container">
+                        <!-- Thumbnails injected here -->
+                    </div>
+                </div>
+
+                <!-- Info Section -->
+                <div
+                    style="display: flex; flex-direction: column; gap: 16px; justify-content: space-between; height: 100%;">
+                    <div>
+                        <h4
+                            style="font-weight: 700; color: var(--text-light); font-size: 12px; text-transform: uppercase;">
+                            Specifications</h4>
+                        <p id="inspect-product-spec"
+                            style="font-size: 15px; color: var(--text-dark); margin-top: 4px; line-height: 1.6;"></p>
+                    </div>
+
+                    <div
+                        style="border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 16px 0; margin: 8px 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span
+                                    style="font-size: 12px; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Price</span>
+                                <div style="display: flex; align-items: baseline;">
+                                    <span id="inspect-product-original-price" class="original-price"
+                                        style="display: none;">GH₵ 0.00</span>
+                                    <strong id="inspect-product-price"
+                                        style="font-size: 24px; color: var(--accent);">GH₵ 0.00</strong>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <span
+                                    style="font-size: 12px; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Availability</span>
+                                <span id="inspect-product-stock-status"
+                                    style="font-weight: 700; font-size: 14px;"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="inspect-add-to-cart-btn" class="btn btn-primary"
+                        style="width: 100%; height: 48px; font-size: 15px;">
+                        <i class="fa-solid fa-cart-plus"></i> Add to Shopping Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Fullscreen Image Lightbox Modal -->
+    <div id="lightbox-modal" class="lightbox-overlay" onclick="app.closeLightbox()">
+        <button class="lightbox-close" onclick="app.closeLightbox()"><i class="fa-solid fa-xmark"></i></button>
+        <button class="lightbox-nav-btn lightbox-prev-btn" onclick="event.stopPropagation(); app.prevLightboxImage()"><i
+                class="fa-solid fa-chevron-left"></i></button>
+        <button class="lightbox-nav-btn lightbox-next-btn" onclick="event.stopPropagation(); app.nextLightboxImage()"><i
+                class="fa-solid fa-chevron-right"></i></button>
+        <div class="lightbox-content" onclick="event.stopPropagation()">
+            <img id="lightbox-img" class="lightbox-img" src="" alt="Large product view">
+        </div>
+    </div>
+
+    <!-- 7. Modal for New Hire Purchase Agreement (Admins) -->
+    <div id="modal-hp-form" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <h3 style="color: var(--primary); font-weight: 800; font-size: 22px; margin-bottom: 16px;">
+                New Hire Purchase Agreement
+            </h3>
+            <form id="hp-details-form">
+                <div class="form-group">
+                    <label>Client Name</label>
+                    <input type="text" id="form-hp-client-name" class="form-control" placeholder="e.g. Kwame Mensah"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" id="form-hp-client-phone" class="form-control" placeholder="e.g. 0241234567"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label>Select Product</label>
+                    <select id="form-hp-product-select" class="form-control"
+                        onchange="app.handleHPProductChange(this.value)">
+                        <!-- Dynamic options -->
+                    </select>
+                </div>
+                <div class="form-group" id="form-hp-custom-product-group" style="display: none;">
+                    <label>Custom Machine/Item Description</label>
+                    <input type="text" id="form-hp-product-custom" class="form-control"
+                        placeholder="e.g. Custom Specs Laptop">
+                </div>
+                <div class="grid grid-3" style="gap: 12px;">
+                    <div class="form-group">
+                        <label>Price (GH₵)</label>
+                        <input type="number" id="form-hp-price" class="form-control" placeholder="6500" required
+                            min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Initial Deposit (GH₵)</label>
+                        <input type="number" id="form-hp-deposit" class="form-control" placeholder="2500" required
+                            min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Duration (Months)</label>
+                        <input type="number" id="form-hp-months" class="form-control" placeholder="6" required min="1"
+                            max="24">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Agreement Start Date</label>
+                    <input type="date" id="form-hp-date" class="form-control" required>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-secondary" style="flex: 1;">Create Agreement</button>
+                    <button type="button" class="btn btn-outline" onclick="app.closeNewHPModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 8. Modal for Hire Purchase Installments Details (Admins) -->
+    <div id="modal-hp-details" class="modal-overlay">
+        <div class="modal-content" style="max-width: 750px; padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                <div>
+                    <h3 style="color: var(--primary); font-weight: 800; font-size: 22px;">Installment Schedule & Status
+                    </h3>
+                </div>
+                <button onclick="document.getElementById('modal-hp-details').classList.remove('active')"
+                    class="btn btn-outline"
+                    style="padding: 6px 12px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div id="hp-details-info"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; background: rgba(0,0,0,0.02); padding: 16px; border-radius: var(--radius-sm); margin-bottom: 20px; font-size: 14px;">
+                <!-- Summary of agreement injected dynamically -->
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Due Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hp-details-installments-tbody">
+                        <!-- Installments list -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for User Profile Details -->
+    <div id="modal-user-profile" class="modal-overlay">
+        <div class="modal-content" style="max-width: 450px; position: relative;">
+            <button onclick="app.closeUserProfileModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 4px; display: flex; align-items: center; justify-content: center;" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 style="color: var(--primary); font-weight: 800; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-user-gear"></i> User Profile
+            </h3>
+            
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 24px; padding: 16px; background: var(--bg-light); border-radius: var(--radius-lg); border: 1px solid var(--border);">
+                <div id="profile-modal-avatar" style="width: 72px; height: 72px; background: var(--primary); color: #000000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; box-shadow: var(--shadow-sm);">U</div>
+                <div style="text-align: center;">
+                    <h4 id="profile-modal-name" style="font-weight: 700; font-size: 18px; margin: 0 0 4px 0;">Name</h4>
+                    <span id="profile-modal-username" style="font-family: monospace; font-size: 14px; background: var(--white); padding: 4px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);">Username</span>
+                </div>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button class="btn btn-primary" onclick="app.openChangePasswordFromProfile()" style="height: 44px; width: 100%; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; color: #000000;">
+                    <i class="fa-solid fa-key"></i> Change Password
+                </button>
+                <button class="btn btn-outline" onclick="app.closeUserProfileModal()" style="height: 44px; width: 100%;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 9. Modal for Universal Change Password (All Users) -->
+    <div id="modal-change-password" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px; padding: 24px;">
+            <h3 style="color: var(--primary); font-weight: 800; font-size: 20px; margin-bottom: 16px;">
+                <i class="fa-solid fa-key"></i> Change Password
+            </h3>
+            <form id="change-password-form">
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="form-pw-current" class="form-control" required
+                        placeholder="Enter current password">
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="form-pw-new" class="form-control" required
+                        placeholder="Enter new password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="form-pw-confirm" class="form-control" required
+                        placeholder="Re-type new password">
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-secondary" style="flex: 1;">Update Password</button>
+                    <button type="button" class="btn btn-outline"
+                        onclick="app.closeChangePasswordModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
