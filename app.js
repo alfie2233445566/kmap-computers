@@ -15,13 +15,29 @@ const triggerKVSync = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-    }).catch(err => console.error('KV Sync Error:', err));
+    })
+    .then(async (res) => {
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            console.error('KV Sync Failed:', res.status, errData);
+            if (window.app && typeof window.app.showToast === 'function') {
+                if (res.status === 413) {
+                    window.app.showToast('⚠️ Cloud sync failed: Photos payload too large for KV storage!', 'error');
+                } else if (res.status === 500) {
+                    window.app.showToast(`⚠️ Cloud sync failed: ${errData.error || 'Server error'}`, 'error');
+                }
+            }
+        } else {
+            console.log('✓ KV Sync successful');
+        }
+    })
+    .catch(err => console.error('KV Sync Network Error:', err));
 };
 
 const safeLocalStorage = {
     getItem: (key) => {
         try {
-            return window.localStorage.getItem(key);
+            return window.localStorage.getItem(key) || storage[key] || null;
         } catch (e) {
             return storage[key] || null;
         }
@@ -85,7 +101,7 @@ class KmapStoreApp {
                 for (const key of Object.keys(data)) {
                     if (data[key]) {
                         const cloudVal = JSON.stringify(data[key]);
-                        const localVal = window.localStorage.getItem(key);
+                        const localVal = safeLocalStorage.getItem(key);
                         if (cloudVal !== localVal) {
                             // Update silently to prevent triggering push
                             safeLocalStorage.setItem(key, cloudVal, true);
@@ -94,7 +110,16 @@ class KmapStoreApp {
                     }
                 }
                 if (updated) {
-                    // Trigger cross-tab sync to refresh UI instantly
+                    // Update active views immediately
+                    this.renderClientCatalog();
+                    this.renderPromotions();
+                    this.renderCart();
+                    this.renderAdminInventory();
+                    this.renderAdminOverview();
+                    this.renderClientOrders();
+                    this.renderAdminOrders();
+
+                    // Trigger cross-tab sync to refresh other local tabs
                     window.dispatchEvent(new StorageEvent('storage', { key: 'kmap_orders' }));
                     window.dispatchEvent(new StorageEvent('storage', { key: 'kmap_products' }));
                 }
@@ -430,12 +455,12 @@ class KmapStoreApp {
         }
 
         if (needsReset) {
-            safeLocalStorage.setItem('kmap_products', JSON.stringify(defaultProducts));
-            safeLocalStorage.setItem('kmap_users', JSON.stringify(defaultUsers));
-            safeLocalStorage.setItem('kmap_orders', JSON.stringify(defaultOrders));
-            safeLocalStorage.setItem('kmap_logs', JSON.stringify([]));
-            safeLocalStorage.setItem('kmap_promos', JSON.stringify([]));
-            safeLocalStorage.setItem('kmap_hire_purchase', JSON.stringify(defaultHP));
+            safeLocalStorage.setItem('kmap_products', JSON.stringify(defaultProducts), true);
+            safeLocalStorage.setItem('kmap_users', JSON.stringify(defaultUsers), true);
+            safeLocalStorage.setItem('kmap_orders', JSON.stringify(defaultOrders), true);
+            safeLocalStorage.setItem('kmap_logs', JSON.stringify([]), true);
+            safeLocalStorage.setItem('kmap_promos', JSON.stringify([]), true);
+            safeLocalStorage.setItem('kmap_hire_purchase', JSON.stringify(defaultHP), true);
         }
 
         this.db = {
@@ -2133,8 +2158,8 @@ class KmapStoreApp {
                 img.onerror = reject;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 500;
-                    const MAX_HEIGHT = 500;
+                    const MAX_WIDTH = 400;
+                    const MAX_HEIGHT = 400;
                     let width = img.width;
                     let height = img.height;
 
@@ -2154,8 +2179,8 @@ class KmapStoreApp {
                     canvas.height = Math.round(height);
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    // Standardize to clean, lightweight JPEG
-                    const base64 = canvas.toDataURL('image/jpeg', 0.75);
+                    // Standardize to clean, lightweight JPEG (0.6 quality for ultra compact payload)
+                    const base64 = canvas.toDataURL('image/jpeg', 0.6);
                     resolve(base64);
                 };
                 img.src = e.target.result;

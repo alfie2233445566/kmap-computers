@@ -12,7 +12,8 @@ export default async function handler(request, response) {
       }
       return response.status(200).json(data);
     } else if (request.method === 'POST') {
-      const { updates } = request.body; // Expecting { updates: { kmap_users: [...], kmap_orders: [...] } }
+      const body = typeof request.body === 'string' ? JSON.parse(request.body) : (request.body || {});
+      const { updates } = body;
       if (!updates || typeof updates !== 'object') {
         return response.status(400).json({ error: 'Invalid payload' });
       }
@@ -28,6 +29,7 @@ export default async function handler(request, response) {
     }
   } catch (error) {
     console.error('KV Error:', error);
-    return response.status(500).json({ error: 'Internal Server Error' });
+    return response.status(500).json({ error: error.message || 'Internal Server Error' });
   }
 }
+
