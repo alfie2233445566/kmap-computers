@@ -55,7 +55,7 @@ const safeLocalStorage = {
             try {
                 window.kvSyncQueue[key] = JSON.parse(val);
                 if (window.kvSyncTimeout) clearTimeout(window.kvSyncTimeout);
-                window.kvSyncTimeout = setTimeout(triggerKVSync, 1000); // Debounce uploads
+                window.kvSyncTimeout = setTimeout(triggerKVSync, 400); // Fast debounce uploads
             } catch(e) {}
         }
     },
