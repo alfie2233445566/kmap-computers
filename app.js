@@ -108,12 +108,21 @@ class KmapStoreApp {
                     indicator.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #059669;"></span> Cloud Sync Live`;
                     indicator.style.background = 'rgba(16,185,129,0.1)';
                     indicator.style.color = '#059669';
-                    indicator.title = 'Connected to Vercel KV cloud database';
+                    indicator.title = 'Connected to Vercel KV / Upstash Redis';
                 }
                 const data = await res.json();
+
+                // Auto-seed cloud if kmap_products is empty in cloud storage
+                if (!data.kmap_products || (Array.isArray(data.kmap_products) && data.kmap_products.length === 0)) {
+                    const localProducts = this.db.getProducts();
+                    if (localProducts && localProducts.length > 0) {
+                        this.forceCloudSyncAll(true);
+                    }
+                }
+
                 let updated = false;
                 for (const key of Object.keys(data)) {
-                    if (data[key]) {
+                    if (data[key] !== null && data[key] !== undefined) {
                         // Filter out legacy test data from incoming cloud sync if still present in KV
                         if (key === 'kmap_orders' && Array.isArray(data[key])) {
                             data[key] = data[key].filter(o => o.id !== 'ORD-8932' && o.id !== 'ORD-7612' && o.clientName !== 'Kwame Mensah' && o.clientName !== 'Ama Serwaa');
@@ -125,10 +134,10 @@ class KmapStoreApp {
                             data[key] = data[key].filter(u => u.username !== '0241234567' && u.name !== 'Kwame Mensah');
                         }
 
-                        const cloudVal = JSON.stringify(data[key]);
+                        let cloudVal = typeof data[key] === 'string' ? data[key] : JSON.stringify(data[key]);
                         const localVal = safeLocalStorage.getItem(key);
                         if (cloudVal !== localVal) {
-                            // Update silently to prevent triggering push
+                            // Update silently to prevent triggering loop
                             safeLocalStorage.setItem(key, cloudVal, true);
                             updated = true;
                         }
@@ -173,6 +182,39 @@ class KmapStoreApp {
         }
     }
 
+    async forceCloudSyncAll(silent = false) {
+        const products = this.db.getProducts();
+        if (!silent) this.showToast('☁️ Syncing products to cloud database...');
+        try {
+            const res = await fetch('/api/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    updates: {
+                        kmap_products: products,
+                        kmap_users: this.db.getUsers(),
+                        kmap_promos: this.db.getPromos(),
+                        kmap_hire_purchase: this.db.getHP()
+                    }
+                })
+            });
+            if (res.ok) {
+                if (!silent) this.showToast('✓ Cloud database updated! All devices synced.', 'success');
+                const indicator = document.getElementById('sync-status-indicator');
+                if (indicator) {
+                    indicator.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #059669;"></span> Cloud Sync Live`;
+                    indicator.style.background = 'rgba(16,185,129,0.1)';
+                    indicator.style.color = '#059669';
+                }
+            } else {
+                const errData = await res.json().catch(() => ({}));
+                if (!silent) this.showToast(`⚠️ Sync failed: ${errData.error || res.statusText}`, 'error');
+            }
+        } catch (e) {
+            if (!silent) this.showToast('⚠️ Network error connecting to cloud sync', 'error');
+        }
+    }
+
     loadCart() {
         try {
             const saved = safeLocalStorage.getItem('kmap_cart');
@@ -209,16 +251,55 @@ class KmapStoreApp {
         this.switchView('client-store');
     }
 
-    openLoginModal() {
+    openLoginModal(tab = 'signin') {
         const modal = document.getElementById('modal-login');
         if (modal) {
             modal.classList.add('active');
-            const loginForm = document.getElementById('login-form');
-            const signupForm = document.getElementById('signup-form');
-            const errMsg = document.getElementById('login-error-msg');
+            this.showAuthTab(tab);
+        }
+    }
+
+    showAuthTab(tab) {
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const tabSignIn = document.getElementById('tab-btn-signin');
+        const tabSignUp = document.getElementById('tab-btn-signup');
+        const subtitle = document.getElementById('auth-modal-subtitle');
+        const err = document.getElementById('login-error-msg');
+        if (err) err.style.display = 'none';
+
+        if (tab === 'signup') {
+            if (loginForm) loginForm.style.display = 'none';
+            if (signupForm) signupForm.style.display = 'block';
+            if (subtitle) subtitle.innerText = 'Create a new customer account';
+            if (tabSignUp) {
+                tabSignUp.style.background = 'var(--white)';
+                tabSignUp.style.color = 'var(--primary)';
+                tabSignUp.style.border = '1px solid var(--border)';
+                tabSignUp.style.fontWeight = '700';
+            }
+            if (tabSignIn) {
+                tabSignIn.style.background = 'transparent';
+                tabSignIn.style.color = 'var(--text-light)';
+                tabSignIn.style.border = 'none';
+                tabSignIn.style.fontWeight = '600';
+            }
+        } else {
             if (loginForm) loginForm.style.display = 'block';
             if (signupForm) signupForm.style.display = 'none';
-            if (errMsg) errMsg.style.display = 'none';
+            if (subtitle) subtitle.innerText = 'Welcome! Sign in to your account';
+            if (tabSignIn) {
+                tabSignIn.style.background = 'var(--white)';
+                tabSignIn.style.color = 'var(--primary)';
+                tabSignIn.style.border = '1px solid var(--border)';
+                tabSignIn.style.fontWeight = '700';
+            }
+            if (tabSignUp) {
+                tabSignUp.style.background = 'transparent';
+                tabSignUp.style.color = 'var(--text-light)';
+                tabSignUp.style.border = 'none';
+                tabSignUp.style.fontWeight = '600';
+            }
         }
     }
 
@@ -611,20 +692,22 @@ class KmapStoreApp {
             }
         });
 
-        // Toggle Login / Signup Forms
-        document.getElementById('link-show-signup').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('login-form').style.display = 'none';
-            document.getElementById('signup-form').style.display = 'block';
-            document.getElementById('login-error-msg').style.display = 'none';
-        });
+        // Toggle Login / Signup Forms (Safeguarded fallback)
+        const linkShowSignup = document.getElementById('link-show-signup');
+        if (linkShowSignup) {
+            linkShowSignup.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showAuthTab('signup');
+            });
+        }
 
-        document.getElementById('link-show-login').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('signup-form').style.display = 'none';
-            document.getElementById('login-form').style.display = 'block';
-            document.getElementById('login-error-msg').style.display = 'none';
-        });
+        const linkShowLogin = document.getElementById('link-show-login');
+        if (linkShowLogin) {
+            linkShowLogin.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showAuthTab('signin');
+            });
+        }
 
         // Handle Signup Form Submit
         document.getElementById('signup-form').addEventListener('submit', (e) => {
@@ -842,6 +925,7 @@ class KmapStoreApp {
             this.db.saveProducts(products);
             this.closeProductModal();
             this.renderAdminInventory();
+            this.forceCloudSyncAll(false);
         });
 
         // Enhanced image compression & live preview handler
@@ -1126,8 +1210,8 @@ class KmapStoreApp {
         if (logoutBtn) {
             if (this.currentUser.role === 'guest') {
                 logoutBtn.style.color = 'var(--accent)';
-                logoutBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In / Staff';
-                logoutBtn.onclick = () => this.openLoginModal();
+                logoutBtn.innerHTML = '<i class="fa-solid fa-user"></i> Sign In / Sign Up';
+                logoutBtn.onclick = () => this.openLoginModal('signin');
             } else {
                 logoutBtn.style.color = 'var(--error)';
                 logoutBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> Logout';
@@ -2249,6 +2333,7 @@ class KmapStoreApp {
             p.stock = Math.max(0, parseInt(newStock) || 0);
             this.db.saveProducts(products);
             this.showToast(`Stock updated for ${p.name}`);
+            this.forceCloudSyncAll(true);
         }
     }
 
@@ -2378,6 +2463,7 @@ class KmapStoreApp {
         this.db.saveProducts(products);
         this.showToast("Product deleted from system inventory.");
         this.renderAdminInventory();
+        this.forceCloudSyncAll(false);
     }
 
     // ADMIN: Invoicing & Reporting assessment

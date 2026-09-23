@@ -31,23 +31,35 @@
     <div id="modal-login" class="modal-overlay" onclick="if(event.target===this) app.closeLoginModal()">
         <div class="login-card" style="position: relative; max-width: 440px; margin: 20px;">
             <button type="button" onclick="app.closeLoginModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light); line-height: 1; padding: 4px;" title="Close">&times;</button>
-            <div style="text-align: center; margin-bottom: 24px;">
-                <div style="font-size: 40px; color: var(--primary); margin-bottom: 12px;"><i
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="font-size: 36px; color: var(--primary); margin-bottom: 8px;"><i
                         class="fa-solid fa-laptop-code"></i></div>
-                <h2 style="color: var(--primary); font-weight: 800; font-size: 24px;">KMAP COMPUTERS</h2>
-                <p style="color: var(--text-light); font-size: 13px;">Sign in to your account or staff portal</p>
+                <h2 style="color: var(--primary); font-weight: 800; font-size: 22px;">KMAP COMPUTERS</h2>
+                <p style="color: var(--text-light); font-size: 13px;" id="auth-modal-subtitle">Welcome! Sign in or create an account</p>
+            </div>
+
+            <!-- Tab Switcher: Sign In / Sign Up -->
+            <div style="display: flex; background: var(--bg); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 20px; gap: 4px;">
+                <button type="button" id="tab-btn-signin" onclick="app.showAuthTab('signin')"
+                    style="flex: 1; height: 38px; font-size: 14px; font-weight: 700; border-radius: 4px; background: var(--white); color: var(--primary); border: 1px solid var(--border); cursor: pointer;">
+                    Sign In
+                </button>
+                <button type="button" id="tab-btn-signup" onclick="app.showAuthTab('signup')"
+                    style="flex: 1; height: 38px; font-size: 14px; font-weight: 600; border-radius: 4px; background: transparent; color: var(--text-light); border: none; cursor: pointer;">
+                    Sign Up
+                </button>
             </div>
 
             <div id="login-error-msg"
                 style="color: var(--error); margin-bottom: 16px; text-align: center; display: none; font-size: 14px; font-weight: 600;">
             </div>
 
-            <!-- Login Form -->
+            <!-- Sign In Form -->
             <form id="login-form">
                 <div class="form-group">
                     <label for="login-username">Username or Phone</label>
                     <input type="text" id="login-username" class="form-control"
-                        placeholder="admin, superadmin, or client phone" required>
+                        placeholder="Enter username or phone" required>
                 </div>
                 <div class="form-group">
                     <label for="login-password">Password</label>
@@ -56,46 +68,44 @@
                         <i class="fa-solid fa-eye" id="toggle-login-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);" onclick="app.togglePasswordVisibility('login-password', 'toggle-login-password')"></i>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; margin-top: 12px;">
+                <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; margin-top: 12px; font-size: 15px;">
                     <i class="fa-solid fa-right-to-bracket"></i> Sign In
                 </button>
 
                 <div style="text-align: center; margin-top: 16px;">
-                    <span style="font-size: 13px; color: var(--text-dark);">Don't have an account? </span>
-                    <a href="#" id="link-show-signup"
-                        style="font-size: 13px; color: var(--secondary); font-weight: 700; text-decoration: none;">Sign
-                        Up</a>
+                    <span style="font-size: 13px; color: var(--text-dark);">New to Kmap? </span>
+                    <a href="javascript:void(0)" onclick="app.showAuthTab('signup')"
+                        style="font-size: 13px; color: var(--secondary); font-weight: 700; text-decoration: none;">Create an Account</a>
                 </div>
             </form>
 
-            <!-- Signup Form (Hidden by default) -->
+            <!-- Sign Up Form (Hidden by default) -->
             <form id="signup-form" style="display: none;">
                 <div class="form-group">
                     <label for="signup-name">Full Name</label>
-                    <input type="text" id="signup-name" class="form-control" placeholder="Enter Your Full Name"
+                    <input type="text" id="signup-name" class="form-control" placeholder="Enter your full name"
                         required>
                 </div>
                 <div class="form-group">
                     <label for="signup-username">Phone Number</label>
-                    <input type="text" id="signup-username" class="form-control" placeholder="Enter Your Mobile Number"
+                    <input type="text" id="signup-username" class="form-control" placeholder="e.g. 0241234567"
                         required>
                 </div>
                 <div class="form-group">
                     <label for="signup-password">Password</label>
                     <div style="position: relative;">
-                        <input type="password" id="signup-password" class="form-control" placeholder="Enter Password" required style="padding-right: 40px;">
+                        <input type="password" id="signup-password" class="form-control" placeholder="Create password" required style="padding-right: 40px;">
                         <i class="fa-solid fa-eye" id="toggle-signup-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);" onclick="app.togglePasswordVisibility('signup-password', 'toggle-signup-password')"></i>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-secondary" style="width: 100%; height: 48px; margin-top: 12px;">
-                    <i class="fa-solid fa-user-plus"></i> Register & Login
+                <button type="submit" class="btn btn-secondary" style="width: 100%; height: 48px; margin-top: 12px; font-size: 15px;">
+                    <i class="fa-solid fa-user-plus"></i> Create Account & Sign In
                 </button>
 
                 <div style="text-align: center; margin-top: 16px;">
                     <span style="font-size: 13px; color: var(--text-dark);">Already have an account? </span>
-                    <a href="#" id="link-show-login"
-                        style="font-size: 13px; color: var(--primary); font-weight: 700; text-decoration: none;">Sign
-                        In</a>
+                    <a href="javascript:void(0)" onclick="app.showAuthTab('signin')"
+                        style="font-size: 13px; color: var(--primary); font-weight: 700; text-decoration: none;">Sign In</a>
                 </div>
             </form>
 
@@ -166,9 +176,9 @@
                         <i class="fa-solid fa-gauge"></i> <span id="admin-toggle-text">Admin Panel</span>
                     </button>
 
-                    <!-- Sign In / Staff button for guests -->
-                    <button id="btn-topbar-signin" class="btn btn-primary" onclick="app.openLoginModal()" style="height: 38px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; border-radius: var(--radius-sm);">
-                        <i class="fa-solid fa-right-to-bracket"></i> Sign In / Staff
+                    <!-- Sign In / Sign Up button for guests -->
+                    <button id="btn-topbar-signin" class="btn btn-primary" onclick="app.openLoginModal('signin')" style="height: 38px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; border-radius: var(--radius-sm);">
+                        <i class="fa-solid fa-user"></i> Sign In / Sign Up
                     </button>
 
                     <!-- User profile widget (hidden for guests, visible when logged in) -->
@@ -520,8 +530,13 @@
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
                         <h3 class="card-title" style="margin-bottom: 0;">Product Inventory</h3>
-                        <button class="btn btn-secondary" onclick="app.openProductModal()"><i
-                                class="fa-solid fa-plus"></i> Add New Product</button>
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <button class="btn btn-outline" onclick="app.forceCloudSyncAll()" title="Push all inventory and photos to cloud database">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Sync to Cloud
+                            </button>
+                            <button class="btn btn-secondary" onclick="app.openProductModal()"><i
+                                    class="fa-solid fa-plus"></i> Add New Product</button>
+                        </div>
                     </div>
                     <div class="table-responsive">
                         <table>
@@ -1172,7 +1187,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=2.8"></script>
+    <script src="app.js?v=2.9"></script>
 </body>
 
 </html>
