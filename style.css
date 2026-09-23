@@ -313,20 +313,29 @@ body {
 }
 
 .product-img {
-    height: 200px;
-    background-color: var(--bg-light);
+    height: 220px;
+    width: 100%;
+    background-color: #f1f5f9;
     border-radius: var(--radius-sm);
     margin-bottom: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    position: relative;
 }
 
 .product-img img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: transform 0.35s ease;
+}
+
+.product-card:hover .product-img img {
+    transform: scale(1.05);
 }
 
 .product-price {

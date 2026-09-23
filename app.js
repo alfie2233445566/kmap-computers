@@ -122,12 +122,14 @@ class KmapStoreApp {
         const syncUrl = getSyncApiUrl();
         try {
             const res = await fetch(syncUrl);
+            const isAdmin = this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role);
             if (res.ok) {
                 if (indicator) {
                     indicator.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #059669;"></span> Cloud Sync Live`;
                     indicator.style.background = 'rgba(16,185,129,0.1)';
                     indicator.style.color = '#059669';
                     indicator.title = `Connected to Upstash Redis (${syncUrl})`;
+                    indicator.style.display = isAdmin ? 'inline-flex' : 'none';
                 }
                 const data = await res.json();
 
@@ -189,14 +191,17 @@ class KmapStoreApp {
                     indicator.style.background = 'rgba(245,158,11,0.1)';
                     indicator.style.color = '#d97706';
                     indicator.title = errData.error || `HTTP ${res.status}: Cloud database not connected`;
+                    indicator.style.display = isAdmin ? 'inline-flex' : 'none';
                 }
             }
         } catch(e) {
+            const isAdmin = this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role);
             if (indicator) {
                 indicator.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #94a3b8;"></span> Local Cache`;
                 indicator.style.background = 'rgba(148,163,184,0.1)';
                 indicator.style.color = '#64748b';
                 indicator.title = 'Offline / Local cache only';
+                indicator.style.display = isAdmin ? 'inline-flex' : 'none';
             }
         }
     }
@@ -204,6 +209,7 @@ class KmapStoreApp {
     async forceCloudSyncAll(silent = false) {
         const products = this.db.getProducts();
         const syncUrl = getSyncApiUrl();
+        const isAdmin = this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role);
         if (!silent) this.showToast('☁️ Syncing products to cloud database...');
         try {
             const res = await fetch(syncUrl, {
@@ -226,6 +232,7 @@ class KmapStoreApp {
                     indicator.style.background = 'rgba(16,185,129,0.1)';
                     indicator.style.color = '#059669';
                     indicator.title = `Connected to Upstash Redis (${syncUrl})`;
+                    indicator.style.display = isAdmin ? 'inline-flex' : 'none';
                 }
             } else {
                 const errData = await res.json().catch(() => ({}));
@@ -339,6 +346,12 @@ class KmapStoreApp {
         const changePwdBtn = document.getElementById('sidebar-change-pwd-btn');
         const adminToggleBtn = document.getElementById('btn-topbar-admin-toggle');
 
+        const syncIndicator = document.getElementById('sync-status-indicator');
+        const isAdmin = user && ['admin', 'superadmin'].includes(user.role);
+        if (syncIndicator) {
+            syncIndicator.style.display = isAdmin ? 'inline-flex' : 'none';
+        }
+
         if (user && user.role !== 'guest') {
             if (profileName) profileName.innerText = user.name || user.username;
             if (profileAvatar) profileAvatar.innerText = (user.name || user.username).charAt(0).toUpperCase();
@@ -347,7 +360,7 @@ class KmapStoreApp {
             if (userProfile) userProfile.style.display = 'flex';
             if (changePwdBtn) changePwdBtn.style.display = 'flex';
             if (adminToggleBtn) {
-                adminToggleBtn.style.display = (user.role === 'admin' || user.role === 'superadmin') ? 'inline-flex' : 'none';
+                adminToggleBtn.style.display = isAdmin ? 'inline-flex' : 'none';
             }
         } else {
             if (profileName) profileName.innerText = 'Guest';
@@ -1314,7 +1327,7 @@ class KmapStoreApp {
             
             // Image handling (support up to 6 images, fallback to default laptop/desktop emoji icons)
             const mainImg = (p.images && p.images.length > 0 && p.images[0]) 
-                ? `<img src="${p.images[0]}" style="width:100%; height:100%; object-fit:contain; border-radius:var(--radius-sm);">` 
+                ? `<img src="${p.images[0]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;">` 
                 : `<span style="font-size: 56px; color: var(--primary); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${p.icon || '💻'}</span>`;
 
             // Split specs by commas or newlines and show only the first two
@@ -2339,7 +2352,7 @@ class KmapStoreApp {
         products.forEach(p => {
             const hasImg = p.images && p.images.length > 0 && p.images[0];
             const iconOrImg = hasImg 
-                ? `<img src="${p.images[0]}" style="width:36px; height:36px; object-fit:contain; border-radius:4px; border:1px solid var(--border); background:#fff;">` 
+                ? `<img src="${p.images[0]}" alt="${p.name}" style="width:36px; height:36px; object-fit:cover; object-position:center; border-radius:4px; border:1px solid var(--border); background:#fff;">` 
                 : `<span style="font-size: 20px;">${p.icon || '💻'}</span>`;
 
             const tr = document.createElement('tr');
@@ -2376,7 +2389,7 @@ class KmapStoreApp {
         }
     }
 
-    // Helper: compress any image file to clean thumbnail JPEG
+    // Helper: compress any image file with high-definition clarity and smooth downsampling
     compressImageFile(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -2386,8 +2399,9 @@ class KmapStoreApp {
                 img.onerror = () => reject(new Error("Unable to parse image. Please use JPG, PNG, or WebP."));
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 320;
-                    const MAX_HEIGHT = 320;
+                    // Upgraded resolution bounds for crystal-clear product photos (1280px HD)
+                    const MAX_WIDTH = 1280;
+                    const MAX_HEIGHT = 1280;
                     let width = img.width;
                     let height = img.height;
 
@@ -2406,9 +2420,14 @@ class KmapStoreApp {
                     canvas.width = Math.round(width);
                     canvas.height = Math.round(height);
                     const ctx = canvas.getContext('2d');
+
+                    // High quality bicubic image smoothing
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    // Standardize to clean, ultra-lightweight JPEG (0.55 quality ~10-14 KB)
-                    const base64 = canvas.toDataURL('image/jpeg', 0.55);
+
+                    // High-quality JPEG (0.85 quality produces vivid colors and sharp details)
+                    const base64 = canvas.toDataURL('image/jpeg', 0.85);
                     resolve(base64);
                 };
                 img.src = e.target.result;
@@ -2434,7 +2453,7 @@ class KmapStoreApp {
             const thumb = document.createElement('div');
             thumb.style.cssText = 'position: relative; width: 60px; height: 60px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); background: #fff;';
             thumb.innerHTML = `
-                <img src="${imgSrc}" style="width: 100%; height: 100%; object-fit: contain;">
+                <img src="${imgSrc}" style="width: 100%; height: 100%; object-fit: cover;">
                 <button type="button" onclick="app.removeModalImage(${idx})" style="position: absolute; top: 2px; right: 2px; background: rgba(220,38,38,0.85); color: #fff; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
             `;
             container.appendChild(thumb);
