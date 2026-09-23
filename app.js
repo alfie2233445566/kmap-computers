@@ -173,6 +173,21 @@ class KmapStoreApp {
         }
     }
 
+    loadCart() {
+        try {
+            const saved = safeLocalStorage.getItem('kmap_cart');
+            this.cart = saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            this.cart = [];
+        }
+    }
+
+    saveCart() {
+        try {
+            safeLocalStorage.setItem('kmap_cart', JSON.stringify(this.cart));
+        } catch (e) {}
+    }
+
     initSession() {
         const savedUser = safeLocalStorage.getItem('kmap_current_user');
         if (savedUser) {
@@ -521,11 +536,32 @@ class KmapStoreApp {
         }
 
         this.db = {
-            getProducts: () => JSON.parse(safeLocalStorage.getItem('kmap_products')),
+            getProducts: () => {
+                try {
+                    const p = JSON.parse(safeLocalStorage.getItem('kmap_products'));
+                    return (Array.isArray(p) && p.length > 0) ? p : defaultProducts;
+                } catch(e) {
+                    return defaultProducts;
+                }
+            },
             saveProducts: (data) => safeLocalStorage.setItem('kmap_products', JSON.stringify(data)),
-            getUsers: () => JSON.parse(safeLocalStorage.getItem('kmap_users')),
+            getUsers: () => {
+                try {
+                    const u = JSON.parse(safeLocalStorage.getItem('kmap_users'));
+                    return (Array.isArray(u) && u.length > 0) ? u : defaultUsers;
+                } catch(e) {
+                    return defaultUsers;
+                }
+            },
             saveUsers: (data) => safeLocalStorage.setItem('kmap_users', JSON.stringify(data)),
-            getOrders: () => JSON.parse(safeLocalStorage.getItem('kmap_orders')),
+            getOrders: () => {
+                try {
+                    const o = JSON.parse(safeLocalStorage.getItem('kmap_orders'));
+                    return Array.isArray(o) ? o : [];
+                } catch(e) {
+                    return [];
+                }
+            },
             saveOrders: (data) => safeLocalStorage.setItem('kmap_orders', JSON.stringify(data)),
             getLogs: () => JSON.parse(safeLocalStorage.getItem('kmap_logs')),
             addLog: (msg) => {
