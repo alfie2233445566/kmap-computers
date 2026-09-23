@@ -154,6 +154,17 @@ class KmapStoreApp {
                         if (key === 'kmap_users' && Array.isArray(data[key])) {
                             data[key] = data[key].filter(u => u.username !== '0241234567' && u.name !== 'Kwame Mensah');
                         }
+                        if (key === 'kmap_products' && Array.isArray(data[key])) {
+                            const p1 = data[key].find(p => p.id === 'PROD-001');
+                            if (p1 && p1.images && p1.images.length > 0 && p1.images[0].startsWith('data:')) {
+                                p1.images = [
+                                    'images/products/PROD-001/1.jpg',
+                                    'images/products/PROD-001/2.jpg',
+                                    'images/products/PROD-001/3.jpg',
+                                    'images/products/PROD-001/4.jpg'
+                                ];
+                            }
+                        }
 
                         let cloudVal = typeof data[key] === 'string' ? data[key] : JSON.stringify(data[key]);
                         const localVal = safeLocalStorage.getItem(key);
@@ -392,7 +403,12 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i7, 8th Generation, 32GB Memory, 1TB Solid state Drive, 8CPUs @ 1.8Ghz Speed, AMD Radeon RX Graphics *4GB Dedicated Graphics*, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 15.6 inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-001/1.jpg',
+                    'images/products/PROD-001/2.jpg',
+                    'images/products/PROD-001/3.jpg',
+                    'images/products/PROD-001/4.jpg'
+                ]
             },
             {
                 id: 'PROD-002',
@@ -402,7 +418,14 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'AMD Ryzen 7 PRO, 16GB Memory, 256GB Solid state Drive, 8CPUs @ 1.9Ghz Speed, AMD Radeon RX Graphics *Dedicated Graphics*, Fingerprint Security, HD camera, Touchscreen, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery, Hdmi & USB Slots, 15.6 inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-002/1.jpg',
+                    'images/products/PROD-002/2.jpg',
+                    'images/products/PROD-002/3.jpg',
+                    'images/products/PROD-002/4.jpg',
+                    'images/products/PROD-002/5.jpg',
+                    'images/products/PROD-002/6.jpg'
+                ]
             },
             {
                 id: 'PROD-003',
@@ -412,7 +435,10 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i5, 8th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 1.6Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-003/1.jpg',
+                    'images/products/PROD-003/2.jpg'
+                ]
             },
             {
                 id: 'PROD-004',
@@ -422,7 +448,11 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i5, 10th Generation, 16gb Memory, 256gb Solid state Drive, 4CPUs @ 1.6Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-004/1.jpg',
+                    'images/products/PROD-004/2.jpg',
+                    'images/products/PROD-004/3.jpg'
+                ]
             },
             {
                 id: 'PROD-005',
@@ -452,7 +482,10 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i5, 8th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 1.60 Ghz Speed, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-007/1.jpg',
+                    'images/products/PROD-007/2.jpg'
+                ]
             },
             {
                 id: 'PROD-008',
@@ -502,7 +535,11 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i5, 7th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.6Ghz Speed, x360 Convertible, Touchscreen Display, Face iD Recognition, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-012/1.jpg',
+                    'images/products/PROD-012/2.jpg',
+                    'images/products/PROD-012/3.jpg'
+                ]
             },
             {
                 id: 'PROD-013',
@@ -512,7 +549,10 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i5, 7th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.6Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-013/1.jpg',
+                    'images/products/PROD-013/2.jpg'
+                ]
             },
             {
                 id: 'PROD-014',
@@ -522,7 +562,10 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i5, 8th Generation, 16gb Memory, 256gb Solid state Drive, 4CPUs @ 1.6Ghz Speed, x360 Convertible, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-014/1.jpg',
+                    'images/products/PROD-014/2.jpg'
+                ]
             },
             {
                 id: 'PROD-015',
@@ -532,7 +575,10 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i5, 6th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.4Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slot, Display port & USB Slots, 14.0 inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-015/1.jpg',
+                    'images/products/PROD-015/2.jpg'
+                ]
             },
             {
                 id: 'PROD-016',
@@ -542,7 +588,11 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i7, 11th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 3.0Ghz Speed, 360 Convertible, Fingerprint Security, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 13.3inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-016/1.jpg',
+                    'images/products/PROD-016/2.jpg',
+                    'images/products/PROD-016/3.jpg'
+                ]
             },
             {
                 id: 'PROD-017',
@@ -552,7 +602,9 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i5, 8th Generation, 8GB Memory, 256gb Solid state Drive, 8CPUs @ 1.7Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-017/1.jpg'
+                ]
             },
             {
                 id: 'PROD-018',
@@ -562,7 +614,10 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i5, 6th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.4Ghz Speed, x360 Convertible, Touchscreen Display, Backlit Keyboard, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-018/1.jpg',
+                    'images/products/PROD-018/2.jpg'
+                ]
             },
             {
                 id: 'PROD-019',
@@ -572,7 +627,14 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i5, 7th Generation, 8Gb Memory, 256gb Solid state Drive, 8CPUs @ 2.6Ghz Speed, Fingerprint Security, Backlit Keyboard, Type C USB Slot, USB Slots, 13.3inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-019/1.jpg',
+                    'images/products/PROD-019/2.jpg',
+                    'images/products/PROD-019/3.jpg',
+                    'images/products/PROD-019/4.jpg',
+                    'images/products/PROD-019/5.jpg',
+                    'images/products/PROD-019/6.jpg'
+                ]
             },
             {
                 id: 'PROD-020',
@@ -595,13 +657,16 @@ class KmapStoreApp {
 
         const defaultHP = [];
 
-        // Check if database reset is needed (to migration to these 20 laptops)
+        // Check if database reset is needed (to migration to these 20 laptops with authentic images)
         const existingProducts = safeLocalStorage.getItem('kmap_products');
         let needsReset = false;
         if (existingProducts) {
             try {
                 const parsed = JSON.parse(existingProducts);
-                if (parsed.length === 0 || parsed.some(p => p.id === 'PROD-001' && p.name !== 'Hp Zbook 15u G6') || parsed.some(p => p.category === 'Accessories')) {
+                if (parsed.length === 0 || 
+                    parsed.some(p => p.id === 'PROD-001' && p.name !== 'Hp Zbook 15u G6') || 
+                    parsed.some(p => p.category === 'Accessories') ||
+                    parsed.some(p => p.id === 'PROD-001' && (!p.images || !p.images.length || p.images[0].startsWith('data:')))) {
                     needsReset = true;
                 }
             } catch (e) {
