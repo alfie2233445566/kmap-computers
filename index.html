@@ -151,9 +151,8 @@
                         </button>
                     </div>
                     <div>
-                        <h1 id="page-title" style="font-weight: 800; color: var(--primary);">Storefront</h1>
-                        <p style="color: var(--text-light); font-size: 14px;" id="page-subtitle">Welcome to Kmap
-                            Computers</p>
+                        <h1 id="page-title" style="font-weight: 800; color: var(--primary);">Open Marketplace</h1>
+                        <p style="color: var(--text-light); font-size: 14px;" id="page-subtitle">Browse computers, laptops, and accessories</p>
                     </div>
                 </div>
                 <div id="topbar-auth-section" style="display: flex; align-items: center; gap: 10px;">
@@ -161,6 +160,11 @@
                     <div id="sync-status-indicator" style="font-size: 11px; padding: 4px 8px; border-radius: 12px; background: rgba(16,185,129,0.1); color: #059669; font-weight: 600; display: flex; align-items: center; gap: 5px; cursor: default;" title="Connecting to cloud...">
                         <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #059669;"></span> Cloud Sync
                     </div>
+
+                    <!-- Quick Admin / Marketplace toggle for staff -->
+                    <button id="btn-topbar-admin-toggle" class="btn btn-secondary" onclick="app.toggleAdminMarketplaceView()" style="display: none; height: 38px; font-size: 13px; align-items: center; gap: 6px; padding: 0 12px; border-radius: var(--radius-sm);" title="Toggle Management / Marketplace">
+                        <i class="fa-solid fa-gauge"></i> <span id="admin-toggle-text">Admin Panel</span>
+                    </button>
 
                     <!-- Sign In / Staff button for guests -->
                     <button id="btn-topbar-signin" class="btn btn-primary" onclick="app.openLoginModal()" style="height: 38px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; border-radius: var(--radius-sm);">
@@ -171,6 +175,7 @@
                     <div class="user-profile" id="topbar-user-profile" onclick="app.openUserProfileModal()" style="cursor: pointer; display: none;" title="View Profile">
                         <div style="text-align: right;">
                             <div style="font-weight: 700; font-size: 14px;" id="profile-name">Guest</div>
+                            <div style="font-size: 11px; color: var(--text-light); text-transform: uppercase;" id="profile-role"></div>
                         </div>
                         <div class="user-avatar" id="profile-avatar">G</div>
                     </div>
@@ -179,7 +184,7 @@
 
             <!-- Dynamic View Containers -->
 
-            <!-- VIEW A: Client Storefront -->
+            <!-- VIEW A: Open Marketplace -->
             <section id="view-client-store" class="app-view" style="display: none;">
                 <div style="display: flex; gap: 24px; flex-wrap: wrap; width: 100%;">
 
@@ -1167,7 +1172,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=2.6"></script>
+    <script src="app.js?v=2.7"></script>
 </body>
 
 </html>

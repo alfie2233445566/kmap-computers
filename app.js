@@ -190,11 +190,8 @@ class KmapStoreApp {
         this.renderSidebar();
         this.loadCart();
 
-        if (this.currentUser.role === 'admin' || this.currentUser.role === 'superadmin') {
-            this.switchView('admin-dashboard');
-        } else {
-            this.switchView('client-store');
-        }
+        // The landing page of the application is ALWAYS the Open Marketplace
+        this.switchView('client-store');
     }
 
     openLoginModal() {
@@ -218,22 +215,38 @@ class KmapStoreApp {
     updateProfileHeader(user) {
         const profileName = document.getElementById('profile-name');
         const profileAvatar = document.getElementById('profile-avatar');
+        const profileRole = document.getElementById('profile-role');
         const btnSignIn = document.getElementById('btn-topbar-signin');
         const userProfile = document.getElementById('topbar-user-profile');
         const changePwdBtn = document.getElementById('sidebar-change-pwd-btn');
+        const adminToggleBtn = document.getElementById('btn-topbar-admin-toggle');
 
         if (user && user.role !== 'guest') {
             if (profileName) profileName.innerText = user.name || user.username;
             if (profileAvatar) profileAvatar.innerText = (user.name || user.username).charAt(0).toUpperCase();
+            if (profileRole) profileRole.innerText = user.role === 'superadmin' ? 'Super Admin' : (user.role === 'admin' ? 'Staff' : 'Customer');
             if (btnSignIn) btnSignIn.style.display = 'none';
             if (userProfile) userProfile.style.display = 'flex';
             if (changePwdBtn) changePwdBtn.style.display = 'flex';
+            if (adminToggleBtn) {
+                adminToggleBtn.style.display = (user.role === 'admin' || user.role === 'superadmin') ? 'inline-flex' : 'none';
+            }
         } else {
             if (profileName) profileName.innerText = 'Guest';
             if (profileAvatar) profileAvatar.innerText = 'G';
+            if (profileRole) profileRole.innerText = '';
             if (btnSignIn) btnSignIn.style.display = 'inline-flex';
             if (userProfile) userProfile.style.display = 'none';
             if (changePwdBtn) changePwdBtn.style.display = 'none';
+            if (adminToggleBtn) adminToggleBtn.style.display = 'none';
+        }
+    }
+
+    toggleAdminMarketplaceView() {
+        if (this.activeView === 'client-store') {
+            this.switchView('admin-dashboard');
+        } else {
+            this.switchView('client-store');
         }
     }
 
@@ -930,11 +943,21 @@ class KmapStoreApp {
         
         this.updateNavHistoryButtons();
 
+        // Update topbar quick admin toggle button text
+        const adminToggleText = document.getElementById('admin-toggle-text');
+        if (adminToggleText) {
+            if (viewName === 'client-store') {
+                adminToggleText.innerText = 'Admin Panel';
+            } else {
+                adminToggleText.innerText = 'Marketplace';
+            }
+        }
+
         switch(viewName) {
             case 'client-store':
                 document.getElementById('view-client-store').style.display = 'flex';
-                pageTitle.innerText = "Kmap Store";
-                pageSubtitle.innerText = "Browse our high performance desktop & portable systems";
+                pageTitle.innerText = "Open Marketplace";
+                pageSubtitle.innerText = "Browse computers, laptops, and accessories";
                 this.renderClientCatalog();
                 break;
             case 'client-cart':
@@ -1023,7 +1046,7 @@ class KmapStoreApp {
             `;
             nav.innerHTML = `
                 <button class="nav-item" id="nav-btn-client-store" onclick="app.switchView('client-store')">
-                    <i class="fa-solid fa-store"></i> Shop Catalog
+                    <i class="fa-solid fa-store"></i> Open Marketplace
                 </button>
                 ${cartBtn}
                 ${ordersBtn}
@@ -1032,16 +1055,21 @@ class KmapStoreApp {
                 </button>
             `;
         } else {
-            // Admin & Super Admin navbar options
+            // Admin & Super Admin navbar: Full access to Open Marketplace AND Staff Management
             nav.innerHTML = `
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 16px 4px;">Marketplace</div>
+                <button class="nav-item" id="nav-btn-client-store" onclick="app.switchView('client-store')">
+                    <i class="fa-solid fa-store"></i> Open Marketplace
+                </button>
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px 4px;">Staff Management</div>
                 <button class="nav-item" id="nav-btn-admin-dashboard" onclick="app.switchView('admin-dashboard')">
                     <i class="fa-solid fa-chart-line"></i> Dashboard
                 </button>
+                <button class="nav-item" id="nav-btn-admin-inventory" onclick="app.switchView('admin-inventory')">
+                    <i class="fa-solid fa-boxes-stacked"></i> Inventory & Stock
+                </button>
                 <button class="nav-item" id="nav-btn-admin-orders" onclick="app.switchView('admin-orders')">
                     <i class="fa-solid fa-truck-fast"></i> Order Hub
-                </button>
-                <button class="nav-item" id="nav-btn-admin-inventory" onclick="app.switchView('admin-inventory')">
-                    <i class="fa-solid fa-boxes-stacked"></i> Inventory
                 </button>
                 <button class="nav-item" id="nav-btn-admin-promos" onclick="app.switchView('admin-promos')">
                     <i class="fa-solid fa-tags"></i> Promotions
@@ -3140,7 +3168,7 @@ class KmapStoreApp {
         this.renderSidebar();
         this.loadCart();
         this.switchView('client-store');
-        this.showToast("Logged out. Browsing store as Guest.");
+        this.showToast("Logged out. Browsing Open Marketplace as Guest.");
     }
 }
 
