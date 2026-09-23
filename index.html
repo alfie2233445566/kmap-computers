@@ -4,7 +4,7 @@
 <head>
     <script>
         window.onerror = function (msg, url, line) {
-            alert("Error: " + msg + "\nURL: " + url + "\nLine: " + line);
+            console.error("Window error:", msg, url, line);
             return false;
         };
     </script>
@@ -1167,7 +1167,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=2.5"></script>
+    <script src="app.js?v=2.6"></script>
 </body>
 
 </html>
