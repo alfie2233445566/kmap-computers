@@ -1078,13 +1078,8 @@ class KmapStoreApp {
 
     // Switch Application Views
     switchView(viewName) {
-        // Auto-close sidebar on mobile view selection
-        const sidebar = document.querySelector('.sidebar');
-        const backdrop = document.getElementById('sidebar-backdrop');
-        if (sidebar && sidebar.classList.contains('active')) {
-            sidebar.classList.remove('active');
-            backdrop.classList.remove('active');
-        }
+        // Auto-close sidebar on view selection
+        this.closeSidebar();
 
         if (!this.isNavigatingHistory) {
             this.viewHistory = this.viewHistory.slice(0, this.viewHistoryPointer + 1);
@@ -1925,9 +1920,22 @@ class KmapStoreApp {
         const sidebar = document.querySelector('.sidebar');
         const backdrop = document.getElementById('sidebar-backdrop');
         if (sidebar && backdrop) {
-            sidebar.classList.toggle('active');
-            backdrop.classList.toggle('active');
+            const isOpen = sidebar.classList.toggle('active');
+            backdrop.classList.toggle('active', isOpen);
+            if (isOpen) {
+                document.body.classList.add('sidebar-open');
+            } else {
+                document.body.classList.remove('sidebar-open');
+            }
         }
+    }
+
+    closeSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        if (sidebar) sidebar.classList.remove('active');
+        if (backdrop) backdrop.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
     }
 
     // Client Order List rendering

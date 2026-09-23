@@ -47,24 +47,55 @@ body {
 
 /* Sidebar Styling */
 .sidebar {
-    width: 260px;
+    width: 270px;
     background-color: var(--sidebar-bg);
     color: var(--white);
     display: flex;
     flex-direction: column;
-    padding: 24px 16px;
+    padding: 20px 16px;
     position: fixed;
     height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
     left: 0;
     top: 0;
     z-index: 1000;
     box-shadow: var(--shadow-lg);
     transition: var(--transition);
     transform: translateX(-100%);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
 }
 
 .sidebar.active {
     transform: translateX(0);
+}
+
+/* Custom Sleek Scrollbar for Sidebar */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Prevent background main page from scrolling while sandwich bar is open */
+body.sidebar-open {
+    overflow: hidden !important;
 }
 
 .sidebar-logo {
@@ -72,8 +103,9 @@ body {
     align-items: center;
     gap: 12px;
     padding: 12px 8px;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
 }
 
 .sidebar-logo h2 {
@@ -92,6 +124,7 @@ body {
     flex-direction: column;
     gap: 8px;
     flex-grow: 1;
+    flex-shrink: 0;
 }
 
 .nav-item {
@@ -110,6 +143,7 @@ body {
     text-align: left;
     width: 100%;
     font-size: 14px;
+    flex-shrink: 0;
 }
 
 .nav-item:hover,
@@ -128,6 +162,9 @@ body {
 .sidebar-footer {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-top: 16px;
+    padding-bottom: 16px;
+    margin-top: auto;
+    flex-shrink: 0;
 }
 
 /* Main Content Styling */
