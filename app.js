@@ -1106,6 +1106,15 @@ class KmapStoreApp {
             }
         }, { passive: false });
 
+        // Close modals when clicking outside on the backdrop
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+
         // Touch swipe gestures for fullscreen Lightbox (viewing images one-by-one)
         const lightbox = document.getElementById('lightbox-modal');
         if (lightbox) {
