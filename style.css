@@ -714,6 +714,42 @@ tr:hover td {
     transform: scale(1.15);
 }
 
+.inspect-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(15, 23, 42, 0.65);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    z-index: 10;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.inspect-nav-btn:hover {
+    background: rgba(15, 23, 42, 0.9);
+    color: var(--secondary);
+    border-color: var(--secondary);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.inspect-prev-btn {
+    left: 10px;
+}
+
+.inspect-next-btn {
+    right: 10px;
+}
+
 .inspect-thumbnails {
     display: flex;
     gap: 8px;

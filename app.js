@@ -1077,6 +1077,27 @@ class KmapStoreApp {
             input.addEventListener('input', () => this.refreshModalImagePreviews());
         });
 
+        // Touch swipe gestures for Inspect Modal main image
+        const inspectMainImg = document.querySelector('.inspect-main-img');
+        if (inspectMainImg) {
+            let touchStartX = 0;
+            let touchEndX = 0;
+            inspectMainImg.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+            inspectMainImg.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                const diff = touchEndX - touchStartX;
+                if (Math.abs(diff) > 40) { // Swipe threshold
+                    if (diff > 0) {
+                        this.prevInspectImage();
+                    } else {
+                        this.nextInspectImage();
+                    }
+                }
+            }, { passive: true });
+        }
+
         // Touch swipe gestures for lightbox swiping
         const lightbox = document.getElementById('lightbox-modal');
         if (lightbox) {
@@ -1090,7 +1111,7 @@ class KmapStoreApp {
             lightbox.addEventListener('touchend', (e) => {
                 touchEndX = e.changedTouches[0].screenX;
                 const diff = touchEndX - touchStartX;
-                if (Math.abs(diff) > 50) { // Swipe threshold
+                if (Math.abs(diff) > 40) { // Swipe threshold
                     if (diff > 0) {
                         this.prevLightboxImage();
                     } else {
@@ -1100,13 +1121,18 @@ class KmapStoreApp {
             }, { passive: true });
         }
         
-        // Keyboard navigation for lightbox
+        // Keyboard navigation for both lightbox and inspect modal
         window.addEventListener('keydown', (e) => {
-            const modal = document.getElementById('lightbox-modal');
-            if (modal && modal.classList.contains('active')) {
+            const lightboxModal = document.getElementById('lightbox-modal');
+            const inspectModal = document.getElementById('modal-product-inspect');
+            if (lightboxModal && lightboxModal.classList.contains('active')) {
                 if (e.key === 'ArrowLeft') this.prevLightboxImage();
                 if (e.key === 'ArrowRight') this.nextLightboxImage();
                 if (e.key === 'Escape') this.closeLightbox();
+            } else if (inspectModal && inspectModal.classList.contains('active')) {
+                if (e.key === 'ArrowLeft') this.prevInspectImage();
+                if (e.key === 'ArrowRight') this.nextInspectImage();
+                if (e.key === 'Escape') this.closeInspectModal();
             }
         });
 
@@ -1867,28 +1893,37 @@ class KmapStoreApp {
             priceEl.innerText = `GH₵ ${p.price.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
         }
 
+        this.currentInspectProductId = productId;
+        this.inspectImages = p.images || [];
+        this.inspectImageIndex = 0;
+
         const mainImgDisplay = document.getElementById('inspect-img-display');
         const thumbContainer = document.getElementById('inspect-thumbnails-container');
+        const inspectPrevBtn = document.getElementById('inspect-prev-btn');
+        const inspectNextBtn = document.getElementById('inspect-next-btn');
         thumbContainer.innerHTML = '';
 
-        let images = p.images || [];
-        if (images.length === 0) {
+        if (this.inspectImages.length === 0) {
             mainImgDisplay.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>';
             mainImgDisplay.style.opacity = '0.5';
             mainImgDisplay.onclick = null;
+            if (inspectPrevBtn) inspectPrevBtn.style.display = 'none';
+            if (inspectNextBtn) inspectNextBtn.style.display = 'none';
         } else {
-            mainImgDisplay.src = images[0];
+            mainImgDisplay.src = this.inspectImages[0];
             mainImgDisplay.style.opacity = '1';
             mainImgDisplay.onclick = () => { this.openLightbox(mainImgDisplay.src, productId); };
             
-            images.forEach((imgSrc, idx) => {
+            const hasMultiple = this.inspectImages.length > 1;
+            if (inspectPrevBtn) inspectPrevBtn.style.display = hasMultiple ? 'flex' : 'none';
+            if (inspectNextBtn) inspectNextBtn.style.display = hasMultiple ? 'flex' : 'none';
+
+            this.inspectImages.forEach((imgSrc, idx) => {
                 const thumb = document.createElement('div');
                 thumb.className = `inspect-thumb ${idx === 0 ? 'active' : ''}`;
                 thumb.innerHTML = `<img src="${imgSrc}">`;
                 thumb.onclick = () => {
-                    document.querySelectorAll('.inspect-thumb').forEach(t => t.classList.remove('active'));
-                    thumb.classList.add('active');
-                    mainImgDisplay.src = imgSrc;
+                    this.setInspectImage(idx);
                 };
                 thumbContainer.appendChild(thumb);
             });
@@ -1910,6 +1945,30 @@ class KmapStoreApp {
         document.getElementById('modal-product-inspect').classList.add('active');
     }
 
+    setInspectImage(index) {
+        if (!this.inspectImages || this.inspectImages.length === 0) return;
+        this.inspectImageIndex = (index + this.inspectImages.length) % this.inspectImages.length;
+        const mainImgDisplay = document.getElementById('inspect-img-display');
+        if (mainImgDisplay) {
+            mainImgDisplay.src = this.inspectImages[this.inspectImageIndex];
+        }
+        document.querySelectorAll('.inspect-thumb').forEach((t, i) => {
+            t.classList.toggle('active', i === this.inspectImageIndex);
+        });
+    }
+
+    nextInspectImage(e) {
+        if (e) e.stopPropagation();
+        if (!this.inspectImages || this.inspectImages.length <= 1) return;
+        this.setInspectImage(this.inspectImageIndex + 1);
+    }
+
+    prevInspectImage(e) {
+        if (e) e.stopPropagation();
+        if (!this.inspectImages || this.inspectImages.length <= 1) return;
+        this.setInspectImage(this.inspectImageIndex - 1);
+    }
+
     closeInspectModal() {
         document.getElementById('modal-product-inspect').classList.remove('active');
         if (this.inspectBackView) {
@@ -1922,31 +1981,38 @@ class KmapStoreApp {
         const modal = document.getElementById('lightbox-modal');
         const img = document.getElementById('lightbox-img');
         if (modal && img) {
-            img.src = src;
-            modal.classList.add('active');
-            
+            const targetProductId = productId || this.currentInspectProductId;
             this.lightboxImages = [];
-            this.lightboxIndex = -1;
             
-            if (productId) {
+            if (targetProductId) {
                 const products = this.db.getProducts();
-                const p = products.find(item => item.id === productId);
+                const p = products.find(item => item.id === targetProductId);
                 if (p && p.images && p.images.length > 0) {
-                    this.lightboxImages = p.images;
-                    this.lightboxIndex = p.images.indexOf(src);
+                    this.lightboxImages = [...p.images];
                 }
             }
+            if (this.lightboxImages.length === 0 && this.inspectImages && this.inspectImages.length > 0) {
+                this.lightboxImages = [...this.inspectImages];
+            }
+            
+            let foundIdx = -1;
+            if (this.lightboxImages.length > 0 && src) {
+                foundIdx = this.lightboxImages.findIndex(item => {
+                    if (!item) return false;
+                    return item === src || src.endsWith(item) || item.endsWith(src);
+                });
+            }
+            
+            this.lightboxIndex = foundIdx >= 0 ? foundIdx : (this.inspectImageIndex || 0);
+            img.src = this.lightboxImages.length > 0 ? this.lightboxImages[this.lightboxIndex] : src;
+            modal.classList.add('active');
             
             const prevBtn = document.querySelector('.lightbox-prev-btn');
             const nextBtn = document.querySelector('.lightbox-next-btn');
             if (prevBtn && nextBtn) {
-                if (this.lightboxImages.length > 1) {
-                    prevBtn.style.display = 'flex';
-                    nextBtn.style.display = 'flex';
-                } else {
-                    prevBtn.style.display = 'none';
-                    nextBtn.style.display = 'none';
-                }
+                const showNav = this.lightboxImages.length > 1;
+                prevBtn.style.display = showNav ? 'flex' : 'none';
+                nextBtn.style.display = showNav ? 'flex' : 'none';
             }
         }
     }
@@ -1959,16 +2025,20 @@ class KmapStoreApp {
     }
 
     nextLightboxImage() {
-        if (this.lightboxImages && this.lightboxImages.length > 1 && this.lightboxIndex > -1) {
+        if (this.lightboxImages && this.lightboxImages.length > 1) {
+            if (this.lightboxIndex < 0) this.lightboxIndex = 0;
             this.lightboxIndex = (this.lightboxIndex + 1) % this.lightboxImages.length;
-            document.getElementById('lightbox-img').src = this.lightboxImages[this.lightboxIndex];
+            const img = document.getElementById('lightbox-img');
+            if (img) img.src = this.lightboxImages[this.lightboxIndex];
         }
     }
 
     prevLightboxImage() {
-        if (this.lightboxImages && this.lightboxImages.length > 1 && this.lightboxIndex > -1) {
+        if (this.lightboxImages && this.lightboxImages.length > 1) {
+            if (this.lightboxIndex < 0) this.lightboxIndex = 0;
             this.lightboxIndex = (this.lightboxIndex - 1 + this.lightboxImages.length) % this.lightboxImages.length;
-            document.getElementById('lightbox-img').src = this.lightboxImages[this.lightboxIndex];
+            const img = document.getElementById('lightbox-img');
+            if (img) img.src = this.lightboxImages[this.lightboxIndex];
         }
     }
 

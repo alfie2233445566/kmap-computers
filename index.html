@@ -1011,9 +1011,11 @@
             <div class="grid grid-2" style="gap: 20px; align-items: start;">
                 <!-- Gallery Section -->
                 <div class="inspect-gallery">
-                    <div class="inspect-main-img">
+                    <div class="inspect-main-img" style="position: relative;">
+                        <button type="button" id="inspect-prev-btn" class="inspect-nav-btn inspect-prev-btn" onclick="app.prevInspectImage(event)" title="Previous Picture" style="display: none;"><i class="fa-solid fa-chevron-left"></i></button>
                         <img id="inspect-img-display" src="" alt="Product view" onclick="app.openLightbox(this.src)"
                             style="cursor: zoom-in;">
+                        <button type="button" id="inspect-next-btn" class="inspect-nav-btn inspect-next-btn" onclick="app.nextInspectImage(event)" title="Next Picture" style="display: none;"><i class="fa-solid fa-chevron-right"></i></button>
                     </div>
                     <div class="inspect-thumbnails" id="inspect-thumbnails-container">
                         <!-- Thumbnails injected here -->
