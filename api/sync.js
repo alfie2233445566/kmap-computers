@@ -3,18 +3,18 @@ import { createClient } from '@vercel/kv';
 export default async function handler(request, response) {
   const allowedKeys = ['kmap_products', 'kmap_users', 'kmap_orders', 'kmap_logs', 'kmap_promos', 'kmap_hire_purchase'];
 
-  // Dynamically resolve URL and TOKEN regardless of prefix (KV_, UPSTASH_REDIS_, STORAGE_, etc.)
+  // Dynamically resolve URL and write TOKEN (ignoring READ_ONLY tokens)
   const url = process.env.KV_REST_API_URL 
+    || process.env.KMAP_KV_KV_REST_API_URL
     || process.env.UPSTASH_REDIS_REST_URL 
     || process.env.STORAGE_REST_API_URL
-    || process.env.STORAGE_URL
-    || Object.entries(process.env).find(([k]) => k.endsWith('_REST_API_URL') || k.endsWith('_URL'))?.[1];
+    || Object.entries(process.env).find(([k]) => !k.includes('READ_ONLY') && (k.endsWith('_REST_API_URL') || k.endsWith('_URL')))?.[1];
 
   const token = process.env.KV_REST_API_TOKEN 
+    || process.env.KMAP_KV_KV_REST_API_TOKEN
     || process.env.UPSTASH_REDIS_REST_TOKEN 
     || process.env.STORAGE_REST_API_TOKEN
-    || process.env.STORAGE_TOKEN
-    || Object.entries(process.env).find(([k]) => k.endsWith('_REST_API_TOKEN') || k.endsWith('_TOKEN'))?.[1];
+    || Object.entries(process.env).find(([k]) => !k.includes('READ_ONLY') && (k.endsWith('_REST_API_TOKEN') || (k.endsWith('_TOKEN') && !k.includes('READ_ONLY'))))?.[1];
 
   // Check if Vercel KV or Upstash Redis is configured in environment
   if (!url || !token) {
