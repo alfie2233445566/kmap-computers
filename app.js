@@ -1,39 +1,6 @@
 // Kmap Computers Application Engine
 let storage = {};
 
-// Queue for uploading to Vercel KV
-window.kvSyncQueue = {};
-window.kvSyncTimeout = null;
-
-const triggerKVSync = () => {
-    if (Object.keys(window.kvSyncQueue).length === 0) return;
-    
-    const payload = { updates: { ...window.kvSyncQueue } };
-    window.kvSyncQueue = {}; // Clear queue
-    
-    fetch('/api/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
-    .then(async (res) => {
-        if (!res.ok) {
-            const errData = await res.json().catch(() => ({}));
-            console.error('KV Sync Failed:', res.status, errData);
-            if (window.app && typeof window.app.showToast === 'function') {
-                if (res.status === 413) {
-                    window.app.showToast('⚠️ Cloud sync failed: Photos payload too large for KV storage!', 'error');
-                } else if (res.status === 500) {
-                    window.app.showToast(`⚠️ Cloud sync failed: ${errData.error || 'Server error'}`, 'error');
-                }
-            }
-        } else {
-            console.log('✓ KV Sync successful');
-        }
-    })
-    .catch(err => console.error('KV Sync Network Error:', err));
-};
-
 const safeLocalStorage = {
     getItem: (key) => {
         try {
@@ -66,6 +33,57 @@ const safeLocalStorage = {
             delete storage[key];
         }
     }
+};
+
+const getSyncApiUrl = () => {
+    try {
+        const custom = safeLocalStorage.getItem('kmap_cloud_sync_url');
+        if (custom) return custom;
+    } catch (e) {}
+
+    // When running from file:/// or localhost without backend server, automatically use the live Vercel production API
+    if (typeof window !== 'undefined' && window.location) {
+        if (window.location.protocol === 'file:' || 
+            window.location.hostname === 'localhost' || 
+            window.location.hostname === '127.0.0.1' || 
+            !window.location.hostname) {
+            return 'https://kmap-computers.vercel.app/api/sync';
+        }
+    }
+    return '/api/sync';
+};
+
+// Queue for uploading to Vercel KV
+window.kvSyncQueue = {};
+window.kvSyncTimeout = null;
+
+const triggerKVSync = () => {
+    if (Object.keys(window.kvSyncQueue).length === 0) return;
+    
+    const payload = { updates: { ...window.kvSyncQueue } };
+    window.kvSyncQueue = {}; // Clear queue
+    
+    fetch(getSyncApiUrl(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(async (res) => {
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            console.error('KV Sync Failed:', res.status, errData);
+            if (window.app && typeof window.app.showToast === 'function') {
+                if (res.status === 413) {
+                    window.app.showToast('⚠️ Cloud sync failed: Photos payload too large for KV storage!', 'error');
+                } else if (res.status === 500) {
+                    window.app.showToast(`⚠️ Cloud sync failed: ${errData.error || 'Server error'}`, 'error');
+                }
+            }
+        } else {
+            console.log('✓ KV Sync successful');
+        }
+    })
+    .catch(err => console.error('KV Sync Network Error:', err));
 };
 
 class KmapStoreApp {
@@ -101,14 +119,15 @@ class KmapStoreApp {
 
     async syncDownstream() {
         const indicator = document.getElementById('sync-status-indicator');
+        const syncUrl = getSyncApiUrl();
         try {
-            const res = await fetch('/api/sync');
+            const res = await fetch(syncUrl);
             if (res.ok) {
                 if (indicator) {
                     indicator.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #059669;"></span> Cloud Sync Live`;
                     indicator.style.background = 'rgba(16,185,129,0.1)';
                     indicator.style.color = '#059669';
-                    indicator.title = 'Connected to Vercel KV / Upstash Redis';
+                    indicator.title = `Connected to Upstash Redis (${syncUrl})`;
                 }
                 const data = await res.json();
 
@@ -174,7 +193,7 @@ class KmapStoreApp {
             }
         } catch(e) {
             if (indicator) {
-                indicator.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #94a3b8;"></span> Local Storage`;
+                indicator.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #94a3b8;"></span> Local Cache`;
                 indicator.style.background = 'rgba(148,163,184,0.1)';
                 indicator.style.color = '#64748b';
                 indicator.title = 'Offline / Local cache only';
@@ -184,9 +203,10 @@ class KmapStoreApp {
 
     async forceCloudSyncAll(silent = false) {
         const products = this.db.getProducts();
+        const syncUrl = getSyncApiUrl();
         if (!silent) this.showToast('☁️ Syncing products to cloud database...');
         try {
-            const res = await fetch('/api/sync', {
+            const res = await fetch(syncUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -205,13 +225,15 @@ class KmapStoreApp {
                     indicator.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #059669;"></span> Cloud Sync Live`;
                     indicator.style.background = 'rgba(16,185,129,0.1)';
                     indicator.style.color = '#059669';
+                    indicator.title = `Connected to Upstash Redis (${syncUrl})`;
                 }
             } else {
                 const errData = await res.json().catch(() => ({}));
                 if (!silent) this.showToast(`⚠️ Sync failed: ${errData.error || res.statusText}`, 'error');
             }
         } catch (e) {
-            if (!silent) this.showToast('⚠️ Network error connecting to cloud sync', 'error');
+            console.error('Cloud Sync Error:', e);
+            if (!silent) this.showToast(`⚠️ Network error: ${e.message || 'Cannot reach cloud endpoint'}`, 'error');
         }
     }
 
