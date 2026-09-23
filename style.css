@@ -870,33 +870,14 @@ tr:hover td {
     border-color: var(--secondary);
 }
 
-/* Mobile cart responsiveness layout styles */
+/* Mobile store responsiveness layout styles */
 @media (max-width: 992px) {
-    #view-client-store>div {
+    #view-client-store > div {
         flex-direction: column !important;
     }
 
-    #view-client-store>div>div:nth-child(2) {
-        display: none !important;
-        /* Hide right cart column */
-    }
-}
-
-.product-img {
-    width: 100%;
-    height: 200px;
-    background-color: var(--bg-light);
-    border-radius: var(--radius-sm);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-@media (max-width: 600px) {
-    .product-img {
-        height: 240px;
+    #view-client-store > div > div:nth-child(2) {
+        display: none !important; /* Hide right desktop cart column */
     }
 }
 
@@ -1030,177 +1011,6 @@ tr:hover td {
     }
 }
 
-/* Find Us Map Pulse Animation */
-.pulse-marker {
-    animation: markerPulse 2s infinite;
-}
-
-@keyframes markerPulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
-    }
-
-    70% {
-        box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
-    }
-
-    100% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-    }
-}
-
-/* Sidebar Backdrop overlay for Mobile */
-.sidebar-backdrop {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(15, 23, 42, 0.5);
-    backdrop-filter: blur(4px);
-    z-index: 999;
-}
-
-.sidebar-backdrop.active {
-    display: block;
-}
-
-@media (max-width: 992px) {
-    .main-content {
-        padding: 15px !important;
-    }
-
-    #hamburger-btn {
-        display: inline-flex !important;
-    }
-}
-
-/* Grid layout rules for product cards */
-.grid-3 {
-    grid-template-columns: repeat(3, 1fr);
-}
-
-@media (max-width: 1200px) {
-    .grid-3 {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 600px) {
-    .grid-3 {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Product gallery inspect layout */
-.inspect-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.inspect-main-img {
-    width: 100%;
-    height: 300px;
-    background-color: var(--bg-light);
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-    border: 1px solid var(--border);
-}
-
-.inspect-main-img img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    transition: transform 0.3s ease;
-}
-
-.inspect-main-img:hover img {
-    transform: scale(1.15);
-}
-
-.inspect-thumbnails {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.inspect-thumb {
-    width: 60px;
-    height: 60px;
-    border: 2px solid var(--border);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--bg-light);
-    transition: var(--transition);
-}
-
-.inspect-thumb.active,
-.inspect-thumb:hover {
-    border-color: var(--secondary);
-    opacity: 0.9;
-}
-
-.inspect-thumb img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover;
-}
-
-/* Image URLs list styling in Add Product Modal */
-.image-input-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-}
-
-/* Promo elements */
-.promo-badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background-color: var(--error);
-    color: var(--white);
-    padding: 4px 10px;
-    font-size: 11px;
-    font-weight: 800;
-    border-radius: var(--radius-sm);
-    text-transform: uppercase;
-    box-shadow: var(--shadow-sm);
-    z-index: 2;
-}
-
-.original-price {
-    text-decoration: line-through;
-    color: var(--text-light);
-    font-size: 14px;
-    margin-right: 6px;
-}
-
-.promo-price {
-    color: var(--error) !important;
-}
-
-/* Map frame design */
-.map-iframe-container {
-    width: 100%;
-    height: 100%;
-    min-height: 350px;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-}
-
 /* Mobile responsive adjustments for the Product Inspection Modal */
 @media (max-width: 768px) {
     #modal-product-inspect .modal-content {
@@ -1214,7 +1024,7 @@ tr:hover td {
     }
 
     #modal-product-inspect .inspect-main-img {
-        height: 200px !important;
+        height: 220px !important;
     }
 }
 
@@ -1227,15 +1037,15 @@ tr:hover td {
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: var(--white);
     font-size: 24px;
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     z-index: 1200;
     transition: var(--transition);
-    border-radius: 0px;
+    border-radius: 50%;
 }
 
 .lightbox-nav-btn:hover {
@@ -1245,11 +1055,83 @@ tr:hover td {
 }
 
 .lightbox-prev-btn {
-    left: 20px;
+    left: 16px;
 }
 
 .lightbox-next-btn {
-    right: 20px;
+    right: 16px;
+}
+
+/* Comprehensive Mobile & Tablet Responsive Enhancements */
+@media (max-width: 768px) {
+    .main-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px 14px;
+    }
+
+    .main-header > div:first-child {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    #topbar-auth-section {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    #page-title {
+        font-size: 20px !important;
+    }
+
+    #page-subtitle {
+        font-size: 11px !important;
+    }
+
+    #btn-topbar-signin,
+    #btn-topbar-admin-toggle {
+        height: 34px !important;
+        font-size: 12px !important;
+        padding: 0 10px !important;
+    }
+
+    /* Product catalog grid on small devices */
+    #products-catalog-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    .product-card {
+        height: auto !important;
+        min-height: 400px;
+    }
+
+    .product-img {
+        height: 220px !important;
+    }
+
+    /* Search bar and Category filter wrap nicely */
+    .card > div:has(#client-search) {
+        width: 100% !important;
+    }
+
+    /* Cart and checkout responsiveness */
+    #view-client-cart .card {
+        padding: 16px !important;
+    }
+
+    /* Table horizontal scrolling with visual indicator */
+    .table-responsive {
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+    }
 }
 
 /* Hire Purchase Styles & Badge extensions */

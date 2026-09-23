@@ -161,8 +161,8 @@
                         </button>
                     </div>
                     <div>
-                        <h1 id="page-title" style="font-weight: 800; color: var(--primary);">Open Marketplace</h1>
-                        <p style="color: var(--text-light); font-size: 14px;" id="page-subtitle">Browse computers, laptops, and accessories</p>
+                        <h1 id="page-title" style="font-weight: 800; color: var(--primary); letter-spacing: -0.5px;">KMAP COMPUTERS</h1>
+                        <p style="color: var(--text-light); font-size: 13px;" id="page-subtitle">Quality Laptops, Computers & Accessories | Sunyani</p>
                     </div>
                 </div>
                 <div id="topbar-auth-section" style="display: flex; align-items: center; gap: 10px;">
@@ -171,8 +171,8 @@
                         <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #059669;"></span> Cloud Sync
                     </div>
 
-                    <!-- Quick Admin / Marketplace toggle for staff -->
-                    <button id="btn-topbar-admin-toggle" class="btn btn-secondary" onclick="app.toggleAdminMarketplaceView()" style="display: none; height: 38px; font-size: 13px; align-items: center; gap: 6px; padding: 0 12px; border-radius: var(--radius-sm);" title="Toggle Management / Marketplace">
+                    <!-- Quick Admin / Store toggle for staff -->
+                    <button id="btn-topbar-admin-toggle" class="btn btn-secondary" onclick="app.toggleAdminMarketplaceView()" style="display: none; height: 38px; font-size: 13px; align-items: center; gap: 6px; padding: 0 12px; border-radius: var(--radius-sm);" title="Toggle Management / Store">
                         <i class="fa-solid fa-gauge"></i> <span id="admin-toggle-text">Admin Panel</span>
                     </button>
 
@@ -947,10 +947,15 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom: 12px;">
-                    <label style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>Product Images (Up to 6)</span>
-                        <span id="img-upload-status" style="font-size: 11px; font-weight: 600; color: var(--primary);"></span>
-                    </label>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label style="margin: 0; font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-light);">Product Images (Up to 6)</label>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span id="img-upload-status" style="font-size: 11px; font-weight: 600; color: var(--primary);"></span>
+                            <button type="button" onclick="app.clearAllModalImages()" class="btn btn-outline" style="padding: 2px 8px; font-size: 11px; height: 24px; color: var(--error); border-color: var(--border);">
+                                <i class="fa-solid fa-trash-can"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
                     
                     <!-- Live Image Preview Gallery -->
                     <div id="modal-image-previews" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; min-height: 40px; padding: 6px; border: 1px dashed var(--border); border-radius: var(--radius-sm); align-items: center;">
@@ -1225,7 +1230,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=3.4"></script>
+    <script src="app.js?v=3.5"></script>
 </body>
 
 </html>

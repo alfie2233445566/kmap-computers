@@ -981,24 +981,24 @@ class KmapStoreApp {
 
                 const urlInputs = Array.from(document.querySelectorAll('.product-img-url'));
 
+                let addedCount = 0;
                 for (const file of files) {
                     try {
                         const base64 = await this.compressImageFile(file);
-                        const emptyInput = urlInputs.find(input => !input.value.trim());
-                        if (emptyInput) {
-                            emptyInput.value = base64;
-                        } else {
-                            // If all 6 inputs filled, replace the last one
-                            urlInputs[urlInputs.length - 1].value = base64;
+                        let targetInput = urlInputs.find(input => !input.value.trim());
+                        if (!targetInput) {
+                            targetInput = urlInputs[Math.min(addedCount, urlInputs.length - 1)];
                         }
+                        targetInput.value = base64;
+                        addedCount++;
                     } catch (err) {
                         console.error('Image processing failed:', err);
                     }
                 }
 
                 if (statusEl) {
-                    statusEl.innerText = '✓ Ready to save!';
-                    setTimeout(() => { if (statusEl) statusEl.innerText = ''; }, 3000);
+                    statusEl.innerText = `✓ ${addedCount} HD photo(s) ready!`;
+                    setTimeout(() => { if (statusEl) statusEl.innerText = ''; }, 4000);
                 }
 
                 this.refreshModalImagePreviews();
@@ -1105,15 +1105,15 @@ class KmapStoreApp {
             if (viewName === 'client-store') {
                 adminToggleText.innerText = 'Admin Panel';
             } else {
-                adminToggleText.innerText = 'Marketplace';
+                adminToggleText.innerText = 'Store';
             }
         }
 
         switch(viewName) {
             case 'client-store':
                 document.getElementById('view-client-store').style.display = 'flex';
-                pageTitle.innerText = "Open Marketplace";
-                pageSubtitle.innerText = "Browse computers, laptops, and accessories";
+                pageTitle.innerText = "KMAP COMPUTERS";
+                pageSubtitle.innerText = "Quality Laptops, Computers & Accessories | Sunyani";
                 this.renderClientCatalog();
                 break;
             case 'client-cart':
@@ -1207,7 +1207,7 @@ class KmapStoreApp {
             `;
             nav.innerHTML = `
                 <button class="nav-item" id="nav-btn-client-store" onclick="app.switchView('client-store')">
-                    <i class="fa-solid fa-store"></i> Open Marketplace
+                    <i class="fa-solid fa-store"></i> Store
                 </button>
                 ${cartBtn}
                 ${ordersBtn}
@@ -1216,11 +1216,11 @@ class KmapStoreApp {
                 </button>
             `;
         } else {
-            // Admin & Super Admin navbar: Full access to Open Marketplace AND Staff Management
+            // Admin & Super Admin navbar: Full access to Store AND Staff Management
             nav.innerHTML = `
-                <div style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 16px 4px;">Marketplace</div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 16px 4px;">Shop & Browse</div>
                 <button class="nav-item" id="nav-btn-client-store" onclick="app.switchView('client-store')">
-                    <i class="fa-solid fa-store"></i> Open Marketplace
+                    <i class="fa-solid fa-store"></i> Store
                 </button>
                 <div style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px 4px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;" onclick="app.switchView('admin-staff')">
                     <span>Staff Management</span>
@@ -1339,7 +1339,7 @@ class KmapStoreApp {
             // Clicking card opens the product inspect view
             card.innerHTML = `
                 ${promoBadge}
-                <div onclick="app.openInspectModal('${p.id}')" style="display: flex; flex-direction: column; height: 320px; justify-content: space-between;">
+                <div onclick="app.openInspectModal('${p.id}')" style="display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between;">
                     <div>
                         <div class="product-img">${mainImg}</div>
                         <h4 style="font-weight: 700; color: var(--text-dark); height: 44px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-top: 8px; font-size: 15px; line-height: 1.4;">${p.name}</h4>
@@ -2397,7 +2397,7 @@ class KmapStoreApp {
         }
     }
 
-    // Helper: compress any image file with high-definition clarity and smooth downsampling
+    // Helper: compress any image file with high-definition clarity, multi-step scaling, and 0.92 quality
     compressImageFile(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -2406,36 +2406,60 @@ class KmapStoreApp {
                 const img = new Image();
                 img.onerror = () => reject(new Error("Unable to parse image. Please use JPG, PNG, or WebP."));
                 img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    // Upgraded resolution bounds for crystal-clear product photos (1280px HD)
-                    const MAX_WIDTH = 1280;
-                    const MAX_HEIGHT = 1280;
-                    let width = img.width;
-                    let height = img.height;
+                    const MAX_WIDTH = 1920;
+                    const MAX_HEIGHT = 1920;
+                    let targetWidth = img.width;
+                    let targetHeight = img.height;
 
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
+                    if (targetWidth > targetHeight) {
+                        if (targetWidth > MAX_WIDTH) {
+                            targetHeight = Math.round(targetHeight * (MAX_WIDTH / targetWidth));
+                            targetWidth = MAX_WIDTH;
                         }
                     } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
+                        if (targetHeight > MAX_HEIGHT) {
+                            targetWidth = Math.round(targetWidth * (MAX_HEIGHT / targetHeight));
+                            targetHeight = MAX_HEIGHT;
                         }
                     }
 
-                    canvas.width = Math.round(width);
-                    canvas.height = Math.round(height);
-                    const ctx = canvas.getContext('2d');
+                    // Multi-step downscaling to eliminate canvas aliasing and blur on large phone camera photos (e.g. 12-48MP)
+                    let currentCanvas = document.createElement('canvas');
+                    currentCanvas.width = img.width;
+                    currentCanvas.height = img.height;
+                    let currentCtx = currentCanvas.getContext('2d');
+                    currentCtx.drawImage(img, 0, 0);
 
-                    // High quality bicubic image smoothing
-                    ctx.imageSmoothingEnabled = true;
-                    ctx.imageSmoothingQuality = 'high';
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    let curW = img.width;
+                    let curH = img.height;
+                    while (curW * 0.5 > targetWidth && curH * 0.5 > targetHeight) {
+                        curW = Math.round(curW * 0.5);
+                        curH = Math.round(curH * 0.5);
+                        const stepCanvas = document.createElement('canvas');
+                        stepCanvas.width = curW;
+                        stepCanvas.height = curH;
+                        const stepCtx = stepCanvas.getContext('2d');
+                        stepCtx.imageSmoothingEnabled = true;
+                        stepCtx.imageSmoothingQuality = 'high';
+                        stepCtx.drawImage(currentCanvas, 0, 0, curW, curH);
+                        currentCanvas = stepCanvas;
+                    }
 
-                    // High-quality JPEG (0.85 quality produces vivid colors and sharp details)
-                    const base64 = canvas.toDataURL('image/jpeg', 0.85);
+                    // Final canvas at exact target resolution
+                    const finalCanvas = document.createElement('canvas');
+                    finalCanvas.width = targetWidth;
+                    finalCanvas.height = targetHeight;
+                    const finalCtx = finalCanvas.getContext('2d');
+                    finalCtx.imageSmoothingEnabled = true;
+                    finalCtx.imageSmoothingQuality = 'high';
+
+                    // Fill white background so transparent PNG cutouts don't turn into black boxes
+                    finalCtx.fillStyle = '#ffffff';
+                    finalCtx.fillRect(0, 0, targetWidth, targetHeight);
+                    finalCtx.drawImage(currentCanvas, 0, 0, targetWidth, targetHeight);
+
+                    // High-definition JPEG at 0.92 quality (super sharp, vibrant colors)
+                    const base64 = finalCanvas.toDataURL('image/jpeg', 0.92);
                     resolve(base64);
                 };
                 img.src = e.target.result;
@@ -2459,13 +2483,41 @@ class KmapStoreApp {
         container.innerHTML = '';
         images.forEach((imgSrc, idx) => {
             const thumb = document.createElement('div');
-            thumb.style.cssText = 'position: relative; width: 60px; height: 60px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); background: #fff;';
+            thumb.style.cssText = 'position: relative; width: 68px; height: 68px; border-radius: 6px; overflow: hidden; border: 2px solid ' + (idx === 0 ? 'var(--secondary)' : 'var(--border)') + '; background: #fff; cursor: pointer;';
+            thumb.title = idx === 0 ? 'Main Photo (shown on storefront card)' : 'Click to set as Main Photo';
             thumb.innerHTML = `
                 <img src="${imgSrc}" style="width: 100%; height: 100%; object-fit: cover;">
-                <button type="button" onclick="app.removeModalImage(${idx})" style="position: absolute; top: 2px; right: 2px; background: rgba(220,38,38,0.85); color: #fff; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+                ${idx === 0 ? '<span style="position: absolute; bottom: 2px; left: 2px; font-size: 8px; font-weight: 800; background: var(--secondary); color: #000; padding: 1px 4px; border-radius: 3px; letter-spacing: 0.5px;">MAIN</span>' : ''}
+                <button type="button" onclick="event.stopPropagation(); app.removeModalImage(${idx})" style="position: absolute; top: 2px; right: 2px; background: rgba(220,38,38,0.9); color: #fff; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Remove Photo">✕</button>
             `;
+            if (idx > 0) {
+                thumb.onclick = () => app.setMainModalImage(idx);
+            }
             container.appendChild(thumb);
         });
+    }
+
+    setMainModalImage(index) {
+        const urlInputs = Array.from(document.querySelectorAll('.product-img-url'));
+        const currentImages = urlInputs.map(input => input.value.trim()).filter(v => v.length > 0);
+        if (index < currentImages.length) {
+            const selected = currentImages.splice(index, 1)[0];
+            currentImages.unshift(selected);
+            urlInputs.forEach((input, idx) => {
+                input.value = currentImages[idx] || '';
+            });
+            this.refreshModalImagePreviews();
+            this.showToast('Updated main display photo');
+        }
+    }
+
+    clearAllModalImages() {
+        const urlInputs = Array.from(document.querySelectorAll('.product-img-url'));
+        urlInputs.forEach(input => input.value = '');
+        const fileInput = document.getElementById('form-product-file-upload');
+        if (fileInput) fileInput.value = '';
+        this.refreshModalImagePreviews();
+        this.showToast('All photos cleared. Select new photos from device.');
     }
 
     removeModalImage(index) {
@@ -3356,7 +3408,7 @@ class KmapStoreApp {
         this.renderSidebar();
         this.loadCart();
         this.switchView('client-store');
-        this.showToast("Logged out. Browsing Open Marketplace as Guest.");
+        this.showToast("Logged out. Browsing Kmap Computers as Guest.");
     }
 }
 
