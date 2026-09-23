@@ -670,42 +670,83 @@
                         </div>
                     </div>
 
-                    <!-- Super Admin View: Staff/Admin User Creation -->
-                    <div class="card" id="superadmin-user-card" style="display: none;">
-                        <h3 class="card-title"><i class="fa-solid fa-users-gear"></i> System Staff Directory</h3>
+                    <!-- Cloud Sync & Network Diagnostics Card -->
+                    <div class="card">
+                        <h3 class="card-title"><i class="fa-solid fa-cloud-arrow-up"></i> Cloud Synchronization Settings</h3>
                         <p style="color: var(--text-light); font-size: 14px; margin-bottom: 16px;">
-                            Manage user profiles and system administrators.
+                            Configure live database replication with Vercel KV / Upstash Redis for seamless cross-device syncing.
                         </p>
-                        <form id="create-staff-form" style="margin-bottom: 24px;">
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div>
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-dark);">Active Cloud Sync API</label>
+                                <div style="display: flex; gap: 8px; margin-top: 4px;">
+                                    <input type="text" id="custom-sync-url-input" class="form-control" style="font-family: monospace; font-size: 12px;" readonly value="https://kmap-computers.vercel.app/api/sync">
+                                    <button class="btn btn-primary" onclick="app.forceCloudSyncAll()" style="font-size: 12px; padding: 6px 12px; white-space: nowrap;">
+                                        <i class="fa-solid fa-rotate"></i> Sync All Now
+                                    </button>
+                                </div>
+                            </div>
+                            <div style="background: var(--bg); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 12px;">
+                                <strong style="color: var(--primary);">Auto-Sync Status:</strong> Changes to products, inventory stock, promotions, orders, and staff are synced automatically across all connected devices in near real-time.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW I: Dedicated Staff Management -->
+            <section id="view-admin-staff" class="app-view" style="display: none;">
+                <div class="grid grid-2">
+                    <!-- Staff Creation Card -->
+                    <div class="card">
+                        <h3 class="card-title"><i class="fa-solid fa-user-plus"></i> Add New Staff Member</h3>
+                        <p style="color: var(--text-light); font-size: 14px; margin-bottom: 16px;">
+                            Grant administrator or manager privileges to store employees.
+                        </p>
+                        <form id="create-staff-form" style="margin-bottom: 8px;">
+                            <div class="form-group">
+                                <label>Staff Full Name</label>
+                                <input type="text" id="staff-name" class="form-control"
+                                    placeholder="e.g. Samuel Kyeremeh" required>
+                            </div>
                             <div class="grid grid-2" style="gap: 12px;">
                                 <div class="form-group">
-                                    <label>Username</label>
+                                    <label>Username / Login ID</label>
                                     <input type="text" id="staff-username" class="form-control"
-                                        placeholder="e.g. staff_elorm" required>
+                                        placeholder="e.g. samuel" required>
                                 </div>
                                 <div class="form-group">
                                     <label>Role</label>
                                     <select id="staff-role" class="form-control" required>
-                                        <option value="admin">Admin</option>
-                                        <option value="superadmin">Super Admin</option>
+                                        <option value="admin">Admin Manager</option>
+                                        <option value="superadmin">Super Administrator</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Password</label>
+                                <label>Login Password</label>
                                 <input type="password" id="staff-password" class="form-control" placeholder="••••••••"
                                     required>
                             </div>
-                            <button type="submit" class="btn btn-secondary" style="width: 100%;">
-                                <i class="fa-solid fa-user-plus"></i> Add Account
+                            <button type="submit" class="btn btn-secondary" style="width: 100%; height: 44px; margin-top: 8px; font-weight: 700;">
+                                <i class="fa-solid fa-user-plus"></i> Create Staff Account
                             </button>
                         </form>
+                    </div>
 
+                    <!-- Staff Directory Table Card -->
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 class="card-title" style="margin-bottom: 0;"><i class="fa-solid fa-users-gear"></i> System Staff Directory</h3>
+                            <button class="btn btn-outline" style="font-size: 12px; padding: 4px 10px;" onclick="app.forceCloudSyncAll()">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Sync Staff
+                            </button>
+                        </div>
                         <div class="table-responsive">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Username</th>
+                                        <th>Staff User</th>
                                         <th>Role</th>
                                         <th>Action</th>
                                     </tr>
@@ -1187,7 +1228,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=3.0"></script>
+    <script src="app.js?v=3.1"></script>
 </body>
 
 </html>

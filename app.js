@@ -874,25 +874,31 @@ class KmapStoreApp {
         });
 
         // Staff Creation Form
-        document.getElementById('create-staff-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const user = document.getElementById('staff-username').value.trim();
-            const role = document.getElementById('staff-role').value;
-            const password = document.getElementById('staff-password').value;
+        const createStaffForm = document.getElementById('create-staff-form');
+        if (createStaffForm) {
+            createStaffForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const nameInput = document.getElementById('staff-name');
+                const user = document.getElementById('staff-username').value.trim();
+                const role = document.getElementById('staff-role').value;
+                const password = document.getElementById('staff-password').value;
+                const name = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : user.toUpperCase();
 
-            const users = this.db.getUsers();
-            if (users.find(u => u.username === user)) {
-                this.showToast("Username already exists!", 'error');
-                return;
-            }
+                const users = this.db.getUsers();
+                if (users.find(u => u.username.toLowerCase() === user.toLowerCase())) {
+                    this.showToast("Username already exists! Choose another.", 'error');
+                    return;
+                }
 
-            users.push({ username: user, role, name: user.toUpperCase(), password });
-            this.db.saveUsers(users);
-            this.db.addLog(`Created new staff user: ${user} with role ${role}`);
-            this.showToast(`User ${user} created successfully.`);
-            document.getElementById('create-staff-form').reset();
-            this.renderStaffList();
-        });
+                users.push({ username: user, role, name, password });
+                this.db.saveUsers(users);
+                this.db.addLog(`Created new staff user: ${user} (${role})`);
+                this.showToast(`Staff user ${user} created successfully.`);
+                createStaffForm.reset();
+                this.renderStaffList();
+                this.forceCloudSyncAll(false);
+            });
+        }
 
         // Promotions Form Submission
         document.getElementById('create-promo-form').addEventListener('submit', (e) => {
@@ -1144,11 +1150,16 @@ class KmapStoreApp {
                 pageSubtitle.innerText = "Download printable reports and summaries";
                 this.handleReportPresetChange();
                 break;
+            case 'admin-staff':
+                document.getElementById('view-admin-staff').style.display = 'block';
+                pageTitle.innerText = "Staff Management";
+                pageSubtitle.innerText = "Manage employees, staff accounts, and administrator permissions";
+                this.renderStaffList();
+                break;
             case 'admin-backups':
                 document.getElementById('view-admin-backups').style.display = 'block';
-                pageTitle.innerText = "System Administration";
-                pageSubtitle.innerText = "Localized system database operations";
-                this.renderStaffList();
+                pageTitle.innerText = "Database & Cloud Sync";
+                pageSubtitle.innerText = "Localized system database operations and cloud replication";
                 this.updateBackupStatus();
                 break;
             case 'admin-promos':
@@ -1203,7 +1214,10 @@ class KmapStoreApp {
                 <button class="nav-item" id="nav-btn-client-store" onclick="app.switchView('client-store')">
                     <i class="fa-solid fa-store"></i> Open Marketplace
                 </button>
-                <div style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px 4px;">Staff Management</div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px 4px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;" onclick="app.switchView('admin-staff')">
+                    <span>Staff Management</span>
+                    <i class="fa-solid fa-chevron-right" style="font-size: 9px; opacity: 0.5;"></i>
+                </div>
                 <button class="nav-item" id="nav-btn-admin-dashboard" onclick="app.switchView('admin-dashboard')">
                     <i class="fa-solid fa-chart-line"></i> Dashboard
                 </button>
@@ -1212,6 +1226,9 @@ class KmapStoreApp {
                 </button>
                 <button class="nav-item" id="nav-btn-admin-orders" onclick="app.switchView('admin-orders')">
                     <i class="fa-solid fa-truck-fast"></i> Order Hub
+                </button>
+                <button class="nav-item" id="nav-btn-admin-staff" onclick="app.switchView('admin-staff')">
+                    <i class="fa-solid fa-users-gear"></i> Staff Management
                 </button>
                 <button class="nav-item" id="nav-btn-admin-promos" onclick="app.switchView('admin-promos')">
                     <i class="fa-solid fa-tags"></i> Promotions
@@ -1223,7 +1240,7 @@ class KmapStoreApp {
                     <i class="fa-solid fa-file-invoice-dollar"></i> Reports
                 </button>
                 <button class="nav-item" id="nav-btn-admin-backups" onclick="app.switchView('admin-backups')">
-                    <i class="fa-solid fa-screwdriver-wrench"></i> Admin Panel
+                    <i class="fa-solid fa-screwdriver-wrench"></i> Database & Cloud
                 </button>
             `;
         }
@@ -2739,28 +2756,27 @@ class KmapStoreApp {
         reader.readAsText(file);
     }
 
-    // Super Admin: List all admin accounts
+    // Staff Management Directory listing (available to all admins)
     renderStaffList() {
-        if (this.currentUser.role === 'superadmin') {
-            document.getElementById('superadmin-user-card').style.display = 'block';
-        } else {
-            document.getElementById('superadmin-user-card').style.display = 'none';
-            return;
-        }
-
         const tbody = document.getElementById('staff-list-tbody');
+        if (!tbody) return;
         tbody.innerHTML = '';
 
-        const users = this.db.getUsers().filter(u => u.role !== 'client');
+        const users = this.db.getUsers().filter(u => u.role !== 'client' && u.role !== 'guest');
         users.forEach(u => {
             const tr = document.createElement('tr');
+            const isSuper = u.username === 'superadmin';
+            const badgeClass = u.role === 'superadmin' ? 'badge-primary' : 'badge-success';
             tr.innerHTML = `
-                <td><strong>${u.username}</strong></td>
-                <td><span class="badge badge-primary">${u.role.toUpperCase()}</span></td>
+                <td>
+                    <strong>${u.name || u.username}</strong><br>
+                    <span style="font-size: 12px; color: var(--text-light); font-family: monospace;">@${u.username}</span>
+                </td>
+                <td><span class="badge ${badgeClass}">${u.role.toUpperCase()}</span></td>
                 <td>
                     <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" 
-                        onclick="app.deleteStaff('${u.username}')" ${u.username === 'superadmin' ? 'disabled' : ''}>
-                        Remove
+                        onclick="app.deleteStaff('${u.username}')" ${isSuper ? 'disabled title="Default Superadmin cannot be removed"' : ''}>
+                        <i class="fa-solid fa-trash"></i> Remove
                     </button>
                 </td>
             `;
@@ -2776,6 +2792,7 @@ class KmapStoreApp {
         this.db.addLog(`Removed staff user: ${username}`);
         this.showToast(`User ${username} removed.`);
         this.renderStaffList();
+        this.forceCloudSyncAll(false);
     }
 
     // Real-time toast alerts
