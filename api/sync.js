@@ -1,15 +1,20 @@
-import { kv } from '@vercel/kv';
+import { createClient } from '@vercel/kv';
 
 export default async function handler(request, response) {
   const allowedKeys = ['kmap_products', 'kmap_users', 'kmap_orders', 'kmap_logs', 'kmap_promos', 'kmap_hire_purchase'];
 
-  // Check if Vercel KV is configured in environment
-  if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  // Check if Vercel KV or Upstash Redis is configured in environment
+  if (!url || !token) {
     return response.status(503).json({
-      error: 'Vercel KV not connected. In your Vercel Dashboard, go to Storage -> Create/Connect KV Database.',
+      error: 'Upstash Redis / Vercel KV not connected. In your Vercel Dashboard, go to Storage -> Upstash and connect it to this project.',
       configured: false
     });
   }
+
+  const kv = createClient({ url, token });
 
   try {
     if (request.method === 'GET') {
