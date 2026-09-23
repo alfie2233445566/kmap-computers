@@ -300,6 +300,7 @@ class KmapStoreApp {
         const modal = document.getElementById('modal-login');
         if (modal) {
             modal.classList.add('active');
+            this.updateScrollLock();
             this.showAuthTab(tab);
         }
     }
@@ -351,6 +352,16 @@ class KmapStoreApp {
     closeLoginModal() {
         const modal = document.getElementById('modal-login');
         if (modal) modal.classList.remove('active');
+        this.updateScrollLock();
+    }
+
+    updateScrollLock() {
+        const hasActiveModal = !!document.querySelector('.modal-overlay.active, .lightbox-overlay.active');
+        if (hasActiveModal) {
+            document.body.classList.add('modal-open');
+        } else {
+            document.body.classList.remove('modal-open');
+        }
     }
 
     updateProfileHeader(user) {
@@ -1070,47 +1081,12 @@ class KmapStoreApp {
             input.addEventListener('input', () => this.refreshModalImagePreviews());
         });
 
-        // Universal Background Scroll Lock Manager for all popups, modals, and smaller menus
-        const updateScrollLock = () => {
-            const hasActiveModal = !!document.querySelector('.modal-overlay.active, .lightbox-overlay.active');
-            const hasActiveSidebar = !!document.querySelector('.sidebar.active');
-            
-            if (hasActiveModal) {
-                document.body.classList.add('modal-open');
-            } else {
-                document.body.classList.remove('modal-open');
-            }
-
-            if (hasActiveSidebar) {
-                document.body.classList.add('sidebar-open');
-            } else {
-                document.body.classList.remove('sidebar-open');
-            }
-        };
-
-        // MutationObserver to automatically lock/unlock background scrolling whenever any modal or menu opens/closes
-        const modalScrollObserver = new MutationObserver(() => {
-            updateScrollLock();
-        });
-        modalScrollObserver.observe(document.body, {
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['class']
-        });
-
-        // Prevent touch dragging on modal backdrops from scrolling background
-        document.addEventListener('touchmove', (e) => {
-            const activeModal = document.querySelector('.modal-overlay.active, .lightbox-overlay.active');
-            if (activeModal && !e.target.closest('.modal-content, .lightbox-content, .sidebar')) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-
         // Close modals when clicking outside on the backdrop
-        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        document.querySelectorAll('.modal-overlay, .lightbox-overlay').forEach(overlay => {
             overlay.addEventListener('click', (e) => {
                 if (e.target === overlay) {
                     overlay.classList.remove('active');
+                    this.updateScrollLock();
                 }
             });
         });
@@ -1148,6 +1124,9 @@ class KmapStoreApp {
                 if (e.key === 'Escape') this.closeLightbox();
             } else if (inspectModal && inspectModal.classList.contains('active')) {
                 if (e.key === 'Escape') this.closeInspectModal();
+            } else if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+                this.updateScrollLock();
             }
         });
 
@@ -1721,6 +1700,7 @@ class KmapStoreApp {
                 `;
             }
             callOverlay.classList.add('active');
+            this.updateScrollLock();
         }
     }
 
@@ -1757,11 +1737,13 @@ class KmapStoreApp {
         }
         
         document.getElementById('modal-checkout-call').classList.remove('active');
+        this.updateScrollLock();
         this.switchView('client-cart');
     }
 
     closeModal() {
         document.getElementById('modal-checkout-call').classList.remove('active');
+        this.updateScrollLock();
         this.switchView('client-orders');
     }
 
@@ -1949,6 +1931,7 @@ class KmapStoreApp {
         }
 
         document.getElementById('modal-product-inspect').classList.add('active');
+        this.updateScrollLock();
     }
 
     setInspectImage(index) {
@@ -1964,7 +1947,9 @@ class KmapStoreApp {
     }
 
     closeInspectModal() {
-        document.getElementById('modal-product-inspect').classList.remove('active');
+        const modal = document.getElementById('modal-product-inspect');
+        if (modal) modal.classList.remove('active');
+        this.updateScrollLock();
         if (this.inspectBackView) {
             this.switchView(this.inspectBackView);
             this.inspectBackView = null;
@@ -1988,6 +1973,11 @@ class KmapStoreApp {
             if (this.lightboxImages.length === 0 && this.inspectImages && this.inspectImages.length > 0) {
                 this.lightboxImages = [...this.inspectImages];
             }
+
+            // Do not open lightbox if there are no real photos (e.g. placeholder icon)
+            if (this.lightboxImages.length === 0 && (!src || src.startsWith('data:image/svg'))) {
+                return;
+            }
             
             let foundIdx = -1;
             if (this.lightboxImages.length > 0 && src) {
@@ -2000,6 +1990,7 @@ class KmapStoreApp {
             this.lightboxIndex = foundIdx >= 0 ? foundIdx : (this.inspectImageIndex || 0);
             img.src = this.lightboxImages.length > 0 ? this.lightboxImages[this.lightboxIndex] : src;
             modal.classList.add('active');
+            this.updateScrollLock();
             
             const prevBtn = document.querySelector('.lightbox-prev-btn');
             const nextBtn = document.querySelector('.lightbox-next-btn');
@@ -2015,6 +2006,7 @@ class KmapStoreApp {
         const modal = document.getElementById('lightbox-modal');
         if (modal) {
             modal.classList.remove('active');
+            this.updateScrollLock();
         }
     }
 
@@ -2697,10 +2689,12 @@ class KmapStoreApp {
         
         this.refreshModalImagePreviews();
         modal.classList.add('active');
+        this.updateScrollLock();
     }
 
     closeProductModal() {
         document.getElementById('modal-product-form').classList.remove('active');
+        this.updateScrollLock();
     }
 
     deleteProduct(id) {
@@ -3029,6 +3023,7 @@ class KmapStoreApp {
     // Open create HP modal
     openHPModal() {
         document.getElementById('modal-hp-form').classList.add('active');
+        this.updateScrollLock();
         
         // Populate products select list
         const select = document.getElementById('form-hp-product-select');
@@ -3061,6 +3056,7 @@ class KmapStoreApp {
 
     closeHPModal() {
         document.getElementById('modal-hp-form').classList.remove('active');
+        this.updateScrollLock();
         document.getElementById('hp-details-form').reset();
     }
 
@@ -3278,6 +3274,7 @@ class KmapStoreApp {
 
         this.activeHPId = hpId;
         document.getElementById('modal-hp-details').classList.add('active');
+        this.updateScrollLock();
 
         // Render top summary in details view
         const unpaid = hp.price - hp.deposit - hp.installments.filter(inst => inst.status === 'paid').reduce((sum, inst) => sum + inst.amount, 0);
@@ -3374,6 +3371,7 @@ class KmapStoreApp {
 
     closeHPDetailsModal() {
         document.getElementById('modal-hp-details').classList.remove('active');
+        this.updateScrollLock();
         this.activeHPId = null;
     }
 
@@ -3428,10 +3426,12 @@ class KmapStoreApp {
         document.getElementById('profile-modal-avatar').innerText = this.currentUser.name.charAt(0).toUpperCase();
 
         document.getElementById('modal-user-profile').classList.add('active');
+        this.updateScrollLock();
     }
 
     closeUserProfileModal() {
         document.getElementById('modal-user-profile').classList.remove('active');
+        this.updateScrollLock();
     }
 
     openChangePasswordFromProfile() {
@@ -3445,10 +3445,12 @@ class KmapStoreApp {
             return;
         }
         document.getElementById('modal-change-password').classList.add('active');
+        this.updateScrollLock();
     }
 
     closeChangePasswordModal() {
         document.getElementById('modal-change-password').classList.remove('active');
+        this.updateScrollLock();
         document.getElementById('change-password-form').reset();
     }
 

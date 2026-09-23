@@ -984,7 +984,7 @@
     </div>
 
     <!-- 5. Modal for Product Inspection Gallery (Clients) -->
-    <div id="modal-product-inspect" class="modal-overlay">
+    <div id="modal-product-inspect" class="modal-overlay" onclick="if(event.target === this) app.closeInspectModal()">
         <div class="modal-content" style="max-width: 950px; padding: 24px;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
                 <div>
@@ -1003,8 +1003,7 @@
                 <!-- Gallery Section -->
                 <div class="inspect-gallery">
                     <div class="inspect-main-img">
-                        <img id="inspect-img-display" src="" alt="Product view" onclick="app.openLightbox(this.src)"
-                            style="cursor: zoom-in;">
+                        <img id="inspect-img-display" src="" alt="Product view">
                     </div>
                     <div class="inspect-thumbnails" id="inspect-thumbnails-container">
                         <!-- Thumbnails injected here -->

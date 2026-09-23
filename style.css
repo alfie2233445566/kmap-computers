@@ -489,9 +489,7 @@ tr:hover td {
 
 /* Order Confirmation & General Modals */
 body.modal-open {
-    overflow: hidden !important;
-    height: 100vh !important;
-    touch-action: none;
+    overflow: hidden;
 }
 
 .modal-overlay {
@@ -717,6 +715,7 @@ body.modal-open {
     max-height: 100%;
     object-fit: contain;
     transition: transform 0.3s ease;
+    cursor: zoom-in;
 }
 
 .inspect-main-img:hover img {
