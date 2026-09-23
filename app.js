@@ -287,8 +287,13 @@ class KmapStoreApp {
         this.renderSidebar();
         this.loadCart();
 
-        // The landing page of the application is ALWAYS the Open Marketplace
-        this.switchView('client-store');
+        // Initialize starting view with browser navigation support
+        const hashView = window.location.hash ? window.location.hash.replace('#', '') : null;
+        const initialView = hashView && document.getElementById(`view-${hashView}`) ? hashView : 'client-store';
+        this.switchView(initialView, false);
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState({ view: initialView }, '', '#' + initialView);
+        }
     }
 
     openLoginModal(tab = 'signin') {
@@ -869,25 +874,13 @@ class KmapStoreApp {
         // Backup Upload
         document.getElementById('restore-db-file').addEventListener('change', (e) => this.restoreBackup(e.target));
         
-        // Swiping gesture recognition for back/forward navigation
-        let touchStartX = 0;
-        let touchStartY = 0;
-        window.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-            touchStartY = e.changedTouches[0].screenY;
-        }, { passive: true });
-
-        window.addEventListener('touchend', (e) => {
-            const diffX = e.changedTouches[0].screenX - touchStartX;
-            const diffY = e.changedTouches[0].screenY - touchStartY;
-            if (Math.abs(diffX) > 80 && Math.abs(diffY) < 50) {
-                if (diffX > 0) {
-                    this.goBack();
-                } else {
-                    this.goForward();
-                }
+        // Browser navigation integration ("the web ones" - native back/forward buttons)
+        window.addEventListener('popstate', (e) => {
+            const targetView = (e.state && e.state.view) || (window.location.hash ? window.location.hash.replace('#', '') : 'client-store');
+            if (targetView && document.getElementById(`view-${targetView}`)) {
+                this.switchView(targetView, false);
             }
-        }, { passive: true });
+        });
 
         // Listen to storage changes for actual real-time order notifications and instant cross-tab sync
         window.addEventListener('storage', (e) => {
@@ -1181,14 +1174,15 @@ class KmapStoreApp {
     }
 
     // Switch Application Views
-    switchView(viewName) {
+    switchView(viewName, updateBrowserHistory = true) {
         // Auto-close sidebar on view selection
         this.closeSidebar();
 
-        if (!this.isNavigatingHistory) {
-            this.viewHistory = this.viewHistory.slice(0, this.viewHistoryPointer + 1);
-            this.viewHistory.push(viewName);
-            this.viewHistoryPointer = this.viewHistory.length - 1;
+        if (updateBrowserHistory && window.history && window.history.pushState) {
+            const currentHash = window.location.hash ? window.location.hash.replace('#', '') : '';
+            if (currentHash !== viewName) {
+                window.history.pushState({ view: viewName }, '', '#' + viewName);
+            }
         }
 
         this.activeView = viewName;
@@ -1200,8 +1194,6 @@ class KmapStoreApp {
         
         const navBtn = document.getElementById(`nav-btn-${viewName}`);
         if (navBtn) navBtn.classList.add('active');
-        
-        this.updateNavHistoryButtons();
 
         // Update topbar quick admin toggle button text
         const adminToggleText = document.getElementById('admin-toggle-text');
@@ -3478,37 +3470,14 @@ class KmapStoreApp {
     }
 
     goBack() {
-        if (this.viewHistoryPointer > 0) {
-            this.isNavigatingHistory = true;
-            this.viewHistoryPointer--;
-            this.switchView(this.viewHistory[this.viewHistoryPointer]);
-            this.isNavigatingHistory = false;
-            this.updateNavHistoryButtons();
+        if (window.history && window.history.back) {
+            window.history.back();
         }
     }
 
     goForward() {
-        if (this.viewHistoryPointer < this.viewHistory.length - 1) {
-            this.isNavigatingHistory = true;
-            this.viewHistoryPointer++;
-            this.switchView(this.viewHistory[this.viewHistoryPointer]);
-            this.isNavigatingHistory = false;
-            this.updateNavHistoryButtons();
-        }
-    }
-
-    updateNavHistoryButtons() {
-        const backBtn = document.getElementById('header-back-btn');
-        const forwardBtn = document.getElementById('header-forward-btn');
-        if (backBtn) {
-            backBtn.disabled = this.viewHistoryPointer <= 0;
-            backBtn.style.opacity = this.viewHistoryPointer <= 0 ? '0.4' : '1';
-            backBtn.style.cursor = this.viewHistoryPointer <= 0 ? 'not-allowed' : 'pointer';
-        }
-        if (forwardBtn) {
-            forwardBtn.disabled = this.viewHistoryPointer >= this.viewHistory.length - 1;
-            forwardBtn.style.opacity = this.viewHistoryPointer >= this.viewHistory.length - 1 ? '0.4' : '1';
-            forwardBtn.style.cursor = this.viewHistoryPointer >= this.viewHistory.length - 1 ? 'not-allowed' : 'pointer';
+        if (window.history && window.history.forward) {
+            window.history.forward();
         }
     }
 
