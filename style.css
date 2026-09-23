@@ -487,7 +487,13 @@ tr:hover td {
     border: 1px solid var(--border);
 }
 
-/* Order Confirmation Modal */
+/* Order Confirmation & General Modals */
+body.modal-open {
+    overflow: hidden !important;
+    height: 100vh !important;
+    touch-action: none;
+}
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -503,6 +509,7 @@ tr:hover td {
     opacity: 0;
     pointer-events: none;
     transition: var(--transition);
+    overscroll-behavior: contain;
 }
 
 .modal-overlay.active {
@@ -519,6 +526,8 @@ tr:hover td {
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     box-shadow: var(--shadow-lg);
     transform: scale(0.9);
     transition: var(--transition);
@@ -714,42 +723,6 @@ tr:hover td {
     transform: scale(1.15);
 }
 
-.inspect-nav-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(15, 23, 42, 0.65);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 16px;
-    z-index: 10;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(4px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-.inspect-nav-btn:hover {
-    background: rgba(15, 23, 42, 0.9);
-    color: var(--secondary);
-    border-color: var(--secondary);
-    transform: translateY(-50%) scale(1.1);
-}
-
-.inspect-prev-btn {
-    left: 10px;
-}
-
-.inspect-next-btn {
-    right: 10px;
-}
-
 .inspect-thumbnails {
     display: flex;
     gap: 8px;
@@ -914,77 +887,6 @@ tr:hover td {
 
     #view-client-store > div > div:nth-child(2) {
         display: none !important; /* Hide right desktop cart column */
-    }
-}
-
-/* Order Confirmation Modal */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    pointer-events: none;
-    transition: var(--transition);
-}
-
-.modal-overlay.active {
-    opacity: 1;
-    pointer-events: all;
-}
-
-.modal-content {
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    padding: 32px;
-    max-width: 500px;
-    width: 90%;
-    box-shadow: var(--shadow-lg);
-    transform: scale(0.9);
-    transition: var(--transition);
-}
-
-.modal-overlay.active .modal-content {
-    transform: scale(1);
-}
-
-/* Toast Notifications */
-#toast-container {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.toast {
-    background: var(--sidebar-bg);
-    color: var(--white);
-    padding: 16px 24px;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transform: translateY(100px);
-    opacity: 0;
-    animation: slideIn 0.3s forwards;
-    border-left: 4px solid var(--accent);
-}
-
-@keyframes slideIn {
-    to {
-        transform: translateY(0);
-        opacity: 1;
     }
 }
 

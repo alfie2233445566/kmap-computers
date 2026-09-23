@@ -1077,28 +1077,43 @@ class KmapStoreApp {
             input.addEventListener('input', () => this.refreshModalImagePreviews());
         });
 
-        // Touch swipe gestures for Inspect Modal main image
-        const inspectMainImg = document.querySelector('.inspect-main-img');
-        if (inspectMainImg) {
-            let touchStartX = 0;
-            let touchEndX = 0;
-            inspectMainImg.addEventListener('touchstart', (e) => {
-                touchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
-            inspectMainImg.addEventListener('touchend', (e) => {
-                touchEndX = e.changedTouches[0].screenX;
-                const diff = touchEndX - touchStartX;
-                if (Math.abs(diff) > 40) { // Swipe threshold
-                    if (diff > 0) {
-                        this.prevInspectImage();
-                    } else {
-                        this.nextInspectImage();
-                    }
-                }
-            }, { passive: true });
-        }
+        // Universal Background Scroll Lock Manager for all popups, modals, and smaller menus
+        const updateScrollLock = () => {
+            const hasActiveModal = !!document.querySelector('.modal-overlay.active, .lightbox-overlay.active');
+            const hasActiveSidebar = !!document.querySelector('.sidebar.active');
+            
+            if (hasActiveModal) {
+                document.body.classList.add('modal-open');
+            } else {
+                document.body.classList.remove('modal-open');
+            }
 
-        // Touch swipe gestures for lightbox swiping
+            if (hasActiveSidebar) {
+                document.body.classList.add('sidebar-open');
+            } else {
+                document.body.classList.remove('sidebar-open');
+            }
+        };
+
+        // MutationObserver to automatically lock/unlock background scrolling whenever any modal or menu opens/closes
+        const modalScrollObserver = new MutationObserver(() => {
+            updateScrollLock();
+        });
+        modalScrollObserver.observe(document.body, {
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['class']
+        });
+
+        // Prevent touch dragging on modal backdrops from scrolling background
+        document.addEventListener('touchmove', (e) => {
+            const activeModal = document.querySelector('.modal-overlay.active, .lightbox-overlay.active');
+            if (activeModal && !e.target.closest('.modal-content, .lightbox-content, .sidebar')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Touch swipe gestures for fullscreen Lightbox (viewing images one-by-one)
         const lightbox = document.getElementById('lightbox-modal');
         if (lightbox) {
             let touchStartX = 0;
@@ -1121,7 +1136,7 @@ class KmapStoreApp {
             }, { passive: true });
         }
         
-        // Keyboard navigation for both lightbox and inspect modal
+        // Keyboard navigation (Arrow keys for Lightbox, Escape to close)
         window.addEventListener('keydown', (e) => {
             const lightboxModal = document.getElementById('lightbox-modal');
             const inspectModal = document.getElementById('modal-product-inspect');
@@ -1130,8 +1145,6 @@ class KmapStoreApp {
                 if (e.key === 'ArrowRight') this.nextLightboxImage();
                 if (e.key === 'Escape') this.closeLightbox();
             } else if (inspectModal && inspectModal.classList.contains('active')) {
-                if (e.key === 'ArrowLeft') this.prevInspectImage();
-                if (e.key === 'ArrowRight') this.nextInspectImage();
                 if (e.key === 'Escape') this.closeInspectModal();
             }
         });
@@ -1899,24 +1912,16 @@ class KmapStoreApp {
 
         const mainImgDisplay = document.getElementById('inspect-img-display');
         const thumbContainer = document.getElementById('inspect-thumbnails-container');
-        const inspectPrevBtn = document.getElementById('inspect-prev-btn');
-        const inspectNextBtn = document.getElementById('inspect-next-btn');
         thumbContainer.innerHTML = '';
 
         if (this.inspectImages.length === 0) {
             mainImgDisplay.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>';
             mainImgDisplay.style.opacity = '0.5';
             mainImgDisplay.onclick = null;
-            if (inspectPrevBtn) inspectPrevBtn.style.display = 'none';
-            if (inspectNextBtn) inspectNextBtn.style.display = 'none';
         } else {
             mainImgDisplay.src = this.inspectImages[0];
             mainImgDisplay.style.opacity = '1';
             mainImgDisplay.onclick = () => { this.openLightbox(mainImgDisplay.src, productId); };
-            
-            const hasMultiple = this.inspectImages.length > 1;
-            if (inspectPrevBtn) inspectPrevBtn.style.display = hasMultiple ? 'flex' : 'none';
-            if (inspectNextBtn) inspectNextBtn.style.display = hasMultiple ? 'flex' : 'none';
 
             this.inspectImages.forEach((imgSrc, idx) => {
                 const thumb = document.createElement('div');
@@ -1955,18 +1960,6 @@ class KmapStoreApp {
         document.querySelectorAll('.inspect-thumb').forEach((t, i) => {
             t.classList.toggle('active', i === this.inspectImageIndex);
         });
-    }
-
-    nextInspectImage(e) {
-        if (e) e.stopPropagation();
-        if (!this.inspectImages || this.inspectImages.length <= 1) return;
-        this.setInspectImage(this.inspectImageIndex + 1);
-    }
-
-    prevInspectImage(e) {
-        if (e) e.stopPropagation();
-        if (!this.inspectImages || this.inspectImages.length <= 1) return;
-        this.setInspectImage(this.inspectImageIndex - 1);
     }
 
     closeInspectModal() {
