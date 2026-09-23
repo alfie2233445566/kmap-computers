@@ -27,14 +27,15 @@
     <!-- Unified Toast Container for Real-time Notifications -->
     <div id="toast-container"></div>
 
-    <!-- 1. Unified Login Container -->
-    <div id="login-screen" class="login-container">
-        <div class="login-card">
+    <!-- 1. Unified Login Modal (Pop-up on demand) -->
+    <div id="modal-login" class="modal-overlay" onclick="if(event.target===this) app.closeLoginModal()">
+        <div class="login-card" style="position: relative; max-width: 440px; margin: 20px;">
+            <button type="button" onclick="app.closeLoginModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light); line-height: 1; padding: 4px;" title="Close">&times;</button>
             <div style="text-align: center; margin-bottom: 24px;">
                 <div style="font-size: 40px; color: var(--primary); margin-bottom: 12px;"><i
                         class="fa-solid fa-laptop-code"></i></div>
-                <h1 style="color: var(--primary); font-weight: 800;">KMAP COMPUTERS</h1>
-                <p style="color: var(--text-light); font-size: 14px;"></p>
+                <h2 style="color: var(--primary); font-weight: 800; font-size: 24px;">KMAP COMPUTERS</h2>
+                <p style="color: var(--text-light); font-size: 13px;">Sign in to your account or staff portal</p>
             </div>
 
             <div id="login-error-msg"
@@ -98,20 +99,17 @@
                 </div>
             </form>
 
-            <div
-                style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
-                <button type="button" id="btn-guest-browse" class="btn btn-outline"
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+                <button type="button" id="btn-guest-browse" onclick="app.closeLoginModal()" class="btn btn-outline"
                     style="width: 100%; height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <i class="fa-solid fa-eye" style="color: var(--secondary);"></i> Browse as Guest
+                    <i class="fa-solid fa-store" style="color: var(--primary);"></i> Continue Browsing Store
                 </button>
             </div>
-
-
         </div>
     </div>
 
-    <!-- 2. Main Store / Admin Workspace (Hidden on Load) -->
-    <div id="app-root" style="display: none;">
+    <!-- 2. Main Store / Admin Workspace (Public Storefront Landing) -->
+    <div id="app-root">
         <!-- Sidebar Backdrop overlay -->
         <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="app.toggleSidebar()"></div>
         <!-- Sidebar Navigation (Responsive dynamically updated on role) -->
@@ -125,7 +123,7 @@
             </nav>
             <div class="sidebar-footer" style="display: flex; flex-direction: column; gap: 8px;">
                 <button class="nav-item" id="sidebar-change-pwd-btn" onclick="app.openChangePasswordModal()"
-                    style="color: var(--accent);">
+                    style="color: var(--accent); display: none;">
                     <i class="fa-solid fa-key"></i> Change Password
                 </button>
                 <button class="nav-item" id="sidebar-logout-btn" onclick="app.logout()" style="color: var(--error);">
@@ -158,11 +156,24 @@
                             Computers</p>
                     </div>
                 </div>
-                <div class="user-profile" onclick="app.openUserProfileModal()" style="cursor: pointer;" title="View Profile">
-                    <div style="text-align: right;">
-                        <div style="font-weight: 700; font-size: 14px;" id="profile-name">Client User</div>
+                <div id="topbar-auth-section" style="display: flex; align-items: center; gap: 10px;">
+                    <!-- Cloud Sync Indicator -->
+                    <div id="sync-status-indicator" style="font-size: 11px; padding: 4px 8px; border-radius: 12px; background: rgba(16,185,129,0.1); color: #059669; font-weight: 600; display: flex; align-items: center; gap: 5px; cursor: default;" title="Connecting to cloud...">
+                        <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #059669;"></span> Cloud Sync
                     </div>
-                    <div class="user-avatar" id="profile-avatar">C</div>
+
+                    <!-- Sign In / Staff button for guests -->
+                    <button id="btn-topbar-signin" class="btn btn-primary" onclick="app.openLoginModal()" style="height: 38px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; border-radius: var(--radius-sm);">
+                        <i class="fa-solid fa-right-to-bracket"></i> Sign In / Staff
+                    </button>
+
+                    <!-- User profile widget (hidden for guests, visible when logged in) -->
+                    <div class="user-profile" id="topbar-user-profile" onclick="app.openUserProfileModal()" style="cursor: pointer; display: none;" title="View Profile">
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700; font-size: 14px;" id="profile-name">Guest</div>
+                        </div>
+                        <div class="user-avatar" id="profile-avatar">G</div>
+                    </div>
                 </div>
             </header>
 

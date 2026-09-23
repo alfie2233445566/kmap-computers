@@ -3,6 +3,14 @@ import { kv } from '@vercel/kv';
 export default async function handler(request, response) {
   const allowedKeys = ['kmap_products', 'kmap_users', 'kmap_orders', 'kmap_logs', 'kmap_promos', 'kmap_hire_purchase'];
 
+  // Check if Vercel KV is configured in environment
+  if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+    return response.status(503).json({
+      error: 'Vercel KV not connected. In your Vercel Dashboard, go to Storage -> Create/Connect KV Database.',
+      configured: false
+    });
+  }
+
   try {
     if (request.method === 'GET') {
       const data = {};

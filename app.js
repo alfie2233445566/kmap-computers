@@ -100,9 +100,16 @@ class KmapStoreApp {
     }
 
     async syncDownstream() {
+        const indicator = document.getElementById('sync-status-indicator');
         try {
             const res = await fetch('/api/sync');
             if (res.ok) {
+                if (indicator) {
+                    indicator.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #059669;"></span> Cloud Sync Live`;
+                    indicator.style.background = 'rgba(16,185,129,0.1)';
+                    indicator.style.color = '#059669';
+                    indicator.title = 'Connected to Vercel KV cloud database';
+                }
                 const data = await res.json();
                 let updated = false;
                 for (const key of Object.keys(data)) {
@@ -147,64 +154,87 @@ class KmapStoreApp {
                     window.dispatchEvent(new StorageEvent('storage', { key: 'kmap_orders' }));
                     window.dispatchEvent(new StorageEvent('storage', { key: 'kmap_products' }));
                 }
+            } else {
+                const errData = await res.json().catch(() => ({}));
+                if (indicator) {
+                    indicator.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #f59e0b;"></span> Sync Offline`;
+                    indicator.style.background = 'rgba(245,158,11,0.1)';
+                    indicator.style.color = '#d97706';
+                    indicator.title = errData.error || `HTTP ${res.status}: Cloud database not connected`;
+                }
             }
         } catch(e) {
-            // Silently fail if offline or API down
+            if (indicator) {
+                indicator.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #94a3b8;"></span> Local Storage`;
+                indicator.style.background = 'rgba(148,163,184,0.1)';
+                indicator.style.color = '#64748b';
+                indicator.title = 'Offline / Local cache only';
+            }
         }
     }
 
     initSession() {
         const savedUser = safeLocalStorage.getItem('kmap_current_user');
         if (savedUser) {
-            this.currentUser = JSON.parse(savedUser);
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app-root').style.display = 'flex';
-            this.updateProfileHeader(this.currentUser);
-            this.renderSidebar();
-            this.loadCart();
-            if (this.currentUser.role === 'client' || this.currentUser.role === 'guest') {
-                this.switchView('client-store');
-            } else {
-                this.switchView('admin-dashboard');
-            }
-        }
-    }
-
-    saveCart() {
-        if (this.currentUser && this.currentUser.username !== 'guest') {
-            safeLocalStorage.setItem(`kmap_cart_${this.currentUser.username}`, JSON.stringify(this.cart));
-            const users = this.db.getUsers();
-            const user = users.find(u => u.username === this.currentUser.username);
-            if (user) {
-                user.cart = [...this.cart];
-                this.db.saveUsers(users);
-                this.currentUser.cart = [...this.cart];
-                if (safeLocalStorage.getItem('kmap_current_user')) {
-                    safeLocalStorage.setItem('kmap_current_user', JSON.stringify(this.currentUser));
-                }
-            }
-        }
-    }
-
-    loadCart() {
-        if (this.currentUser && this.currentUser.username !== 'guest') {
-            const users = this.db.getUsers();
-            const user = users.find(u => u.username === this.currentUser.username);
-            if (user && user.cart) {
-                this.cart = [...user.cart];
-            } else {
-                const saved = safeLocalStorage.getItem(`kmap_cart_${this.currentUser.username}`);
-                this.cart = saved ? JSON.parse(saved) : [];
+            try {
+                this.currentUser = JSON.parse(savedUser);
+            } catch(e) {
+                this.currentUser = { username: 'guest', role: 'guest', name: 'Guest Viewer' };
             }
         } else {
-            this.cart = [];
+            this.currentUser = { username: 'guest', role: 'guest', name: 'Guest Viewer' };
         }
-        this.renderCart();
+
+        this.closeLoginModal();
+        this.updateProfileHeader(this.currentUser);
+        this.renderSidebar();
+        this.loadCart();
+
+        if (this.currentUser.role === 'admin' || this.currentUser.role === 'superadmin') {
+            this.switchView('admin-dashboard');
+        } else {
+            this.switchView('client-store');
+        }
+    }
+
+    openLoginModal() {
+        const modal = document.getElementById('modal-login');
+        if (modal) {
+            modal.classList.add('active');
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const errMsg = document.getElementById('login-error-msg');
+            if (loginForm) loginForm.style.display = 'block';
+            if (signupForm) signupForm.style.display = 'none';
+            if (errMsg) errMsg.style.display = 'none';
+        }
+    }
+
+    closeLoginModal() {
+        const modal = document.getElementById('modal-login');
+        if (modal) modal.classList.remove('active');
     }
 
     updateProfileHeader(user) {
-        document.getElementById('profile-name').innerText = user.name;
-        document.getElementById('profile-avatar').innerText = user.name.charAt(0);
+        const profileName = document.getElementById('profile-name');
+        const profileAvatar = document.getElementById('profile-avatar');
+        const btnSignIn = document.getElementById('btn-topbar-signin');
+        const userProfile = document.getElementById('topbar-user-profile');
+        const changePwdBtn = document.getElementById('sidebar-change-pwd-btn');
+
+        if (user && user.role !== 'guest') {
+            if (profileName) profileName.innerText = user.name || user.username;
+            if (profileAvatar) profileAvatar.innerText = (user.name || user.username).charAt(0).toUpperCase();
+            if (btnSignIn) btnSignIn.style.display = 'none';
+            if (userProfile) userProfile.style.display = 'flex';
+            if (changePwdBtn) changePwdBtn.style.display = 'flex';
+        } else {
+            if (profileName) profileName.innerText = 'Guest';
+            if (profileAvatar) profileAvatar.innerText = 'G';
+            if (btnSignIn) btnSignIn.style.display = 'inline-flex';
+            if (userProfile) userProfile.style.display = 'none';
+            if (changePwdBtn) changePwdBtn.style.display = 'none';
+        }
     }
 
     // Initialize mock database in localStorage
@@ -511,8 +541,7 @@ class KmapStoreApp {
                 this.currentUser = foundUser;
                 this.loadCart();
                 safeLocalStorage.setItem('kmap_current_user', JSON.stringify(foundUser));
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app-root').style.display = 'flex';
+                this.closeLoginModal();
                 
                 // Set Header Profile
                 this.updateProfileHeader(foundUser);
@@ -525,6 +554,7 @@ class KmapStoreApp {
                 } else {
                     this.switchView('admin-dashboard');
                 }
+                this.showToast(`Welcome back, ${foundUser.name || foundUser.username}!`);
             } else {
                 const err = document.getElementById('login-error-msg');
                 err.innerText = "Invalid credentials. Please check details.";
@@ -571,8 +601,7 @@ class KmapStoreApp {
             this.currentUser = newUser;
             this.loadCart();
             safeLocalStorage.setItem('kmap_current_user', JSON.stringify(newUser));
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app-root').style.display = 'flex';
+            this.closeLoginModal();
             
             this.updateProfileHeader(newUser);
             
@@ -583,21 +612,12 @@ class KmapStoreApp {
         });
 
         // Handle Guest Browse Button
-        document.getElementById('btn-guest-browse').addEventListener('click', () => {
-            const guestUser = { username: 'guest', role: 'guest', name: 'Guest Viewer' };
-            this.currentUser = guestUser;
-            this.loadCart();
-            safeLocalStorage.setItem('kmap_current_user', JSON.stringify(guestUser));
-            
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app-root').style.display = 'flex';
-            
-            this.updateProfileHeader(guestUser);
-            
-            this.renderSidebar();
-            this.switchView('client-store');
-            this.showToast("Logged in in Guest Mode. You can browse catalog.");
-        });
+        const guestBtn = document.getElementById('btn-guest-browse');
+        if (guestBtn) {
+            guestBtn.addEventListener('click', () => {
+                this.closeLoginModal();
+            });
+        }
 
         // Search Input Handlers
         const searchInput = document.getElementById('client-search');
@@ -1041,11 +1061,13 @@ class KmapStoreApp {
         const logoutBtn = document.getElementById('sidebar-logout-btn');
         if (logoutBtn) {
             if (this.currentUser.role === 'guest') {
-                logoutBtn.style.color = 'var(--success)';
-                logoutBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Sign In / Register';
+                logoutBtn.style.color = 'var(--accent)';
+                logoutBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In / Staff';
+                logoutBtn.onclick = () => this.openLoginModal();
             } else {
                 logoutBtn.style.color = 'var(--error)';
                 logoutBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> Logout';
+                logoutBtn.onclick = () => this.logout();
             }
         }
     }
@@ -2173,11 +2195,11 @@ class KmapStoreApp {
             reader.onerror = reject;
             reader.onload = (e) => {
                 const img = new Image();
-                img.onerror = reject;
+                img.onerror = () => reject(new Error("Unable to parse image. Please use JPG, PNG, or WebP."));
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 400;
-                    const MAX_HEIGHT = 400;
+                    const MAX_WIDTH = 320;
+                    const MAX_HEIGHT = 320;
                     let width = img.width;
                     let height = img.height;
 
@@ -2197,8 +2219,8 @@ class KmapStoreApp {
                     canvas.height = Math.round(height);
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    // Standardize to clean, lightweight JPEG (0.6 quality for ultra compact payload)
-                    const base64 = canvas.toDataURL('image/jpeg', 0.6);
+                    // Standardize to clean, ultra-lightweight JPEG (0.55 quality ~10-14 KB)
+                    const base64 = canvas.toDataURL('image/jpeg', 0.55);
                     resolve(base64);
                 };
                 img.src = e.target.result;
@@ -3109,20 +3131,16 @@ class KmapStoreApp {
     }
 
     logout(preserveCart = false) {
-        this.currentUser = null;
-        if (this.simInterval) clearInterval(this.simInterval);
+        this.currentUser = { username: 'guest', role: 'guest', name: 'Guest Viewer' };
         if (!preserveCart) this.cart = [];
         safeLocalStorage.removeItem('kmap_current_user');
         
-        document.getElementById('app-root').style.display = 'none';
-        document.getElementById('login-screen').style.display = 'flex';
-        document.getElementById('login-form').reset();
-        document.getElementById('signup-form').reset();
-        document.getElementById('login-error-msg').style.display = 'none';
-        
-        // Show login form by default on returning
-        document.getElementById('signup-form').style.display = 'none';
-        document.getElementById('login-form').style.display = 'block';
+        this.closeLoginModal();
+        this.updateProfileHeader(this.currentUser);
+        this.renderSidebar();
+        this.loadCart();
+        this.switchView('client-store');
+        this.showToast("Logged out. Browsing store as Guest.");
     }
 }
 
