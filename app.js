@@ -1367,6 +1367,14 @@ class KmapStoreApp {
 
             this.changePassword(currentPw, newPw, confirmPw);
         });
+
+        // Close report download dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('report-download-dropdown');
+            if (dropdown && !dropdown.contains(e.target)) {
+                this.closeReportDownloadDropdown();
+            }
+        });
     }
 
     // Switch Application Views
@@ -3002,6 +3010,8 @@ class KmapStoreApp {
                     date: hp.startDate,
                     id: `${hp.id}-DEP`,
                     clientName: hp.clientName,
+                    phone: hp.phone || '',
+                    items: `${hp.machine} (Initial Deposit)`,
                     type: 'HP Deposit',
                     total: hp.deposit
                 });
@@ -3015,6 +3025,8 @@ class KmapStoreApp {
                             date: inst.dueDate,
                             id: `${hp.id}-M${inst.month}`,
                             clientName: hp.clientName,
+                            phone: hp.phone || '',
+                            items: `${hp.machine} (Installment ${inst.month}/${hp.months})`,
                             type: `HP Month ${inst.month}`,
                             total: inst.amount
                         });
@@ -3029,12 +3041,17 @@ class KmapStoreApp {
                 date: o.date,
                 id: o.id,
                 clientName: o.clientName,
-                type: o.claimMethod.replace('_', ' ').toUpperCase(),
+                phone: o.phone || '',
+                items: (o.items || []).map(i => `${i.name} (x${i.quantity})`).join(', ') || 'Direct Purchase',
+                type: (o.claimMethod || 'order').replace('_', ' ').toUpperCase(),
                 total: o.total
             })),
             ...hpEvents
         ];
         allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        this.currentReportTransactions = allTransactions;
+        this.currentReportPeriod = { start, end };
 
         const tbody = document.getElementById('report-orders-tbody');
         tbody.innerHTML = '';
@@ -3072,8 +3089,158 @@ class KmapStoreApp {
         document.getElementById('report-subtitle').innerText = `Sales Analysis (${start.toLocaleDateString()} - ${end.toLocaleDateString()})`;
     }
 
+    toggleReportDownloadDropdown(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        const menu = document.getElementById('report-download-menu');
+        const btn = document.getElementById('btn-download-report');
+        if (!menu) return;
+        const isOpen = menu.style.display === 'block';
+        if (isOpen) {
+            this.closeReportDownloadDropdown();
+        } else {
+            menu.style.display = 'block';
+            if (btn) btn.setAttribute('aria-expanded', 'true');
+        }
+    }
+
+    closeReportDownloadDropdown() {
+        const menu = document.getElementById('report-download-menu');
+        const btn = document.getElementById('btn-download-report');
+        if (menu) menu.style.display = 'none';
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
+    // Excel spreadsheet (.xlsx) generation using SheetJS
+    downloadReportExcel() {
+        this.closeReportDownloadDropdown();
+
+        // Make sure current report transactions are populated
+        if (!this.currentReportTransactions || this.currentReportTransactions.length === 0) {
+            this.generateSalesReport();
+        }
+
+        const transactions = this.currentReportTransactions || [];
+        const subtitle = document.getElementById('report-subtitle') ? document.getElementById('report-subtitle').innerText : 'Sales Analysis';
+        const rev = document.getElementById('report-stat-revenue') ? document.getElementById('report-stat-revenue').innerText : 'GH₵ 0.00';
+        const count = document.getElementById('report-stat-count') ? document.getElementById('report-stat-count').innerText : '0';
+        const avg = document.getElementById('report-stat-average') ? document.getElementById('report-stat-average').innerText : 'GH₵ 0.00';
+
+        const nowStr = new Date().toLocaleString();
+        const userName = this.currentUser ? `${this.currentUser.name} (${this.currentUser.role.toUpperCase()})` : 'Authorized User';
+
+        // Check if SheetJS (XLSX) is available
+        if (typeof window.XLSX !== 'undefined') {
+            try {
+                const wsData = [
+                    ["KMAP COMPUTERS - SALES & FINANCIAL ASSESSMENT REPORT"],
+                    ["Sunyani, Ghana | Contact: +23320 834 1561"],
+                    [`Generated: ${nowStr}`],
+                    [`Period: ${subtitle}`],
+                    [`Authorized By: ${userName}`],
+                    [],
+                    ["EXECUTIVE FINANCIAL SUMMARY"],
+                    ["Metric", "Value"],
+                    ["Total Sales Revenue", rev],
+                    ["Total Completed Transactions", count],
+                    ["Average Order Size", avg],
+                    [],
+                    ["TRANSACTION BREAKDOWN"],
+                    ["Date", "Transaction ID", "Customer Name", "Contact Phone", "Items / Description", "Payment Type", "Status", "Amount (GH₵)"]
+                ];
+
+                let numericTotal = 0;
+                transactions.forEach(t => {
+                    numericTotal += (t.total || 0);
+                    wsData.push([
+                        new Date(t.date).toLocaleDateString(),
+                        t.id,
+                        t.clientName,
+                        t.phone || 'N/A',
+                        t.items || t.type,
+                        t.type,
+                        "COMPLETED",
+                        t.total
+                    ]);
+                });
+
+                if (transactions.length > 0) {
+                    wsData.push([]);
+                    wsData.push(["TOTAL REVENUE", "", "", "", "", "", "", numericTotal]);
+                } else {
+                    wsData.push(["No transactions recorded for this period."]);
+                }
+
+                const ws = window.XLSX.utils.aoa_to_sheet(wsData);
+
+                // Column formatting widths
+                ws['!cols'] = [
+                    { wch: 14 }, // Date
+                    { wch: 18 }, // ID
+                    { wch: 24 }, // Customer Name
+                    { wch: 16 }, // Phone
+                    { wch: 42 }, // Items / Description
+                    { wch: 18 }, // Payment Type
+                    { wch: 14 }, // Status
+                    { wch: 16 }  // Amount
+                ];
+
+                const wb = window.XLSX.utils.book_new();
+                window.XLSX.utils.book_append_sheet(wb, ws, "Sales Summary");
+
+                const filename = `KMAP_Sales_Report_${Date.now()}.xlsx`;
+                window.XLSX.writeFile(wb, filename);
+
+                this.db.addLog(`Downloaded Sales Report as Excel (.xlsx)`);
+                this.showToast(`Report downloaded successfully as Excel spreadsheet!`);
+                return;
+            } catch (err) {
+                console.error("Excel generation error, falling back to CSV:", err);
+            }
+        }
+
+        // Fallback: UTF-8 BOM CSV export (opens natively in Excel with proper Ghanaian Cedi and characters)
+        let csv = '\uFEFF';
+        csv += '"KMAP COMPUTERS - SALES & FINANCIAL ASSESSMENT REPORT"\n';
+        csv += `"Generated: ${nowStr}"\n`;
+        csv += `"Period: ${subtitle}"\n`;
+        csv += `"Authorized By: ${userName}"\n\n`;
+        csv += '"EXECUTIVE FINANCIAL SUMMARY"\n';
+        csv += `"Total Sales Revenue","${rev}"\n`;
+        csv += `"Total Completed Transactions","${count}"\n`;
+        csv += `"Average Order Size","${avg}"\n\n`;
+        csv += '"TRANSACTION BREAKDOWN"\n';
+        csv += '"Date","Transaction ID","Customer Name","Phone","Items / Description","Payment Type","Status","Amount (GH₵)"\n';
+
+        transactions.forEach(t => {
+            const cleanName = (t.clientName || '').replace(/"/g, '""');
+            const cleanPhone = (t.phone || 'N/A').replace(/"/g, '""');
+            const cleanItems = (t.items || t.type || '').replace(/"/g, '""');
+            const cleanType = (t.type || '').replace(/"/g, '""');
+            const dateStr = new Date(t.date).toLocaleDateString();
+            csv += `"${dateStr}","${t.id}","${cleanName}","${cleanPhone}","${cleanItems}","${cleanType}","COMPLETED",${t.total}\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `KMAP_Sales_Report_${Date.now()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        this.db.addLog(`Downloaded Sales Report as CSV (Excel compatible)`);
+        this.showToast(`Report downloaded as Excel CSV format!`);
+    }
+
     // PDF generation using jsPDF library
     downloadReportPDF() {
+        this.closeReportDownloadDropdown();
+
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
@@ -3117,6 +3284,7 @@ class KmapStoreApp {
 
         doc.save(`KMAP_Sales_Report_${Date.now()}.pdf`);
         this.db.addLog(`Downloaded Sales PDF Report`);
+        this.showToast(`Report downloaded successfully as PDF!`);
     }
 
     // Backup & Restore Database Functions
