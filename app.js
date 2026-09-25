@@ -408,10 +408,10 @@ class KmapStoreApp {
     }
 
     toggleAdminMarketplaceView() {
-        if (this.activeView === 'client-store') {
-            this.switchView('admin-dashboard');
-        } else {
+        if (this.activeView && this.activeView.startsWith('admin-')) {
             this.switchView('client-store');
+        } else {
+            this.switchView('admin-dashboard');
         }
     }
 
@@ -1294,8 +1294,7 @@ class KmapStoreApp {
         document.querySelectorAll('.modal-overlay, .lightbox-overlay').forEach(overlay => {
             overlay.addEventListener('click', (e) => {
                 if (e.target === overlay) {
-                    overlay.classList.remove('active');
-                    this.updateScrollLock();
+                    this.closeActiveModal(overlay);
                 }
             });
         });
@@ -1395,10 +1394,10 @@ class KmapStoreApp {
         // Update topbar quick admin toggle button text
         const adminToggleText = document.getElementById('admin-toggle-text');
         if (adminToggleText) {
-            if (viewName === 'client-store') {
-                adminToggleText.innerText = 'Admin Panel';
-            } else {
+            if (viewName && viewName.startsWith('admin-')) {
                 adminToggleText.innerText = 'Store';
+            } else {
+                adminToggleText.innerText = 'Admin Panel';
             }
         }
 
@@ -1450,6 +1449,7 @@ class KmapStoreApp {
                 pageTitle.innerText = "Business Invoicing & Sales Reports";
                 pageSubtitle.innerText = "Download printable reports and summaries";
                 this.handleReportPresetChange();
+                this.generateSalesReport();
                 break;
             case 'admin-staff':
                 document.getElementById('view-admin-staff').style.display = 'block';
@@ -1567,7 +1567,10 @@ class KmapStoreApp {
         const products = this.db.getProducts();
         const categories = ['All', ...new Set(products.map(p => p.category))];
 
-        if (select.options.length === 0) {
+        const currentOptions = Array.from(select.options).map(o => o.value);
+        const needsUpdate = categories.length !== currentOptions.length || !categories.every((c, i) => c === currentOptions[i]);
+
+        if (needsUpdate || select.options.length === 0) {
             select.innerHTML = '';
             categories.forEach(cat => {
                 const opt = document.createElement('option');
@@ -1628,11 +1631,16 @@ class KmapStoreApp {
             card.className = 'card product-card';
             card.style.position = 'relative';
             card.style.cursor = 'pointer';
+            card.onclick = (e) => {
+                if (!e.target.closest('button')) {
+                    this.openInspectModal(p.id);
+                }
+            };
 
             // Clicking card opens the product inspect view
             card.innerHTML = `
                 ${promoBadge}
-                <div onclick="app.openInspectModal('${p.id}')" style="display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between;">
+                <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; pointer-events: none;">
                     <div>
                         <div class="product-img">${mainImg}</div>
                         <h4 style="font-weight: 700; color: var(--text-dark); height: 44px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-top: 8px; font-size: 15px; line-height: 1.4;">${p.name}</h4>
@@ -2250,9 +2258,10 @@ class KmapStoreApp {
         const sidebar = document.querySelector('.sidebar');
         const backdrop = document.getElementById('sidebar-backdrop');
         if (sidebar && backdrop) {
-            const isOpen = sidebar.classList.toggle('active');
-            backdrop.classList.toggle('active', isOpen);
-            if (isOpen) {
+            const willOpen = !sidebar.classList.contains('active');
+            sidebar.classList.toggle('active', willOpen);
+            backdrop.classList.toggle('active', willOpen);
+            if (willOpen) {
                 document.body.classList.add('sidebar-open');
             } else {
                 document.body.classList.remove('sidebar-open');
@@ -2490,7 +2499,7 @@ class KmapStoreApp {
         }
 
         if (orders.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-light)">No matching client orders found.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-light)">No matching client orders found.</td></tr>`;
             return;
         }
         orders.forEach(o => {
@@ -2506,6 +2515,7 @@ class KmapStoreApp {
             if (o.status === 'void') selectStyle = 'background-color: rgba(217, 48, 37, 0.15); color: #C5221F; font-weight: 700; border-color: #D93025;';
 
             tr.innerHTML = `
+                <td style="text-align: center;"><input type="checkbox" class="admin-order-select" value="${o.id}"></td>
                 <td><strong>${o.id}</strong></td>
                 <td>
                     <strong>${o.clientName}</strong><br>
@@ -3255,7 +3265,9 @@ class KmapStoreApp {
         // Set default date to today
         document.getElementById('form-hp-date').value = new Date().toISOString().substring(0, 10);
 
-        // Reset custom input
+        // Reset custom input & group
+        const customGroup = document.getElementById('form-hp-custom-product-group');
+        if (customGroup) customGroup.style.display = 'none';
         document.getElementById('form-hp-product-custom').style.display = 'none';
         document.getElementById('form-hp-product-custom').required = false;
 
@@ -3271,15 +3283,18 @@ class KmapStoreApp {
 
     handleHPProductChange() {
         const select = document.getElementById('form-hp-product-select');
+        const customGroup = document.getElementById('form-hp-custom-product-group');
         const customInput = document.getElementById('form-hp-product-custom');
         const priceInput = document.getElementById('form-hp-price');
 
         if (select.value === 'custom') {
+            if (customGroup) customGroup.style.display = 'block';
             customInput.style.display = 'block';
             customInput.required = true;
             customInput.value = '';
             priceInput.value = '';
         } else {
+            if (customGroup) customGroup.style.display = 'none';
             customInput.style.display = 'none';
             customInput.required = false;
 
@@ -3727,6 +3742,29 @@ class KmapStoreApp {
         this.switchView('client-store');
         this.showToast("Logged out. Browsing Kmap Computers as Guest.");
     }
+
+    closeActiveModal(overlay) {
+        if (!overlay) return;
+        const id = overlay.id;
+        if (id === 'modal-login') this.closeLoginModal();
+        else if (id === 'modal-product-inspect') this.closeInspectModal();
+        else if (id === 'lightbox-modal') this.closeLightbox();
+        else if (id === 'modal-checkout-call') this.closeModal();
+        else if (id === 'modal-product-form') this.closeProductModal();
+        else if (id === 'modal-hp-form') this.closeHPModal();
+        else if (id === 'modal-hp-details') this.closeHPDetailsModal();
+        else if (id === 'modal-user-profile') this.closeUserProfileModal();
+        else if (id === 'modal-change-password') this.closeChangePasswordModal();
+        else {
+            overlay.classList.remove('active');
+            this.updateScrollLock();
+        }
+    }
+
+    // UI action aliases
+    openNewHPModal() { this.openHPModal(); }
+    closeNewHPModal() { this.closeHPModal(); }
+    renderHP() { this.renderHPList(); }
 }
 
 // Instantiate App

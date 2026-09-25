@@ -13,7 +13,7 @@
     <title>Kmap Computers | Sunyani, Ghana</title>
     <meta name="description"
         content="Kmap Computers - Laptop Sales, Repairs and Computer Accessories in Sunyani. Building between Tasty Joint and Izwe opposite Regional Court.">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=3.6">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js for Sales Analytics -->
@@ -830,7 +830,7 @@
                         <h3 class="card-title" style="margin-bottom: 0;">Hire Purchase Records</h3>
                         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                             <select id="admin-hp-status-filter" class="form-control" style="width: 150px;"
-                                onchange="app.renderHP()">
+                                onchange="app.renderHPList()">
                                 <option value="all">All Agreements</option>
                                 <option value="active">Active</option>
                                 <option value="overdue">Overdue</option>
@@ -838,8 +838,8 @@
                             </select>
                             <input type="text" id="admin-hp-search" class="form-control"
                                 placeholder="Search client name, phone..." style="width: 250px;"
-                                oninput="app.renderHP()">
-                            <button class="btn btn-secondary" onclick="app.openNewHPModal()"><i
+                                oninput="app.renderHPList()">
+                            <button class="btn btn-secondary" onclick="app.openHPModal()"><i
                                     class="fa-solid fa-plus"></i> New Hire Purchase</button>
                         </div>
                     </div>
@@ -1116,7 +1116,7 @@
 
                 <div style="display: flex; gap: 12px; margin-top: 20px;">
                     <button type="submit" class="btn btn-secondary" style="flex: 1;">Create Agreement</button>
-                    <button type="button" class="btn btn-outline" onclick="app.closeNewHPModal()">Cancel</button>
+                    <button type="button" class="btn btn-outline" onclick="app.closeHPModal()">Cancel</button>
                 </div>
             </form>
         </div>
@@ -1130,7 +1130,7 @@
                     <h3 style="color: var(--primary); font-weight: 800; font-size: 22px;">Installment Schedule & Status
                     </h3>
                 </div>
-                <button onclick="document.getElementById('modal-hp-details').classList.remove('active')"
+                <button onclick="app.closeHPDetailsModal()"
                     class="btn btn-outline"
                     style="padding: 6px 12px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
                     <i class="fa-solid fa-xmark"></i>
@@ -1219,7 +1219,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=3.5"></script>
+    <script src="app.js?v=3.6"></script>
 </body>
 
 </html>

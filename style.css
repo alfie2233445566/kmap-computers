@@ -37,6 +37,12 @@ body {
     color: var(--text-dark);
     line-height: 1.5;
     overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+button, .btn, .nav-item, .card, .product-card, .stat-card, .inspect-thumb, .hamburger-btn, select, input {
+    touch-action: manipulation;
 }
 
 /* App Container Layout */
@@ -343,10 +349,12 @@ body.sidebar-open {
     border: 1px solid var(--border);
 }
 
-.product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--secondary);
+@media (hover: hover) and (pointer: fine) {
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--secondary);
+    }
 }
 
 .product-img {
@@ -371,8 +379,10 @@ body.sidebar-open {
     transition: transform 0.35s ease;
 }
 
-.product-card:hover .product-img img {
-    transform: scale(1.05);
+@media (hover: hover) and (pointer: fine) {
+    .product-card:hover .product-img img {
+        transform: scale(1.05);
+    }
 }
 
 .product-price {
@@ -718,10 +728,6 @@ body.modal-open {
     cursor: zoom-in;
 }
 
-.inspect-main-img:hover img {
-    transform: scale(1.15);
-}
-
 .inspect-thumbnails {
     display: flex;
     gap: 8px;
@@ -742,10 +748,20 @@ body.modal-open {
     transition: var(--transition);
 }
 
-.inspect-thumb.active,
-.inspect-thumb:hover {
+.inspect-thumb.active {
     border-color: var(--secondary);
-    opacity: 0.9;
+    opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .inspect-main-img:hover img {
+        transform: scale(1.15);
+    }
+
+    .inspect-thumb:hover {
+        border-color: var(--secondary);
+        opacity: 0.9;
+    }
 }
 
 .inspect-thumb img {
@@ -851,11 +867,13 @@ body.modal-open {
     z-index: 1200;
 }
 
-.lightbox-close:hover {
-    background: rgba(0, 0, 0, 0.9);
-    color: var(--accent);
-    border-color: var(--accent);
-    transform: scale(1.05);
+@media (hover: hover) and (pointer: fine) {
+    .lightbox-close:hover {
+        background: rgba(0, 0, 0, 0.9);
+        color: var(--accent);
+        border-color: var(--accent);
+        transform: scale(1.05);
+    }
 }
 
 /* Category filter buttons style */
@@ -985,10 +1003,12 @@ body.modal-open {
     border-radius: 50%;
 }
 
-.lightbox-nav-btn:hover {
-    background: rgba(0, 0, 0, 0.9);
-    color: var(--accent);
-    border-color: var(--accent);
+@media (hover: hover) and (pointer: fine) {
+    .lightbox-nav-btn:hover {
+        background: rgba(0, 0, 0, 0.9);
+        color: var(--accent);
+        border-color: var(--accent);
+    }
 }
 
 .lightbox-prev-btn {
