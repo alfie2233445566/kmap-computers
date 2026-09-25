@@ -485,7 +485,11 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i5, 6th Generation, 8gb Memory, 256GB Solid state Drive, 8CPUs @ 2.40 Ghz Speed, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-005/1.jpg',
+                    'images/products/PROD-005/2.jpg',
+                    'images/products/PROD-005/3.jpg'
+                ]
             },
             {
                 id: 'PROD-006',
@@ -528,7 +532,10 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i7, 11th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 3.0Ghz Speed, Fingerprint Security, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 13.3inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-009/1.jpg',
+                    'images/products/PROD-009/2.jpg'
+                ]
             },
             {
                 id: 'PROD-010',
@@ -548,7 +555,10 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Core i5 10th Generation, 16gbMemory, 256gb Solid state Drive, 8CPUs @ 1.7Ghz Speed, x360 Convertible, Touchscreen Display, Face iD Recognition, Fingerprint Security, Backlit Keyboard, 2Type C Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-011/1.jpg',
+                    'images/products/PROD-011/2.jpg'
+                ]
             },
             {
                 id: 'PROD-012',
@@ -667,7 +677,10 @@ class KmapStoreApp {
                 stock: 10,
                 spec: 'Intel Core i5, 7th Generation, 8Gb Memory, 256gb Solid state Drive, 8CPUs @ 2.6Ghz Speed, Backlit Keyboard, Type C USB Slot, USB Slots, 13.3inch Screen Size, Strong Battery',
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-020/1.jpg',
+                    'images/products/PROD-020/2.jpg'
+                ]
             },
             {
                 id: 'PROD-021',
@@ -879,11 +892,15 @@ class KmapStoreApp {
                     parsed.some(p => p.id === 'PROD-001' && (!p.images || !p.images.length || p.images[0].startsWith('data:')))) {
                     needsReset = true;
                 } else {
-                    // Seamlessly incorporate any newly added default products (e.g. PROD-021 to PROD-034)
+                    // Seamlessly incorporate any newly added default products and attach new photos
                     let modified = false;
                     defaultProducts.forEach(defProd => {
-                        if (!parsed.some(p => p.id === defProd.id)) {
+                        const existing = parsed.find(p => p.id === defProd.id);
+                        if (!existing) {
                             parsed.push(defProd);
+                            modified = true;
+                        } else if ((!existing.images || existing.images.length === 0) && defProd.images && defProd.images.length > 0) {
+                            existing.images = defProd.images;
                             modified = true;
                         }
                     });
