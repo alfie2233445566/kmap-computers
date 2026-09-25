@@ -417,14 +417,14 @@ class KmapStoreApp {
 
     // Initialize mock database in localStorage
     initDatabase() {
-        const defaultProducts = [
+                const defaultProducts = [
             {
                 id: 'PROD-001',
-                name: 'Hp Zbook 15u G6',
+                name: "Hp Zbook 15u G6",
                 category: 'Laptops',
                 price: 7000,
                 stock: 10,
-                spec: 'Intel Core i7, 8th Generation, 32GB Memory, 1TB Solid state Drive, 8CPUs @ 1.8Ghz Speed, AMD Radeon RX Graphics *4GB Dedicated Graphics*, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 15.6 inch Screen Size, Strong Battery',
+                spec: "Intel Core i7, 8th Generation, 32GB Memory, 1TB Solid state Drive, 8CPUs @ 1.8Ghz Speed, AMD Radeon RX Graphics *4GB Dedicated Graphics*, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 15.6 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-001/1.jpg',
@@ -435,11 +435,11 @@ class KmapStoreApp {
             },
             {
                 id: 'PROD-002',
-                name: 'HP Probook x360 435 G7',
+                name: "HP Probook x360 435 G7",
                 category: 'Laptops',
                 price: 4800,
                 stock: 10,
-                spec: 'AMD Ryzen 7 PRO, 16GB Memory, 256GB Solid state Drive, 8CPUs @ 1.9Ghz Speed, AMD Radeon RX Graphics *Dedicated Graphics*, Fingerprint Security, HD camera, Touchscreen, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery, Hdmi & USB Slots, 15.6 inch Screen Size, Strong Battery',
+                spec: "AMD Ryzen 7 PRO, 16GB Memory, 256GB Solid state Drive, 8CPUs @ 1.9Ghz Speed, AMD Radeon RX Graphics *Dedicated Graphics*, Fingerprint Security, HD camera, Touchscreen, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery, Hdmi & USB Slots, 15.6 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-002/1.jpg',
@@ -452,11 +452,11 @@ class KmapStoreApp {
             },
             {
                 id: 'PROD-003',
-                name: 'Hp Probook 640 G5',
+                name: "Hp Probook 640 G5",
                 category: 'Laptops',
                 price: 3200,
                 stock: 10,
-                spec: 'Intel Core i5, 8th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 1.6Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 8th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 1.6Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-003/1.jpg',
@@ -465,11 +465,11 @@ class KmapStoreApp {
             },
             {
                 id: 'PROD-004',
-                name: 'Hp Probook 430 G7',
+                name: "Hp Probook 430 G7",
                 category: 'Laptops',
                 price: 4800,
                 stock: 10,
-                spec: 'Intel Core i5, 10th Generation, 16gb Memory, 256gb Solid state Drive, 4CPUs @ 1.6Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 10th Generation, 16gb Memory, 256gb Solid state Drive, 4CPUs @ 1.6Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-004/1.jpg',
@@ -479,11 +479,11 @@ class KmapStoreApp {
             },
             {
                 id: 'PROD-005',
-                name: 'Dell Latitude 5270',
+                name: "Dell Latitude 5270",
                 category: 'Laptops',
                 price: 2600,
                 stock: 10,
-                spec: 'Intel Core i5, 6th Generation, 8gb Memory, 256GB Solid state Drive, 8CPUs @ 2.40 Ghz Speed, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 6th Generation, 8gb Memory, 256GB Solid state Drive, 8CPUs @ 2.40 Ghz Speed, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-005/1.jpg',
@@ -493,21 +493,24 @@ class KmapStoreApp {
             },
             {
                 id: 'PROD-006',
-                name: 'Dell Latitude 5450',
-                category: 'Laptops',
-                price: 1950,
-                stock: 10,
-                spec: 'Intel Core i5, 5th Generation, 8gb Memory, 500GB HDD, 8CPUs @ 2.30Ghz Speed, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
-                icon: '💻',
-                images: []
-            },
-            {
-                id: 'PROD-007',
-                name: 'Dell Latitude 5400',
+                name: "Dell Latitude 5400",
                 category: 'Laptops',
                 price: 4600,
                 stock: 10,
-                spec: 'Intel Core i5, 8th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 1.60 Ghz Speed, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 8th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 1.60 Ghz Speed, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
+                icon: '💻',
+                images: [
+                    'images/products/PROD-006/1.jpg',
+                    'images/products/PROD-006/2.jpg'
+                ]
+            },
+            {
+                id: 'PROD-007',
+                name: "Dell Latitude 7320",
+                category: 'Laptops',
+                price: 6000,
+                stock: 10,
+                spec: "Intel Core i7, 11th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 3.0Ghz Speed, Fingerprint Security, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 13.3inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-007/1.jpg',
@@ -516,44 +519,51 @@ class KmapStoreApp {
             },
             {
                 id: 'PROD-008',
-                name: 'Dell Latitude 5500',
-                category: 'Laptops',
-                price: 4200,
-                stock: 10,
-                spec: 'Intel Core i5, 8th Generation, 8gb Memory, 256gb Solid state Drive, 8CPUs @ 1.60 Ghz Speed, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 15.6 inch Screen Size, Strong Battery',
-                icon: '💻',
-                images: []
-            },
-            {
-                id: 'PROD-009',
-                name: 'Dell Latitude 7320',
+                name: "Hp EliteBook 1040 G7",
                 category: 'Laptops',
                 price: 6000,
                 stock: 10,
-                spec: 'Intel Core i7, 11th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 3.0Ghz Speed, Fingerprint Security, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 13.3inch Screen Size, Strong Battery',
+                spec: "Core i5 10th Generation, 16gbMemory, 256gb Solid state Drive, 8CPUs @ 1.7Ghz Speed, x360 Convertible, Touchscreen Display, Face iD Recognition, Fingerprint Security, Backlit Keyboard, 2Type C Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
+                icon: '💻',
+                images: [
+                    'images/products/PROD-008/1.jpg',
+                    'images/products/PROD-008/2.jpg'
+                ]
+            },
+            {
+                id: 'PROD-009',
+                name: "Hp EliteBook 1030 G2",
+                category: 'Laptops',
+                price: 4000,
+                stock: 10,
+                spec: "Intel Core i5, 7th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.6Ghz Speed, x360 Convertible, Touchscreen Display, Face iD Recognition, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-009/1.jpg',
-                    'images/products/PROD-009/2.jpg'
+                    'images/products/PROD-009/2.jpg',
+                    'images/products/PROD-009/3.jpg'
                 ]
             },
             {
                 id: 'PROD-010',
-                name: 'Hp Elitebook 840 G7',
+                name: "Hp EliteBook 840 G5",
                 category: 'Laptops',
-                price: 5000,
+                price: 3000,
                 stock: 10,
-                spec: 'Intel Core i5, 10th Generation, 8GB Memory, 256gb Solid state Drive, 8CPUs @ 1.7Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 7th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.6Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
-                images: []
+                images: [
+                    'images/products/PROD-010/1.jpg',
+                    'images/products/PROD-010/2.jpg'
+                ]
             },
             {
                 id: 'PROD-011',
-                name: 'Hp EliteBook 1040 G7',
+                name: "Hp EliteBook 830 G6",
                 category: 'Laptops',
-                price: 6000,
+                price: 4800,
                 stock: 10,
-                spec: 'Core i5 10th Generation, 16gbMemory, 256gb Solid state Drive, 8CPUs @ 1.7Ghz Speed, x360 Convertible, Touchscreen Display, Face iD Recognition, Fingerprint Security, Backlit Keyboard, 2Type C Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 8th Generation, 16gb Memory, 256gb Solid state Drive, 4CPUs @ 1.6Ghz Speed, x360 Convertible, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-011/1.jpg',
@@ -562,51 +572,50 @@ class KmapStoreApp {
             },
             {
                 id: 'PROD-012',
-                name: 'Hp EliteBook 1030 G2',
+                name: "Hp EliteBook 840 G3",
                 category: 'Laptops',
-                price: 4000,
+                price: 2500,
                 stock: 10,
-                spec: 'Intel Core i5, 7th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.6Ghz Speed, x360 Convertible, Touchscreen Display, Face iD Recognition, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 6th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.4Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slot, Display port & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-012/1.jpg',
-                    'images/products/PROD-012/2.jpg',
-                    'images/products/PROD-012/3.jpg'
+                    'images/products/PROD-012/2.jpg'
                 ]
             },
             {
                 id: 'PROD-013',
-                name: 'Hp EliteBook 840 G5',
+                name: "Dell Latitude 5320",
                 category: 'Laptops',
-                price: 3000,
+                price: 6500,
                 stock: 10,
-                spec: 'Intel Core i5, 7th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.6Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i7, 11th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 3.0Ghz Speed, 360 Convertible, Fingerprint Security, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 13.3inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-013/1.jpg',
-                    'images/products/PROD-013/2.jpg'
+                    'images/products/PROD-013/2.jpg',
+                    'images/products/PROD-013/3.jpg'
                 ]
             },
             {
                 id: 'PROD-014',
-                name: 'Hp EliteBook 830 G6',
+                name: "Hp Elitebook x360 1040 G5",
                 category: 'Laptops',
                 price: 4800,
                 stock: 10,
-                spec: 'Intel Core i5, 8th Generation, 16gb Memory, 256gb Solid state Drive, 4CPUs @ 1.6Ghz Speed, x360 Convertible, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 8th Generation, 8GB Memory, 256gb Solid state Drive, 8CPUs @ 1.7Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
-                    'images/products/PROD-014/1.jpg',
-                    'images/products/PROD-014/2.jpg'
+                    'images/products/PROD-014/1.jpg'
                 ]
             },
             {
                 id: 'PROD-015',
-                name: 'Hp EliteBook 840 G3',
+                name: "Hp Spectre Pro x360 G2",
                 category: 'Laptops',
-                price: 2500,
+                price: 3500,
                 stock: 10,
-                spec: 'Intel Core i5, 6th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.4Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slot, Display port & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 6th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.4Ghz Speed, x360 Convertible, Touchscreen Display, Backlit Keyboard, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-015/1.jpg',
@@ -615,106 +624,106 @@ class KmapStoreApp {
             },
             {
                 id: 'PROD-016',
-                name: 'Dell Latitude 5320',
+                name: "Dell XPS 13 9360",
                 category: 'Laptops',
-                price: 6500,
+                price: 3800,
                 stock: 10,
-                spec: 'Intel Core i7, 11th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 3.0Ghz Speed, 360 Convertible, Fingerprint Security, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 13.3inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 7th Generation, 8Gb Memory, 256gb Solid state Drive, 8CPUs @ 2.6Ghz Speed, Fingerprint Security, Backlit Keyboard, Type C USB Slot, USB Slots, 13.3inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-016/1.jpg',
                     'images/products/PROD-016/2.jpg',
-                    'images/products/PROD-016/3.jpg'
+                    'images/products/PROD-016/3.jpg',
+                    'images/products/PROD-016/4.jpg',
+                    'images/products/PROD-016/5.jpg',
+                    'images/products/PROD-016/6.jpg'
                 ]
             },
             {
                 id: 'PROD-017',
-                name: 'Hp Elitebook x360 1040 G5',
+                name: "Dell latitude 7290",
                 category: 'Laptops',
-                price: 4800,
+                price: 3000,
                 stock: 10,
-                spec: 'Intel Core i5, 8th Generation, 8GB Memory, 256gb Solid state Drive, 8CPUs @ 1.7Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 7th Generation, 8Gb Memory, 256gb Solid state Drive, 8CPUs @ 2.6Ghz Speed, Backlit Keyboard, Type C USB Slot, USB Slots, 13.3inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
-                    'images/products/PROD-017/1.jpg'
+                    'images/products/PROD-017/1.jpg',
+                    'images/products/PROD-017/2.jpg'
                 ]
             },
             {
                 id: 'PROD-018',
-                name: 'Hp Spectre Pro x360 G2',
+                name: "Hp Elitebook 840 G8",
                 category: 'Laptops',
-                price: 3500,
+                price: 6300,
                 stock: 10,
-                spec: 'Intel Core i5, 6th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.4Ghz Speed, x360 Convertible, Touchscreen Display, Backlit Keyboard, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i7, 11th Generation, 32GB Memory, 512GB Solid state Drive, 8CPUs @ 3.0 Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-018/1.jpg',
-                    'images/products/PROD-018/2.jpg'
+                    'images/products/PROD-018/2.jpg',
+                    'images/products/PROD-018/3.jpg'
                 ]
             },
             {
                 id: 'PROD-019',
-                name: 'Dell XPS 13 9360',
+                name: "Hp Elitebook x360 1030 G3 (Core i5)",
                 category: 'Laptops',
-                price: 3800,
+                price: 4000,
                 stock: 10,
-                spec: 'Intel Core i5, 7th Generation, 8Gb Memory, 256gb Solid state Drive, 8CPUs @ 2.6Ghz Speed, Fingerprint Security, Backlit Keyboard, Type C USB Slot, USB Slots, 13.3inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 8th Generation, 8GB Memory, 256gb Solid state Drive, 8CPUs @ 1.7Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 13.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
-                    'images/products/PROD-019/1.jpg',
-                    'images/products/PROD-019/2.jpg',
-                    'images/products/PROD-019/3.jpg',
-                    'images/products/PROD-019/4.jpg',
-                    'images/products/PROD-019/5.jpg',
-                    'images/products/PROD-019/6.jpg'
+                    'images/products/PROD-019/1.jpg'
                 ]
             },
             {
                 id: 'PROD-020',
-                name: 'Dell latitude 7290',
+                name: "Hp Elitebook x360 1030 G3 (Core i7)",
                 category: 'Laptops',
-                price: 3000,
+                price: 4800,
                 stock: 10,
-                spec: 'Intel Core i5, 7th Generation, 8Gb Memory, 256gb Solid state Drive, 8CPUs @ 2.6Ghz Speed, Backlit Keyboard, Type C USB Slot, USB Slots, 13.3inch Screen Size, Strong Battery',
+                spec: "Intel Core i7, 8th Generation, 16GB Memory, 256gb Solid state Drive, 8CPUs @ 1.7Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 13.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
-                    'images/products/PROD-020/1.jpg',
-                    'images/products/PROD-020/2.jpg'
+                    'images/products/PROD-020/1.jpg'
                 ]
             },
             {
                 id: 'PROD-021',
-                name: 'Hp Elitebook 840 G8',
+                name: "Dell Latitude 5410",
                 category: 'Laptops',
-                price: 6300,
+                price: 3400,
                 stock: 10,
-                spec: 'Intel Core i7, 11th Generation, 32GB Memory, 512GB Solid state Drive, 8CPUs @ 3.0 Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 10th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 1.60 Ghz Speed, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-021/1.jpg',
-                    'images/products/PROD-021/2.jpg',
-                    'images/products/PROD-021/3.jpg'
+                    'images/products/PROD-021/2.jpg'
                 ]
             },
             {
                 id: 'PROD-022',
-                name: 'Hp Elitebook x360 1030 G3 (Core i5)',
+                name: "Dell Latitude 7420",
                 category: 'Laptops',
-                price: 4000,
+                price: 4500,
                 stock: 10,
-                spec: 'Intel Core i5, 8th Generation, 8GB Memory, 256gb Solid state Drive, 8CPUs @ 1.7Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 13.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 11th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 2.6Ghz Speed, Fingerprint Security, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 13.3inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
-                    'images/products/PROD-022/1.jpg'
+                    'images/products/PROD-022/1.jpg',
+                    'images/products/PROD-022/2.jpg',
+                    'images/products/PROD-022/3.jpg'
                 ]
             },
             {
                 id: 'PROD-023',
-                name: 'Hp Elitebook x360 1030 G3 (Core i7)',
+                name: "Lenovo Thinkpad T480s",
                 category: 'Laptops',
-                price: 4800,
+                price: 2880,
                 stock: 10,
-                spec: 'Intel Core i7, 8th Generation, 16GB Memory, 256gb Solid state Drive, 8CPUs @ 1.7Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 13.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 8th Generation, 16gb Memory, 256gb Solid state Drive, 4CPUs @ 1.60GHz, Type C USB Slot, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-023/1.jpg'
@@ -722,11 +731,11 @@ class KmapStoreApp {
             },
             {
                 id: 'PROD-024',
-                name: 'Dell Latitude 5410',
+                name: "Lenovo Thinkpad T470s",
                 category: 'Laptops',
-                price: 3400,
+                price: 4100,
                 stock: 10,
-                spec: 'Intel Core i5, 10th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 1.60 Ghz Speed, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Touchscreen, Intel Core i5, 6th Generation, 12gb Memory, 512gb Solid state Drive, 4CPUs @ 2.3GHz, Type C USB Slot, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-024/1.jpg',
@@ -735,65 +744,68 @@ class KmapStoreApp {
             },
             {
                 id: 'PROD-025',
-                name: 'Dell Latitude 7420',
+                name: "Hp OMEN 15 (Core i7 / GTX 1050Ti)",
                 category: 'Laptops',
-                price: 4500,
+                price: 6800,
                 stock: 10,
-                spec: 'Intel Core i5, 11th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 2.6Ghz Speed, Fingerprint Security, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 13.3inch Screen Size, Strong Battery',
+                spec: "Intel Core i7 7th Generation, 2.8 GHz up to 3.2GHz, 16GB Ddr4 Ram, 256GB SSD + 1TB HDD, GTX 1050ti 4GB GPU, Keyboard Light, 15.6 inch 60Hz IPS LED Display (1920 x 1080), Cam + Mic, Black Color, Windows 11, B&O Audio, Lithium-Ion Battery, 150W Charger",
                 icon: '💻',
                 images: [
                     'images/products/PROD-025/1.jpg',
                     'images/products/PROD-025/2.jpg',
-                    'images/products/PROD-025/3.jpg'
+                    'images/products/PROD-025/3.jpg',
+                    'images/products/PROD-025/4.jpg'
                 ]
             },
             {
                 id: 'PROD-026',
-                name: 'Lenovo Thinkpad T480s',
+                name: "Hp OMEN 15 (Core i5 / GTX 1050)",
                 category: 'Laptops',
-                price: 2880,
+                price: 5900,
                 stock: 10,
-                spec: 'Intel Core i5, 8th Generation, 16gb Memory, 256gb Solid state Drive, 4CPUs @ 1.60GHz, Type C USB Slot, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5 8th Generation, 2.3GHz upto 3.2GHz, 12GB Ddr4 Ram, 256GB SSD + 1TB HDD, GTX 1050 GPU 2GB Dedicated, Keyboard Light, 15.6 inch WQXGA 60Hz IPS LED Display (1920 x 1080), Cam + Mic, Black Color, Windows 11, B&O Audio, Lithium-Ion Battery, 150W Charger",
                 icon: '💻',
                 images: [
-                    'images/products/PROD-026/1.jpg'
+                    'images/products/PROD-026/1.jpg',
+                    'images/products/PROD-026/2.jpg'
                 ]
             },
             {
                 id: 'PROD-027',
-                name: 'Lenovo Thinkpad T470s',
+                name: "Hp OMEN 15 (Ryzen 7 / RTX 2060)",
                 category: 'Laptops',
-                price: 4100,
+                price: 9500,
                 stock: 10,
-                spec: 'Touchscreen, Intel Core i5, 6th Generation, 12gb Memory, 512gb Solid state Drive, 4CPUs @ 2.3GHz, Type C USB Slot, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "AMD Ryzen 7-5800H 2.9GHz upto 4.2GHz, 16GB Ddr4 Ram, 512GB SSD + 128GB SSD, RTX 2060 GPU 6GB Dedicated, RGB Keyboard Light, 15.6 inch WQXGA 144Hz IPS LED Display (1920 x 1080), Cam + Mic, Black Color, Windows 11, B&O Audio, Lithium-Ion Battery, 200W Charger",
                 icon: '💻',
                 images: [
                     'images/products/PROD-027/1.jpg',
-                    'images/products/PROD-027/2.jpg'
+                    'images/products/PROD-027/2.jpg',
+                    'images/products/PROD-027/3.jpg',
+                    'images/products/PROD-027/4.jpg',
+                    'images/products/PROD-027/5.jpg',
+                    'images/products/PROD-027/6.jpg'
                 ]
             },
             {
                 id: 'PROD-028',
-                name: 'Hp OMEN 15 (Core i7 / GTX 1050Ti)',
+                name: "Hp Probook 650 G8",
                 category: 'Laptops',
-                price: 6800,
+                price: 4800,
                 stock: 10,
-                spec: 'Intel Core i7 7th Generation, 2.8 GHz up to 3.2GHz, 16GB Ddr4 Ram, 256GB SSD + 1TB HDD, GTX 1050ti 4GB GPU, Keyboard Light, 15.6 inch 60Hz IPS LED Display (1920 x 1080), Cam + Mic, Black Color, Windows 11, B&O Audio, Lithium-Ion Battery, 150W Charger',
+                spec: "Intel Core i5, 11th Generation, 16gb Memory, 256gb Solid state Drive, 8CPUs @ 2.4Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
-                    'images/products/PROD-028/1.jpg',
-                    'images/products/PROD-028/2.jpg',
-                    'images/products/PROD-028/3.jpg',
-                    'images/products/PROD-028/4.jpg'
+                    'images/products/PROD-028/1.jpg'
                 ]
             },
             {
                 id: 'PROD-029',
-                name: 'Hp OMEN 15 (Core i5 / GTX 1050)',
+                name: "Toshiba Portege X20W",
                 category: 'Laptops',
-                price: 5900,
+                price: 3800,
                 stock: 10,
-                spec: 'Intel Core i5 8th Generation, 2.3GHz upto 3.2GHz, 12GB Ddr4 Ram, 256GB SSD + 1TB HDD, GTX 1050 GPU 2GB Dedicated, Keyboard Light, 15.6 inch WQXGA 60Hz IPS LED Display (1920 x 1080), Cam + Mic, Black Color, Windows 11, B&O Audio, Lithium-Ion Battery, 150W Charger',
+                spec: "Intel Core i7, 7th Generation, 16Gb Memory, 256gb Solid state Drive, 8CPUs @ 2.7Ghz Speed, X360 Touchscreen, Face ID Security, Backlit Keyboard, Type C USB Slot, USB Slots, 13.3inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
                     'images/products/PROD-029/1.jpg',
@@ -802,69 +814,27 @@ class KmapStoreApp {
             },
             {
                 id: 'PROD-030',
-                name: 'Hp OMEN 15 (Ryzen 7 / RTX 2060)',
+                name: "Lenovo Yoga 11e",
                 category: 'Laptops',
-                price: 9500,
+                price: 1950,
                 stock: 10,
-                spec: 'AMD Ryzen 7-5800H 2.9GHz upto 4.2GHz, 16GB Ddr4 Ram, 512GB SSD + 128GB SSD, RTX 2060 GPU 6GB Dedicated, RGB Keyboard Light, 15.6 inch WQXGA 144Hz IPS LED Display (1920 x 1080), Cam + Mic, Black Color, Windows 11, B&O Audio, Lithium-Ion Battery, 200W Charger',
+                spec: "Intel Core i3, 6th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.3GHz, x360 Convertible, Touchscreen Display, Type C USB Slots, Hdmi & USB Slots, 12.5 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
-                    'images/products/PROD-030/1.jpg',
-                    'images/products/PROD-030/2.jpg',
-                    'images/products/PROD-030/3.jpg',
-                    'images/products/PROD-030/4.jpg',
-                    'images/products/PROD-030/5.jpg',
-                    'images/products/PROD-030/6.jpg'
+                    'images/products/PROD-030/1.jpg'
                 ]
             },
             {
                 id: 'PROD-031',
-                name: 'Hp Probook 650 G8',
-                category: 'Laptops',
-                price: 4800,
-                stock: 10,
-                spec: 'Intel Core i5, 11th Generation, 16gb Memory, 256gb Solid state Drive, 8CPUs @ 2.4Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
-                icon: '💻',
-                images: [
-                    'images/products/PROD-031/1.jpg'
-                ]
-            },
-            {
-                id: 'PROD-032',
-                name: 'Toshiba Portege X20W',
-                category: 'Laptops',
-                price: 3800,
-                stock: 10,
-                spec: 'Intel Core i7, 7th Generation, 16Gb Memory, 256gb Solid state Drive, 8CPUs @ 2.7Ghz Speed, X360 Touchscreen, Face ID Security, Backlit Keyboard, Type C USB Slot, USB Slots, 13.3inch Screen Size, Strong Battery',
-                icon: '💻',
-                images: [
-                    'images/products/PROD-032/1.jpg',
-                    'images/products/PROD-032/2.jpg'
-                ]
-            },
-            {
-                id: 'PROD-033',
-                name: 'Lenovo Yoga 11e',
-                category: 'Laptops',
-                price: 1950,
-                stock: 10,
-                spec: 'Intel Core i3, 6th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.3GHz, x360 Convertible, Touchscreen Display, Type C USB Slots, Hdmi & USB Slots, 12.5 inch Screen Size, Strong Battery',
-                icon: '💻',
-                images: [
-                    'images/products/PROD-033/1.jpg'
-                ]
-            },
-            {
-                id: 'PROD-034',
-                name: 'Hp Elitebook x360 830 G8',
+                name: "Hp Elitebook x360 830 G8",
                 category: 'Laptops',
                 price: 6500,
                 stock: 10,
-                spec: 'Intel Core i5, 11th Generation, 16GB Memory, 512gb Solid state Drive, 8CPUs @ 1.6 Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                spec: "Intel Core i5, 11th Generation, 16GB Memory, 512gb Solid state Drive, 8CPUs @ 1.6 Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery",
                 icon: '💻',
                 images: [
-                    'images/products/PROD-034/1.jpg',
-                    'images/products/PROD-034/2.jpg'
+                    'images/products/PROD-031/1.jpg',
+                    'images/products/PROD-031/2.jpg'
                 ]
             }
         ];
@@ -889,11 +859,15 @@ class KmapStoreApp {
                 if (parsed.length === 0 ||
                     parsed.some(p => p.id === 'PROD-001' && p.name !== 'Hp Zbook 15u G6') ||
                     parsed.some(p => p.category === 'Accessories') ||
+                    parsed.some(p => !p.images || p.images.length === 0) ||
                     parsed.some(p => p.id === 'PROD-001' && (!p.images || !p.images.length || p.images[0].startsWith('data:')))) {
                     needsReset = true;
                 } else {
-                    // Seamlessly incorporate any newly added default products and attach new photos
                     let modified = false;
+                    const validLen = parsed.length;
+                    parsed = parsed.filter(p => p.images && p.images.length > 0);
+                    if (parsed.length !== validLen) modified = true;
+
                     defaultProducts.forEach(defProd => {
                         const existing = parsed.find(p => p.id === defProd.id);
                         if (!existing) {
