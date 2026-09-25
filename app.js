@@ -3169,6 +3169,11 @@ class KmapStoreApp {
         let end = new Date();
 
         switch (preset) {
+            case 'all_time':
+                start = new Date(0);
+                end = new Date();
+                end.setHours(23, 59, 59, 999);
+                break;
             case 'today':
                 start.setHours(0, 0, 0, 0);
                 end.setHours(23, 59, 59, 999);
@@ -3298,9 +3303,10 @@ class KmapStoreApp {
 
         document.getElementById('report-stat-revenue').innerText = `GH₵ ${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
         document.getElementById('report-stat-count').innerText = allTransactions.length;
-        document.getElementById('report-stat-average').innerText = `GH₵ ${(totalRevenue / allTransactions.length).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+        document.getElementById('report-stat-average').innerText = `GH₵ ${(allTransactions.length > 0 ? totalRevenue / allTransactions.length : 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
 
-        document.getElementById('report-subtitle').innerText = `Sales Analysis (${start.toLocaleDateString()} - ${end.toLocaleDateString()})`;
+        const dateRangeStr = preset === 'all_time' ? 'All Time (Full History)' : `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+        document.getElementById('report-subtitle').innerText = `Sales Analysis (${dateRangeStr})`;
     }
 
     toggleReportDownloadDropdown(e) {
@@ -3327,12 +3333,12 @@ class KmapStoreApp {
         if (btn) btn.setAttribute('aria-expanded', 'false');
     }
 
-    // Excel spreadsheet (.xlsx) generation using SheetJS
+    // Excel spreadsheet (.xlsx / .xls) generation
     downloadReportExcel() {
         this.closeReportDownloadDropdown();
 
         // Make sure current report transactions are populated
-        if (!this.currentReportTransactions || this.currentReportTransactions.length === 0) {
+        if (!this.currentReportTransactions) {
             this.generateSalesReport();
         }
 
@@ -3342,16 +3348,17 @@ class KmapStoreApp {
         const count = document.getElementById('report-stat-count') ? document.getElementById('report-stat-count').innerText : '0';
         const avg = document.getElementById('report-stat-average') ? document.getElementById('report-stat-average').innerText : 'GH₵ 0.00';
 
-        const nowStr = new Date().toLocaleString();
+        const now = new Date();
+        const dateTimestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
         const userName = this.currentUser ? `${this.currentUser.name} (${this.currentUser.role.toUpperCase()})` : 'Authorized User';
 
         // Check if SheetJS (XLSX) is available
-        if (typeof window.XLSX !== 'undefined') {
+        if (typeof window.XLSX !== 'undefined' && window.XLSX.utils) {
             try {
                 const wsData = [
                     ["KMAP COMPUTERS - SALES & FINANCIAL ASSESSMENT REPORT"],
                     ["Sunyani, Ghana | Contact: +23320 834 1561"],
-                    [`Generated: ${nowStr}`],
+                    [`Generated: ${now.toLocaleString()}`],
                     [`Period: ${subtitle}`],
                     [`Authorized By: ${userName}`],
                     [],
@@ -3384,7 +3391,7 @@ class KmapStoreApp {
                     wsData.push([]);
                     wsData.push(["TOTAL REVENUE", "", "", "", "", "", "", numericTotal]);
                 } else {
-                    wsData.push(["No transactions recorded for this period."]);
+                    wsData.push(["No completed transactions recorded for this period."]);
                 }
 
                 const ws = window.XLSX.utils.aoa_to_sheet(wsData);
@@ -3404,51 +3411,127 @@ class KmapStoreApp {
                 const wb = window.XLSX.utils.book_new();
                 window.XLSX.utils.book_append_sheet(wb, ws, "Sales Summary");
 
-                const filename = `KMAP_Sales_Report_${Date.now()}.xlsx`;
-                window.XLSX.writeFile(wb, filename);
+                const filename = `KMAP_Sales_Report_${dateTimestamp}.xlsx`;
+                const wbout = window.XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
-                this.db.addLog(`Downloaded Sales Report as Excel (.xlsx)`);
-                this.showToast(`Report downloaded successfully as Excel spreadsheet!`);
+                if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveOrOpenBlob(blob, filename);
+                } else {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.style.display = 'none';
+                    link.href = url;
+                    link.setAttribute('download', filename);
+                    document.body.appendChild(link);
+                    link.click();
+                    setTimeout(() => {
+                        try {
+                            document.body.removeChild(link);
+                            URL.revokeObjectURL(url);
+                        } catch (e) { }
+                    }, 1500);
+                }
+
+                this.db.addLog(`Downloaded Sales Report as Excel (${filename})`);
+                this.showToast(`📥 Excel file "${filename}" downloaded to your Downloads!`, 'success');
                 return;
             } catch (err) {
-                console.error("Excel generation error, falling back to CSV:", err);
+                console.error("SheetJS XLSX generation error, using native Excel XML fallback:", err);
             }
         }
 
-        // Fallback: UTF-8 BOM CSV export (opens natively in Excel with proper Ghanaian Cedi and characters)
-        let csv = '\uFEFF';
-        csv += '"KMAP COMPUTERS - SALES & FINANCIAL ASSESSMENT REPORT"\n';
-        csv += `"Generated: ${nowStr}"\n`;
-        csv += `"Period: ${subtitle}"\n`;
-        csv += `"Authorized By: ${userName}"\n\n`;
-        csv += '"EXECUTIVE FINANCIAL SUMMARY"\n';
-        csv += `"Total Sales Revenue","${rev}"\n`;
-        csv += `"Total Completed Transactions","${count}"\n`;
-        csv += `"Average Order Size","${avg}"\n\n`;
-        csv += '"TRANSACTION BREAKDOWN"\n';
-        csv += '"Date","Transaction ID","Customer Name","Phone","Items / Description","Payment Type","Status","Amount (GH₵)"\n';
+        // Native Excel XML Spreadsheet 2003 (.xls) Fallback
+        // This is a genuine Excel spreadsheet recognized natively by Microsoft Excel on Windows with green Excel icon!
+        try {
+            const filename = `KMAP_Sales_Report_${dateTimestamp}.xls`;
+            const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-        transactions.forEach(t => {
-            const cleanName = (t.clientName || '').replace(/"/g, '""');
-            const cleanPhone = (t.phone || 'N/A').replace(/"/g, '""');
-            const cleanItems = (t.items || t.type || '').replace(/"/g, '""');
-            const cleanType = (t.type || '').replace(/"/g, '""');
-            const dateStr = new Date(t.date).toLocaleDateString();
-            csv += `"${dateStr}","${t.id}","${cleanName}","${cleanPhone}","${cleanItems}","${cleanType}","COMPLETED",${t.total}\n`;
-        });
+            let xml = '<?xml version="1.0"?>\n';
+            xml += '<?mso-application progid="Excel.Sheet"?>\n';
+            xml += '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"\n';
+            xml += ' xmlns:o="urn:schemas-microsoft-com:office:office"\n';
+            xml += ' xmlns:x="urn:schemas-microsoft-com:office:excel"\n';
+            xml += ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"\n';
+            xml += ' xmlns:html="http://www.w3.org/TR/REC-html40">\n';
+            xml += '<Styles>\n';
+            xml += ' <Style ss:ID="Header"><Font ss:Bold="1" ss:Size="14" ss:Color="#DA9100"/></Style>\n';
+            xml += ' <Style ss:ID="SubHeader"><Font ss:Bold="1" ss:Color="#555555"/></Style>\n';
+            xml += ' <Style ss:ID="ColHeader"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#DA9100" ss:Pattern="Solid"/></Style>\n';
+            xml += ' <Style ss:ID="TotalRow"><Font ss:Bold="1"/><Interior ss:Color="#FEF2D5" ss:Pattern="Solid"/></Style>\n';
+            xml += '</Styles>\n';
+            xml += '<Worksheet ss:Name="Sales Summary">\n';
+            xml += '<Table>\n';
+            xml += '<Column ss:Width="90"/>\n<Column ss:Width="110"/>\n<Column ss:Width="140"/>\n<Column ss:Width="100"/>\n<Column ss:Width="220"/>\n<Column ss:Width="120"/>\n<Column ss:Width="90"/>\n<Column ss:Width="100"/>\n';
 
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", `KMAP_Sales_Report_${Date.now()}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+            xml += `<Row><Cell ss:StyleID="Header"><Data ss:Type="String">KMAP COMPUTERS - SALES &amp; FINANCIAL ASSESSMENT REPORT</Data></Cell></Row>\n`;
+            xml += `<Row><Cell ss:StyleID="SubHeader"><Data ss:Type="String">Sunyani, Ghana | Contact: +23320 834 1561</Data></Cell></Row>\n`;
+            xml += `<Row><Cell><Data ss:Type="String">Generated: ${esc(now.toLocaleString())}</Data></Cell></Row>\n`;
+            xml += `<Row><Cell><Data ss:Type="String">Period: ${esc(subtitle)}</Data></Cell></Row>\n`;
+            xml += `<Row><Cell><Data ss:Type="String">Authorized By: ${esc(userName)}</Data></Cell></Row>\n`;
+            xml += '<Row/>\n';
 
-        this.db.addLog(`Downloaded Sales Report as CSV (Excel compatible)`);
-        this.showToast(`Report downloaded as Excel CSV format!`);
+            xml += '<Row><Cell ss:StyleID="SubHeader"><Data ss:Type="String">EXECUTIVE FINANCIAL SUMMARY</Data></Cell></Row>\n';
+            xml += `<Row><Cell><Data ss:Type="String">Total Sales Revenue</Data></Cell><Cell><Data ss:Type="String">${esc(rev)}</Data></Cell></Row>\n`;
+            xml += `<Row><Cell><Data ss:Type="String">Total Completed Transactions</Data></Cell><Cell><Data ss:Type="String">${esc(count)}</Data></Cell></Row>\n`;
+            xml += `<Row><Cell><Data ss:Type="String">Average Order Size</Data></Cell><Cell><Data ss:Type="String">${esc(avg)}</Data></Cell></Row>\n`;
+            xml += '<Row/>\n';
+
+            xml += '<Row><Cell ss:StyleID="SubHeader"><Data ss:Type="String">TRANSACTION BREAKDOWN</Data></Cell></Row>\n';
+            xml += '<Row ss:StyleID="ColHeader">';
+            ['Date', 'Transaction ID', 'Customer Name', 'Contact Phone', 'Items / Description', 'Payment Type', 'Status', 'Amount (GH₵)'].forEach(h => {
+                xml += `<Cell><Data ss:Type="String">${esc(h)}</Data></Cell>`;
+            });
+            xml += '</Row>\n';
+
+            let numericTotal = 0;
+            transactions.forEach(t => {
+                numericTotal += (t.total || 0);
+                const dateStr = new Date(t.date).toLocaleDateString();
+                xml += '<Row>';
+                xml += `<Cell><Data ss:Type="String">${esc(dateStr)}</Data></Cell>`;
+                xml += `<Cell><Data ss:Type="String">${esc(t.id)}</Data></Cell>`;
+                xml += `<Cell><Data ss:Type="String">${esc(t.clientName)}</Data></Cell>`;
+                xml += `<Cell><Data ss:Type="String">${esc(t.phone || 'N/A')}</Data></Cell>`;
+                xml += `<Cell><Data ss:Type="String">${esc(t.items || t.type)}</Data></Cell>`;
+                xml += `<Cell><Data ss:Type="String">${esc(t.type)}</Data></Cell>`;
+                xml += `<Cell><Data ss:Type="String">COMPLETED</Data></Cell>`;
+                xml += `<Cell><Data ss:Type="Number">${t.total}</Data></Cell>`;
+                xml += '</Row>\n';
+            });
+
+            if (transactions.length > 0) {
+                xml += '<Row ss:StyleID="TotalRow">';
+                xml += '<Cell><Data ss:Type="String">TOTAL REVENUE</Data></Cell><Cell/><Cell/><Cell/><Cell/><Cell/><Cell/>';
+                xml += `<Cell><Data ss:Type="Number">${numericTotal}</Data></Cell>`;
+                xml += '</Row>\n';
+            } else {
+                xml += '<Row><Cell><Data ss:Type="String">No completed transactions recorded for this period.</Data></Cell></Row>\n';
+            }
+
+            xml += '</Table>\n</Worksheet>\n</Workbook>';
+
+            const blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.style.display = 'none';
+            link.href = url;
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(() => {
+                try {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                } catch (e) { }
+            }, 1500);
+
+            this.db.addLog(`Downloaded Sales Report as Excel (${filename})`);
+            this.showToast(`📥 Excel file "${filename}" downloaded to your Downloads!`, 'success');
+        } catch (e) {
+            console.error("Failed to export Excel report:", e);
+            this.showToast("Failed to generate Excel report file.", 'error');
+        }
     }
 
     // PDF generation using jsPDF library

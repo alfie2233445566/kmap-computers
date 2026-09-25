@@ -20,8 +20,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- jsPDF for Report Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- SheetJS for Excel Report Generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- SheetJS for Excel Report Generation (Bundled locally + CDN fallback) -->
+    <script src="xlsx.full.min.js"></script>
+    <script>
+        if (typeof XLSX === 'undefined') {
+            const s = document.createElement('script');
+            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+            document.head.appendChild(s);
+        }
+    </script>
 </head>
 
 <body>
@@ -600,8 +607,9 @@
                     <div class="report-header-controls">
                         <div class="form-group" style="margin-bottom: 0;">
                             <label>Preset Ranges</label>
-                            <select id="report-preset" class="form-control" style="width: 180px;"
+                            <select id="report-preset" class="form-control" style="width: 200px;"
                                 onchange="app.handleReportPresetChange()">
+                                <option value="all_time" selected>All Time (Full History)</option>
                                 <option value="today">Today</option>
                                 <option value="yesterday">Yesterday</option>
                                 <option value="this_week">This Week</option>
