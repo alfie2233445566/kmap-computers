@@ -15,7 +15,7 @@ const safeLocalStorage = {
         } catch (e) {
             storage[key] = String(val);
         }
-        
+
         // Push to cloud if it's a watched key and sync is not skipped
         const watchedKeys = ['kmap_products', 'kmap_users', 'kmap_orders', 'kmap_logs', 'kmap_promos', 'kmap_hire_purchase'];
         if (!skipSync && watchedKeys.includes(key)) {
@@ -23,7 +23,7 @@ const safeLocalStorage = {
                 window.kvSyncQueue[key] = JSON.parse(val);
                 if (window.kvSyncTimeout) clearTimeout(window.kvSyncTimeout);
                 window.kvSyncTimeout = setTimeout(triggerKVSync, 400); // Fast debounce uploads
-            } catch(e) {}
+            } catch (e) { }
         }
     },
     removeItem: (key) => {
@@ -39,13 +39,13 @@ const getSyncApiUrl = () => {
     try {
         const custom = safeLocalStorage.getItem('kmap_cloud_sync_url');
         if (custom) return custom;
-    } catch (e) {}
+    } catch (e) { }
 
     // When running from file:/// or localhost without backend server, automatically use the live Vercel production API
     if (typeof window !== 'undefined' && window.location) {
-        if (window.location.protocol === 'file:' || 
-            window.location.hostname === 'localhost' || 
-            window.location.hostname === '127.0.0.1' || 
+        if (window.location.protocol === 'file:' ||
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
             !window.location.hostname) {
             return 'https://kmap-computers.vercel.app/api/sync';
         }
@@ -59,31 +59,31 @@ window.kvSyncTimeout = null;
 
 const triggerKVSync = () => {
     if (Object.keys(window.kvSyncQueue).length === 0) return;
-    
+
     const payload = { updates: { ...window.kvSyncQueue } };
     window.kvSyncQueue = {}; // Clear queue
-    
+
     fetch(getSyncApiUrl(), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
-    .then(async (res) => {
-        if (!res.ok) {
-            const errData = await res.json().catch(() => ({}));
-            console.error('KV Sync Failed:', res.status, errData);
-            if (window.app && typeof window.app.showToast === 'function') {
-                if (res.status === 413) {
-                    window.app.showToast('⚠️ Cloud sync failed: Photos payload too large for KV storage!', 'error');
-                } else if (res.status === 500) {
-                    window.app.showToast(`⚠️ Cloud sync failed: ${errData.error || 'Server error'}`, 'error');
+        .then(async (res) => {
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                console.error('KV Sync Failed:', res.status, errData);
+                if (window.app && typeof window.app.showToast === 'function') {
+                    if (res.status === 413) {
+                        window.app.showToast('⚠️ Cloud sync failed: Photos payload too large for KV storage!', 'error');
+                    } else if (res.status === 500) {
+                        window.app.showToast(`⚠️ Cloud sync failed: ${errData.error || 'Server error'}`, 'error');
+                    }
                 }
+            } else {
+                console.log('✓ KV Sync successful');
             }
-        } else {
-            console.log('✓ KV Sync successful');
-        }
-    })
-    .catch(err => console.error('KV Sync Network Error:', err));
+        })
+        .catch(err => console.error('KV Sync Network Error:', err));
 };
 
 class KmapStoreApp {
@@ -95,12 +95,12 @@ class KmapStoreApp {
         this.cart = [];
         this.salesChart = null;
         this.inspectBackView = null;
-        
+
         // History Navigation
         this.viewHistory = [];
         this.viewHistoryPointer = -1;
         this.isNavigatingHistory = false;
-        
+
         this.initDatabase();
         this.bindEvents();
         this.initSession();
@@ -110,8 +110,8 @@ class KmapStoreApp {
         try {
             const initialOrders = JSON.parse(safeLocalStorage.getItem('kmap_orders') || '[]');
             initialOrders.forEach(o => this.knownOrderIds.add(o.id));
-        } catch(e) {}
-        
+        } catch (e) { }
+
         // Start polling for Vercel KV updates
         setInterval(() => this.syncDownstream(), 5000);
         this.syncDownstream();
@@ -164,6 +164,13 @@ class KmapStoreApp {
                                     'images/products/PROD-001/4.jpg'
                                 ];
                             }
+                            if (this.defaultProductsList && Array.isArray(this.defaultProductsList)) {
+                                this.defaultProductsList.forEach(defProd => {
+                                    if (!data[key].some(p => p.id === defProd.id)) {
+                                        data[key].push(defProd);
+                                    }
+                                });
+                            }
                         }
 
                         let cloudVal = typeof data[key] === 'string' ? data[key] : JSON.stringify(data[key]);
@@ -180,7 +187,7 @@ class KmapStoreApp {
                     try {
                         const currentOrders = JSON.parse(safeLocalStorage.getItem('kmap_orders') || '[]');
                         currentOrders.forEach(o => this.knownOrderIds.add(o.id));
-                    } catch(e) {}
+                    } catch (e) { }
 
                     // Update active views immediately
                     this.renderClientCatalog();
@@ -205,7 +212,7 @@ class KmapStoreApp {
                     indicator.style.display = isAdmin ? 'inline-flex' : 'none';
                 }
             }
-        } catch(e) {
+        } catch (e) {
             const isAdmin = this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role);
             if (indicator) {
                 indicator.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #94a3b8;"></span> Local Cache`;
@@ -267,7 +274,7 @@ class KmapStoreApp {
     saveCart() {
         try {
             safeLocalStorage.setItem('kmap_cart', JSON.stringify(this.cart));
-        } catch (e) {}
+        } catch (e) { }
     }
 
     initSession() {
@@ -275,7 +282,7 @@ class KmapStoreApp {
         if (savedUser) {
             try {
                 this.currentUser = JSON.parse(savedUser);
-            } catch(e) {
+            } catch (e) {
                 this.currentUser = { username: 'guest', role: 'guest', name: 'Guest Viewer' };
             }
         } else {
@@ -661,8 +668,195 @@ class KmapStoreApp {
                 spec: 'Intel Core i5, 7th Generation, 8Gb Memory, 256gb Solid state Drive, 8CPUs @ 2.6Ghz Speed, Backlit Keyboard, Type C USB Slot, USB Slots, 13.3inch Screen Size, Strong Battery',
                 icon: '💻',
                 images: []
+            },
+            {
+                id: 'PROD-021',
+                name: 'Hp Elitebook 840 G8',
+                category: 'Laptops',
+                price: 6300,
+                stock: 10,
+                spec: 'Intel Core i7, 11th Generation, 32GB Memory, 512GB Solid state Drive, 8CPUs @ 3.0 Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                icon: '💻',
+                images: [
+                    'images/products/PROD-021/1.jpg',
+                    'images/products/PROD-021/2.jpg',
+                    'images/products/PROD-021/3.jpg'
+                ]
+            },
+            {
+                id: 'PROD-022',
+                name: 'Hp Elitebook x360 1030 G3 (Core i5)',
+                category: 'Laptops',
+                price: 4000,
+                stock: 10,
+                spec: 'Intel Core i5, 8th Generation, 8GB Memory, 256gb Solid state Drive, 8CPUs @ 1.7Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 13.0 inch Screen Size, Strong Battery',
+                icon: '💻',
+                images: [
+                    'images/products/PROD-022/1.jpg'
+                ]
+            },
+            {
+                id: 'PROD-023',
+                name: 'Hp Elitebook x360 1030 G3 (Core i7)',
+                category: 'Laptops',
+                price: 4800,
+                stock: 10,
+                spec: 'Intel Core i7, 8th Generation, 16GB Memory, 256gb Solid state Drive, 8CPUs @ 1.7Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 13.0 inch Screen Size, Strong Battery',
+                icon: '💻',
+                images: [
+                    'images/products/PROD-023/1.jpg'
+                ]
+            },
+            {
+                id: 'PROD-024',
+                name: 'Dell Latitude 5410',
+                category: 'Laptops',
+                price: 3400,
+                stock: 10,
+                spec: 'Intel Core i5, 10th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 1.60 Ghz Speed, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                icon: '💻',
+                images: [
+                    'images/products/PROD-024/1.jpg',
+                    'images/products/PROD-024/2.jpg'
+                ]
+            },
+            {
+                id: 'PROD-025',
+                name: 'Dell Latitude 7420',
+                category: 'Laptops',
+                price: 4500,
+                stock: 10,
+                spec: 'Intel Core i5, 11th Generation, 16gb Memory, 512gb Solid state Drive, 8CPUs @ 2.6Ghz Speed, Fingerprint Security, Backlit Keyboard, 2Type C USB Slots, Hdmi & USB Slots, 13.3inch Screen Size, Strong Battery',
+                icon: '💻',
+                images: [
+                    'images/products/PROD-025/1.jpg',
+                    'images/products/PROD-025/2.jpg',
+                    'images/products/PROD-025/3.jpg'
+                ]
+            },
+            {
+                id: 'PROD-026',
+                name: 'Lenovo Thinkpad T480s',
+                category: 'Laptops',
+                price: 2880,
+                stock: 10,
+                spec: 'Intel Core i5, 8th Generation, 16gb Memory, 256gb Solid state Drive, 4CPUs @ 1.60GHz, Type C USB Slot, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                icon: '💻',
+                images: [
+                    'images/products/PROD-026/1.jpg'
+                ]
+            },
+            {
+                id: 'PROD-027',
+                name: 'Lenovo Thinkpad T470s',
+                category: 'Laptops',
+                price: 4100,
+                stock: 10,
+                spec: 'Touchscreen, Intel Core i5, 6th Generation, 12gb Memory, 512gb Solid state Drive, 4CPUs @ 2.3GHz, Type C USB Slot, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                icon: '💻',
+                images: [
+                    'images/products/PROD-027/1.jpg',
+                    'images/products/PROD-027/2.jpg'
+                ]
+            },
+            {
+                id: 'PROD-028',
+                name: 'Hp OMEN 15 (Core i7 / GTX 1050Ti)',
+                category: 'Laptops',
+                price: 6800,
+                stock: 10,
+                spec: 'Intel Core i7 7th Generation, 2.8 GHz up to 3.2GHz, 16GB Ddr4 Ram, 256GB SSD + 1TB HDD, GTX 1050ti 4GB GPU, Keyboard Light, 15.6 inch 60Hz IPS LED Display (1920 x 1080), Cam + Mic, Black Color, Windows 11, B&O Audio, Lithium-Ion Battery, 150W Charger',
+                icon: '💻',
+                images: [
+                    'images/products/PROD-028/1.jpg',
+                    'images/products/PROD-028/2.jpg',
+                    'images/products/PROD-028/3.jpg',
+                    'images/products/PROD-028/4.jpg'
+                ]
+            },
+            {
+                id: 'PROD-029',
+                name: 'Hp OMEN 15 (Core i5 / GTX 1050)',
+                category: 'Laptops',
+                price: 5900,
+                stock: 10,
+                spec: 'Intel Core i5 8th Generation, 2.3GHz upto 3.2GHz, 12GB Ddr4 Ram, 256GB SSD + 1TB HDD, GTX 1050 GPU 2GB Dedicated, Keyboard Light, 15.6 inch WQXGA 60Hz IPS LED Display (1920 x 1080), Cam + Mic, Black Color, Windows 11, B&O Audio, Lithium-Ion Battery, 150W Charger',
+                icon: '💻',
+                images: [
+                    'images/products/PROD-029/1.jpg',
+                    'images/products/PROD-029/2.jpg'
+                ]
+            },
+            {
+                id: 'PROD-030',
+                name: 'Hp OMEN 15 (Ryzen 7 / RTX 2060)',
+                category: 'Laptops',
+                price: 9500,
+                stock: 10,
+                spec: 'AMD Ryzen 7-5800H 2.9GHz upto 4.2GHz, 16GB Ddr4 Ram, 512GB SSD + 128GB SSD, RTX 2060 GPU 6GB Dedicated, RGB Keyboard Light, 15.6 inch WQXGA 144Hz IPS LED Display (1920 x 1080), Cam + Mic, Black Color, Windows 11, B&O Audio, Lithium-Ion Battery, 200W Charger',
+                icon: '💻',
+                images: [
+                    'images/products/PROD-030/1.jpg',
+                    'images/products/PROD-030/2.jpg',
+                    'images/products/PROD-030/3.jpg',
+                    'images/products/PROD-030/4.jpg',
+                    'images/products/PROD-030/5.jpg',
+                    'images/products/PROD-030/6.jpg'
+                ]
+            },
+            {
+                id: 'PROD-031',
+                name: 'Hp Probook 650 G8',
+                category: 'Laptops',
+                price: 4800,
+                stock: 10,
+                spec: 'Intel Core i5, 11th Generation, 16gb Memory, 256gb Solid state Drive, 8CPUs @ 2.4Ghz Speed, Fingerprint Security, Backlit Keyboard, 1Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                icon: '💻',
+                images: [
+                    'images/products/PROD-031/1.jpg'
+                ]
+            },
+            {
+                id: 'PROD-032',
+                name: 'Toshiba Portege X20W',
+                category: 'Laptops',
+                price: 3800,
+                stock: 10,
+                spec: 'Intel Core i7, 7th Generation, 16Gb Memory, 256gb Solid state Drive, 8CPUs @ 2.7Ghz Speed, X360 Touchscreen, Face ID Security, Backlit Keyboard, Type C USB Slot, USB Slots, 13.3inch Screen Size, Strong Battery',
+                icon: '💻',
+                images: [
+                    'images/products/PROD-032/1.jpg',
+                    'images/products/PROD-032/2.jpg'
+                ]
+            },
+            {
+                id: 'PROD-033',
+                name: 'Lenovo Yoga 11e',
+                category: 'Laptops',
+                price: 1950,
+                stock: 10,
+                spec: 'Intel Core i3, 6th Generation, 8gb Memory, 256gb Solid state Drive, 4CPUs @ 2.3GHz, x360 Convertible, Touchscreen Display, Type C USB Slots, Hdmi & USB Slots, 12.5 inch Screen Size, Strong Battery',
+                icon: '💻',
+                images: [
+                    'images/products/PROD-033/1.jpg'
+                ]
+            },
+            {
+                id: 'PROD-034',
+                name: 'Hp Elitebook x360 830 G8',
+                category: 'Laptops',
+                price: 6500,
+                stock: 10,
+                spec: 'Intel Core i5, 11th Generation, 16GB Memory, 512gb Solid state Drive, 8CPUs @ 1.6 Ghz Speed, Fingerprint Security, 2Type C USB Slots, Hdmi & USB Slots, 14.0 inch Screen Size, Strong Battery',
+                icon: '💻',
+                images: [
+                    'images/products/PROD-034/1.jpg',
+                    'images/products/PROD-034/2.jpg'
+                ]
             }
         ];
+
+        this.defaultProductsList = defaultProducts;
 
         const defaultUsers = [
             { username: 'superadmin', role: 'superadmin', name: 'Super Administrator', password: 'super123' },
@@ -673,17 +867,29 @@ class KmapStoreApp {
 
         const defaultHP = [];
 
-        // Check if database reset is needed (to migration to these 20 laptops with authentic images)
+        // Check if database reset or sync is needed
         const existingProducts = safeLocalStorage.getItem('kmap_products');
         let needsReset = false;
         if (existingProducts) {
             try {
-                const parsed = JSON.parse(existingProducts);
-                if (parsed.length === 0 || 
-                    parsed.some(p => p.id === 'PROD-001' && p.name !== 'Hp Zbook 15u G6') || 
+                let parsed = JSON.parse(existingProducts);
+                if (parsed.length === 0 ||
+                    parsed.some(p => p.id === 'PROD-001' && p.name !== 'Hp Zbook 15u G6') ||
                     parsed.some(p => p.category === 'Accessories') ||
                     parsed.some(p => p.id === 'PROD-001' && (!p.images || !p.images.length || p.images[0].startsWith('data:')))) {
                     needsReset = true;
+                } else {
+                    // Seamlessly incorporate any newly added default products (e.g. PROD-021 to PROD-034)
+                    let modified = false;
+                    defaultProducts.forEach(defProd => {
+                        if (!parsed.some(p => p.id === defProd.id)) {
+                            parsed.push(defProd);
+                            modified = true;
+                        }
+                    });
+                    if (modified) {
+                        safeLocalStorage.setItem('kmap_products', JSON.stringify(parsed));
+                    }
                 }
             } catch (e) {
                 needsReset = true;
@@ -708,7 +914,7 @@ class KmapStoreApp {
             if (cleanedOrders.length !== currentOrders.length || !safeLocalStorage.getItem('kmap_orders')) {
                 safeLocalStorage.setItem('kmap_orders', JSON.stringify(cleanedOrders));
             }
-        } catch(e) {
+        } catch (e) {
             safeLocalStorage.setItem('kmap_orders', JSON.stringify([]));
         }
 
@@ -718,7 +924,7 @@ class KmapStoreApp {
             if (cleanedHP.length !== currentHP.length || !safeLocalStorage.getItem('kmap_hire_purchase')) {
                 safeLocalStorage.setItem('kmap_hire_purchase', JSON.stringify(cleanedHP));
             }
-        } catch(e) {
+        } catch (e) {
             safeLocalStorage.setItem('kmap_hire_purchase', JSON.stringify([]));
         }
 
@@ -728,7 +934,7 @@ class KmapStoreApp {
             if (cleanedUsers.length !== currentUsers.length || !safeLocalStorage.getItem('kmap_users')) {
                 safeLocalStorage.setItem('kmap_users', JSON.stringify(cleanedUsers.length > 0 ? cleanedUsers : defaultUsers));
             }
-        } catch(e) {
+        } catch (e) {
             safeLocalStorage.setItem('kmap_users', JSON.stringify(defaultUsers));
         }
 
@@ -737,7 +943,7 @@ class KmapStoreApp {
                 try {
                     const p = JSON.parse(safeLocalStorage.getItem('kmap_products'));
                     return (Array.isArray(p) && p.length > 0) ? p : defaultProducts;
-                } catch(e) {
+                } catch (e) {
                     return defaultProducts;
                 }
             },
@@ -746,7 +952,7 @@ class KmapStoreApp {
                 try {
                     const u = JSON.parse(safeLocalStorage.getItem('kmap_users'));
                     return (Array.isArray(u) && u.length > 0) ? u : defaultUsers;
-                } catch(e) {
+                } catch (e) {
                     return defaultUsers;
                 }
             },
@@ -755,7 +961,7 @@ class KmapStoreApp {
                 try {
                     const o = JSON.parse(safeLocalStorage.getItem('kmap_orders'));
                     return Array.isArray(o) ? o : [];
-                } catch(e) {
+                } catch (e) {
                     return [];
                 }
             },
@@ -779,7 +985,7 @@ class KmapStoreApp {
             e.preventDefault();
             const username = document.getElementById('login-username').value.trim();
             const pass = document.getElementById('login-password').value.trim();
-            
+
             const users = this.db.getUsers();
             const foundUser = users.find(u => u.username === username && u.password === pass);
 
@@ -788,13 +994,13 @@ class KmapStoreApp {
                 this.loadCart();
                 safeLocalStorage.setItem('kmap_current_user', JSON.stringify(foundUser));
                 this.closeLoginModal();
-                
+
                 // Set Header Profile
                 this.updateProfileHeader(foundUser);
-                
+
                 this.db.addLog(`User ${username} authenticated successfully.`);
                 this.renderSidebar();
-                
+
                 if (foundUser.role === 'client') {
                     this.switchView('client-store');
                 } else {
@@ -831,7 +1037,7 @@ class KmapStoreApp {
             const name = document.getElementById('signup-name').value.trim();
             const username = document.getElementById('signup-username').value.trim();
             const pass = document.getElementById('signup-password').value.trim();
-            
+
             const users = this.db.getUsers();
             if (users.find(u => u.username === username)) {
                 const err = document.getElementById('login-error-msg');
@@ -850,9 +1056,9 @@ class KmapStoreApp {
             this.loadCart();
             safeLocalStorage.setItem('kmap_current_user', JSON.stringify(newUser));
             this.closeLoginModal();
-            
+
             this.updateProfileHeader(newUser);
-            
+
             this.renderSidebar();
             this.switchView('client-store');
             this.showToast(`Welcome, ${name}! Your account has been registered.`);
@@ -873,7 +1079,7 @@ class KmapStoreApp {
 
         const orderSearchInput = document.getElementById('order-search');
         if (orderSearchInput) orderSearchInput.addEventListener('input', () => this.renderClientOrders());
-        
+
         const claimMethod = document.getElementById('checkout-claim-method');
         if (claimMethod) {
             claimMethod.addEventListener('change', (e) => {
@@ -884,7 +1090,7 @@ class KmapStoreApp {
 
         // Backup Upload
         document.getElementById('restore-db-file').addEventListener('change', (e) => this.restoreBackup(e.target));
-        
+
         // Browser navigation integration ("the web ones" - native back/forward buttons)
         window.addEventListener('popstate', (e) => {
             const targetView = (e.state && e.state.view) || (window.location.hash ? window.location.hash.replace('#', '') : 'client-store');
@@ -899,7 +1105,7 @@ class KmapStoreApp {
                 try {
                     const oldOrders = JSON.parse(e.oldValue || '[]');
                     const newOrders = JSON.parse(e.newValue || safeLocalStorage.getItem('kmap_orders') || '[]');
-                    
+
                     // Show notification to Admin/Superadmin on genuinely new client order
                     if (this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role)) {
                         const genuinelyNewOrders = newOrders.filter(no => !this.knownOrderIds.has(no.id));
@@ -933,7 +1139,7 @@ class KmapStoreApp {
                             }
                         });
                     }
-                    
+
                     // Refresh views on all tabs instantly
                     this.renderClientOrders();
                     this.renderAdminOrders();
@@ -990,7 +1196,7 @@ class KmapStoreApp {
             const productId = document.getElementById('promo-product').value;
             const type = document.getElementById('promo-type').value;
             const value = document.getElementById('promo-value').value;
-            
+
             this.createPromotion(scope, category, productId, type, value);
             document.getElementById('create-promo-form').reset();
             this.handlePromoScopeChange();
@@ -1005,7 +1211,7 @@ class KmapStoreApp {
             const price = parseFloat(document.getElementById('form-product-price').value) || 0;
             const stock = parseInt(document.getElementById('form-product-stock').value) || 0;
             const spec = document.getElementById('form-product-spec').value.trim();
-            
+
             const images = [];
             document.querySelectorAll('.product-img-url').forEach(input => {
                 if (input.value.trim()) images.push(input.value.trim());
@@ -1027,7 +1233,8 @@ class KmapStoreApp {
                 this.showToast(`Product ${name} updated.`);
             } else {
                 // Add
-                const newId = 'PROD-00' + (products.length + 1);
+                const nextNum = products.length + 1;
+                const newId = 'PROD-' + String(nextNum).padStart(3, '0');
                 products.push({ id: newId, name, category, price, stock, spec, images, icon: category === 'Laptops' ? '💻' : '🔌' });
                 this.db.addLog(`Created new product: ${name} (${newId})`);
                 this.showToast(`Product ${name} added.`);
@@ -1096,11 +1303,11 @@ class KmapStoreApp {
         if (lightbox) {
             let touchStartX = 0;
             let touchEndX = 0;
-            
+
             lightbox.addEventListener('touchstart', (e) => {
                 touchStartX = e.changedTouches[0].screenX;
             }, { passive: true });
-            
+
             lightbox.addEventListener('touchend', (e) => {
                 touchEndX = e.changedTouches[0].screenX;
                 const diff = touchEndX - touchStartX;
@@ -1113,7 +1320,7 @@ class KmapStoreApp {
                 }
             }, { passive: true });
         }
-        
+
         // Keyboard navigation (Arrow keys for Lightbox, Escape to close)
         window.addEventListener('keydown', (e) => {
             const lightboxModal = document.getElementById('lightbox-modal');
@@ -1146,7 +1353,7 @@ class KmapStoreApp {
             const deposit = document.getElementById('form-hp-deposit').value;
             const months = document.getElementById('form-hp-months').value;
             const startDate = document.getElementById('form-hp-date').value;
-            
+
             this.saveNewHP(clientName, phone, machine, price, deposit, months, startDate);
         });
 
@@ -1156,7 +1363,7 @@ class KmapStoreApp {
             const currentPw = document.getElementById('form-pw-current').value;
             const newPw = document.getElementById('form-pw-new').value;
             const confirmPw = document.getElementById('form-pw-confirm').value;
-            
+
             this.changePassword(currentPw, newPw, confirmPw);
         });
     }
@@ -1179,7 +1386,7 @@ class KmapStoreApp {
 
         const pageTitle = document.getElementById('page-title');
         const pageSubtitle = document.getElementById('page-subtitle');
-        
+
         const navBtn = document.getElementById(`nav-btn-${viewName}`);
         if (navBtn) navBtn.classList.add('active');
 
@@ -1193,7 +1400,7 @@ class KmapStoreApp {
             }
         }
 
-        switch(viewName) {
+        switch (viewName) {
             case 'client-store':
                 document.getElementById('view-client-store').style.display = 'flex';
                 pageTitle.innerText = "KMAP COMPUTERS";
@@ -1354,10 +1561,10 @@ class KmapStoreApp {
     renderCategoryFilters() {
         const select = document.getElementById('client-category-select');
         if (!select) return;
-        
+
         const products = this.db.getProducts();
         const categories = ['All', ...new Set(products.map(p => p.category))];
-        
+
         if (select.options.length === 0) {
             select.innerHTML = '';
             categories.forEach(cat => {
@@ -1366,13 +1573,13 @@ class KmapStoreApp {
                 opt.innerText = cat === 'All' ? 'All Categories' : cat;
                 select.appendChild(opt);
             });
-            
+
             select.onchange = (e) => {
                 this.activeCategory = e.target.value;
                 this.renderClientCatalog();
             };
         }
-        
+
         select.value = this.activeCategory;
     }
 
@@ -1398,20 +1605,20 @@ class KmapStoreApp {
         filtered.forEach(p => {
             const discPrice = this.getDiscountedPrice(p);
             const hasPromo = discPrice < p.price;
-            const priceHtml = hasPromo 
-                ? `<div class="product-price"><span class="original-price">GH₵ ${p.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</span><span class="promo-price">GH₵ ${discPrice.toLocaleString(undefined, {minimumFractionDigits: 2})}</span></div>`
-                : `<div class="product-price">GH₵ ${p.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>`;
-            
+            const priceHtml = hasPromo
+                ? `<div class="product-price"><span class="original-price">GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span><span class="promo-price">GH₵ ${discPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>`
+                : `<div class="product-price">GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>`;
+
             const promoBadge = hasPromo ? `<div class="promo-badge">PROMO</div>` : '';
-            
+
             // Image handling (support up to 6 images, fallback to default laptop/desktop emoji icons)
-            const mainImg = (p.images && p.images.length > 0 && p.images[0]) 
-                ? `<img src="${p.images[0]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;">` 
+            const mainImg = (p.images && p.images.length > 0 && p.images[0])
+                ? `<img src="${p.images[0]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;">`
                 : `<span style="font-size: 56px; color: var(--primary); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${p.icon || '💻'}</span>`;
 
             // Split specs by commas or newlines and show only the first two
             const specsArray = p.spec ? p.spec.split(/,|\n/).map(s => s.trim()).filter(s => s.length > 0) : [];
-            const shortSpec = specsArray.length > 2 
+            const shortSpec = specsArray.length > 2
                 ? `${specsArray[0]}, ${specsArray[1]}... <span style="color: var(--primary); font-weight: 700; text-decoration: underline;">See More</span>`
                 : (p.spec || 'No specifications listed.');
 
@@ -1419,7 +1626,7 @@ class KmapStoreApp {
             card.className = 'card product-card';
             card.style.position = 'relative';
             card.style.cursor = 'pointer';
-            
+
             // Clicking card opens the product inspect view
             card.innerHTML = `
                 ${promoBadge}
@@ -1448,7 +1655,7 @@ class KmapStoreApp {
     addToCart(id) {
         const products = this.db.getProducts();
         const prod = products.find(p => p.id === id);
-        
+
         if (!prod || prod.stock <= 0) return;
 
         const cartItem = this.cart.find(item => item.id === id);
@@ -1473,18 +1680,18 @@ class KmapStoreApp {
         const empty = document.getElementById('cart-empty-msg');
         const items = document.getElementById('cart-items-container');
         const summary = document.getElementById('cart-summary');
-        
+
         const mEmpty = document.getElementById('mobile-cart-empty-msg');
         const mItems = document.getElementById('mobile-cart-items-container');
         const mSummary = document.getElementById('mobile-cart-summary');
-        
+
         if (items) items.innerHTML = '';
         if (mItems) mItems.innerHTML = '';
-        
+
         // Update sidebar cart counts
         const totalQty = this.cart.reduce((sum, item) => sum + item.qty, 0);
         document.querySelectorAll('.cart-count').forEach(el => el.innerText = totalQty);
-        
+
         if (this.cart.length === 0) {
             if (empty) empty.style.display = 'block';
             if (summary) summary.style.display = 'none';
@@ -1518,14 +1725,14 @@ class KmapStoreApp {
                     </button>
                 </div>
             `;
-            
+
             if (items) {
                 const row = document.createElement('div');
                 row.style = 'display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 8px;';
                 row.innerHTML = html;
                 items.appendChild(row);
             }
-            
+
             if (mItems) {
                 const mRow = document.createElement('div');
                 mRow.style = 'display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 8px;';
@@ -1534,7 +1741,7 @@ class KmapStoreApp {
             }
         });
 
-        const subtotalText = `GH₵ ${subtotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+        const subtotalText = `GH₵ ${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
         if (document.getElementById('cart-subtotal')) document.getElementById('cart-subtotal').innerText = subtotalText;
         if (document.getElementById('cart-total')) document.getElementById('cart-total').innerText = subtotalText;
         if (document.getElementById('mobile-cart-subtotal')) document.getElementById('mobile-cart-subtotal').innerText = subtotalText;
@@ -1586,7 +1793,7 @@ class KmapStoreApp {
 
         const claimMethodEl = document.getElementById(isMobile ? 'mobile-checkout-claim-method' : 'checkout-claim-method') || document.getElementById('mobile-checkout-claim-method');
         const addressEl = document.getElementById(isMobile ? 'mobile-checkout-address' : 'checkout-address') || document.getElementById('mobile-checkout-address');
-        
+
         const claimMethod = claimMethodEl ? claimMethodEl.value : 'walk_in';
         const address = addressEl ? addressEl.value.trim() : '';
 
@@ -1627,11 +1834,11 @@ class KmapStoreApp {
         // Reset Cart
         this.cart = [];
         this.renderCart();
-        
+
         // Show support line payment instructions modal
         const orderIdEl = document.getElementById('modal-order-id');
         if (orderIdEl) orderIdEl.innerText = uniqueId;
-        
+
         const callOverlay = document.getElementById('modal-checkout-call');
         if (callOverlay) {
             if (claimMethod === 'hire_purchase') {
@@ -1707,35 +1914,35 @@ class KmapStoreApp {
     cancelCheckout(orderId, showToast = true) {
         const orders = this.db.getOrders();
         const orderIndex = orders.findIndex(o => o.id === orderId);
-        
+
         if (orderIndex > -1) {
             const order = orders[orderIndex];
-            
+
             // Restore inventory stock
             const products = this.db.getProducts();
             order.items.forEach(cItem => {
                 const p = products.find(prod => prod.id === cItem.id);
                 if (p) p.stock += cItem.qty;
             });
-            
+
             // Restore cart
             this.cart = [...order.items];
-            
+
             // Remove order
             orders.splice(orderIndex, 1);
-            
+
             // Save & Rerender
             this.db.saveOrders(orders);
             this.db.saveProducts(products);
             this.db.addLog(`Cancelled checkout for order ${orderId}, restored cart & stock.`);
-            
+
             this.renderCart();
             this.renderClientCatalog();
             if (showToast) {
                 this.showToast("Checkout cancelled. Items restored to your cart.");
             }
         }
-        
+
         document.getElementById('modal-checkout-call').classList.remove('active');
         this.updateScrollLock();
         this.switchView('client-cart');
@@ -1865,7 +2072,7 @@ class KmapStoreApp {
         document.getElementById('inspect-product-name').innerText = p.name;
         document.getElementById('inspect-product-category').innerText = p.category;
         document.getElementById('inspect-product-spec').innerText = p.spec || 'No specifications listed.';
-        
+
         const statusEl = document.getElementById('inspect-product-stock-status');
         if (p.stock <= 0) {
             statusEl.innerText = 'OUT OF STOCK';
@@ -1879,14 +2086,14 @@ class KmapStoreApp {
         const hasPromo = discPrice < p.price;
         const originalPriceEl = document.getElementById('inspect-product-original-price');
         const priceEl = document.getElementById('inspect-product-price');
-        
+
         if (hasPromo) {
             originalPriceEl.style.display = 'inline';
-            originalPriceEl.innerText = `GH₵ ${p.price.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            priceEl.innerText = `GH₵ ${discPrice.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            originalPriceEl.innerText = `GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+            priceEl.innerText = `GH₵ ${discPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
         } else {
             originalPriceEl.style.display = 'none';
-            priceEl.innerText = `GH₵ ${p.price.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            priceEl.innerText = `GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
         }
 
         this.currentInspectProductId = productId;
@@ -1962,7 +2169,7 @@ class KmapStoreApp {
         if (modal && img) {
             const targetProductId = productId || this.currentInspectProductId;
             this.lightboxImages = [];
-            
+
             if (targetProductId) {
                 const products = this.db.getProducts();
                 const p = products.find(item => item.id === targetProductId);
@@ -1978,7 +2185,7 @@ class KmapStoreApp {
             if (this.lightboxImages.length === 0 && (!src || src.startsWith('data:image/svg'))) {
                 return;
             }
-            
+
             let foundIdx = -1;
             if (this.lightboxImages.length > 0 && src) {
                 foundIdx = this.lightboxImages.findIndex(item => {
@@ -1986,12 +2193,12 @@ class KmapStoreApp {
                     return item === src || src.endsWith(item) || item.endsWith(src);
                 });
             }
-            
+
             this.lightboxIndex = foundIdx >= 0 ? foundIdx : (this.inspectImageIndex || 0);
             img.src = this.lightboxImages.length > 0 ? this.lightboxImages[this.lightboxIndex] : src;
             modal.classList.add('active');
             this.updateScrollLock();
-            
+
             const prevBtn = document.querySelector('.lightbox-prev-btn');
             const nextBtn = document.querySelector('.lightbox-next-btn');
             if (prevBtn && nextBtn) {
@@ -2087,9 +2294,9 @@ class KmapStoreApp {
 
         clientOrders.forEach(o => {
             const tr = document.createElement('tr');
-            const dateStr = new Date(o.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
+            const dateStr = new Date(o.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             const itemsStr = o.items.map(i => `${i.name} (${i.qty})`).join(', ');
-            
+
             let badgeClass = 'badge-pending';
             if (o.status === 'confirmed') badgeClass = 'badge-confirmed';
             if (o.status === 'in_transit') badgeClass = 'badge-transit';
@@ -2102,7 +2309,7 @@ class KmapStoreApp {
                 <td>${dateStr}</td>
                 <td>${itemsStr}</td>
                 <td>${o.claimMethod.replace('_', ' ').toUpperCase()}</td>
-                <td><strong>GH₵ ${o.total.toLocaleString(undefined, {minimumFractionDigits: 2})}</strong></td>
+                <td><strong>GH₵ ${o.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong></td>
                 <td><span class="badge ${badgeClass}">${o.status.toUpperCase()}</span></td>
                 <td>
                     <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="app.downloadInvoicePDF('${o.id}')"><i class="fa-solid fa-file-pdf"></i> Download</button>
@@ -2124,7 +2331,7 @@ class KmapStoreApp {
         const pending = orders.filter(o => o.status === 'pending').length;
         const lowStock = products.filter(p => p.stock <= 3).length;
 
-        document.getElementById('stat-revenue').innerText = `GH₵ ${revenue.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+        document.getElementById('stat-revenue').innerText = `GH₵ ${revenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
         document.getElementById('stat-active-orders').innerText = active;
         document.getElementById('stat-pending-orders').innerText = pending;
         document.getElementById('stat-low-stock').innerText = lowStock;
@@ -2137,7 +2344,7 @@ class KmapStoreApp {
             tr.style.cursor = 'pointer';
             tr.onclick = () => this.viewOrderDetails(o.id);
             tr.title = "Click to view order details";
-            
+
             let badgeClass = 'badge-pending';
             if (o.status === 'confirmed') badgeClass = 'badge-confirmed';
             if (o.status === 'in_transit') badgeClass = 'badge-transit';
@@ -2147,7 +2354,7 @@ class KmapStoreApp {
             tr.innerHTML = `
                 <td><strong>${o.id}</strong></td>
                 <td>${o.clientName}</td>
-                <td>GH₵ ${o.total.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                <td>GH₵ ${o.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                 <td><span class="badge ${badgeClass}">${o.status.toUpperCase()}</span></td>
             `;
             recentTbody.appendChild(tr);
@@ -2208,20 +2415,20 @@ class KmapStoreApp {
         for (let i = 6; i >= 0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
-            const dStr = d.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+            const dStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
             dates.push(dStr);
-            
+
             // Sum sales for that day
-            const startDay = new Date(d.setHours(0,0,0,0)).getTime();
-            const endDay = new Date(d.setHours(23,59,59,999)).getTime();
-            
+            const startDay = new Date(d.setHours(0, 0, 0, 0)).getTime();
+            const endDay = new Date(d.setHours(23, 59, 59, 999)).getTime();
+
             const daySales = completedOrders
                 .filter(o => {
                     const oTime = new Date(o.date).getTime();
                     return oTime >= startDay && oTime <= endDay;
                 })
                 .reduce((sum, o) => sum + o.total, 0);
-            
+
             data.push(daySales);
         }
 
@@ -2262,7 +2469,7 @@ class KmapStoreApp {
         tbody.innerHTML = '';
 
         let orders = this.db.getOrders();
-        
+
         // Search query filter
         if (searchQuery) {
             const queryLower = searchQuery.toLowerCase();
@@ -2287,7 +2494,7 @@ class KmapStoreApp {
         orders.forEach(o => {
             const tr = document.createElement('tr');
             const itemsStr = o.items.map(i => `${i.name} (x${i.qty})`).join(', ');
-            const dateStr = new Date(o.date).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'});
+            const dateStr = new Date(o.date).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
             let selectStyle = 'border: 1px solid var(--border);';
             if (o.status === 'pending') selectStyle = 'background-color: rgba(244, 180, 0, 0.15); color: #B07D00; font-weight: 700; border-color: #F4B400;';
@@ -2308,7 +2515,7 @@ class KmapStoreApp {
                     <span style="font-size: 12px; font-weight: 600;">${o.claimMethod.toUpperCase()}</span><br>
                     <span style="font-size:11px; color: var(--text-light);">${o.address || 'In-store Pick up'}</span>
                 </td>
-                <td><strong>GH₵ ${o.total.toLocaleString(undefined, {minimumFractionDigits: 2})}</strong></td>
+                <td><strong>GH₵ ${o.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong></td>
                 <td>
                     <select class="form-control" style="${selectStyle} width: 140px; font-size:12px; padding: 6px 12px; border-radius: var(--radius-sm);" onchange="app.updateOrderStatus('${o.id}', this.value)">
                         <option value="pending" ${o.status === 'pending' ? 'selected' : ''}>PENDING</option>
@@ -2334,13 +2541,13 @@ class KmapStoreApp {
     updateOrderStatus(orderId, newStatus) {
         const orders = this.db.getOrders();
         const order = orders.find(o => o.id === orderId);
-        
+
         if (order) {
             order.status = newStatus;
             this.db.saveOrders(orders);
             this.db.addLog(`Updated order status ${orderId} to: ${newStatus}`);
             this.showToast(`Order status updated to ${newStatus}`);
-            
+
             if (this.activeView === 'admin-dashboard') this.renderAdminOverview();
             if (this.activeView === 'admin-orders') this.renderAdminOrders();
         }
@@ -2353,11 +2560,11 @@ class KmapStoreApp {
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        
+
         doc.setFont("helvetica", "bold");
         doc.setFontSize(22);
         doc.text("Kmap Computers - Invoice", 14, 20);
-        
+
         doc.setFontSize(11);
         doc.setFont("helvetica", "normal");
         doc.text(`Order ID: ${o.id}`, 14, 30);
@@ -2373,10 +2580,10 @@ class KmapStoreApp {
         }
 
         doc.line(14, nextY, 196, nextY);
-        
+
         doc.setFont("helvetica", "bold");
         doc.text("Items Ordered", 14, nextY + 8);
-        
+
         let y = nextY + 18;
         doc.setFont("helvetica", "normal");
         o.items.forEach((item, idx) => {
@@ -2388,7 +2595,7 @@ class KmapStoreApp {
         doc.line(14, y + 4, 196, y + 4);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(14);
-        doc.text(`Total Amount: GHS ${o.total.toLocaleString(undefined, {minimumFractionDigits: 2})}`, 14, y + 14);
+        doc.text(`Total Amount: GHS ${o.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, 14, y + 14);
 
         doc.save(`KMAP_Invoice_${o.id}.pdf`);
         this.db.addLog(`Downloaded invoice for order ${o.id}`);
@@ -2413,7 +2620,7 @@ class KmapStoreApp {
 
     downloadAllInvoices() {
         const orders = this.db.getOrders();
-        
+
         let filteredOrders = [...orders];
         const searchQuery = document.getElementById('admin-order-search').value.toLowerCase().trim();
         if (searchQuery) {
@@ -2434,18 +2641,18 @@ class KmapStoreApp {
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        
+
         doc.setFont("helvetica", "bold");
         doc.setFontSize(22);
         doc.text("Kmap Computers - System Orders List", 14, 20);
-        
+
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
         doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28);
         doc.text(`Total Orders: ${filteredOrders.length}`, 14, 34);
 
         doc.line(14, 40, 196, 40);
-        
+
         let y = 48;
         filteredOrders.forEach((o, idx) => {
             const dateStr = new Date(o.date).toLocaleDateString();
@@ -2453,12 +2660,12 @@ class KmapStoreApp {
             const text = `${idx + 1}. ID: ${o.id} | ${o.clientName} | ${dateStr} | ${o.status.toUpperCase()} | GHS ${o.total.toLocaleString()}`;
             doc.text(text, 14, y);
             y += 8;
-            
+
             doc.setFontSize(8);
             doc.text(`   Items: ${itemsStr}`, 14, y);
             y += 10;
             doc.setFontSize(10);
-            
+
             if (y > 280) {
                 doc.addPage();
                 y = 20;
@@ -2480,8 +2687,8 @@ class KmapStoreApp {
         }
         products.forEach(p => {
             const hasImg = p.images && p.images.length > 0 && p.images[0];
-            const iconOrImg = hasImg 
-                ? `<img src="${p.images[0]}" alt="${p.name}" style="width:36px; height:36px; object-fit:cover; object-position:center; border-radius:4px; border:1px solid var(--border); background:#fff;">` 
+            const iconOrImg = hasImg
+                ? `<img src="${p.images[0]}" alt="${p.name}" style="width:36px; height:36px; object-fit:cover; object-position:center; border-radius:4px; border:1px solid var(--border); background:#fff;">`
                 : `<span style="font-size: 20px;">${p.icon || '💻'}</span>`;
 
             const tr = document.createElement('tr');
@@ -2656,7 +2863,7 @@ class KmapStoreApp {
         const title = document.getElementById('product-modal-title');
         const form = document.getElementById('product-details-form');
         form.reset();
-        
+
         const urls = document.querySelectorAll('.product-img-url');
         urls.forEach(u => u.value = '');
 
@@ -2674,7 +2881,7 @@ class KmapStoreApp {
                 document.getElementById('form-product-price').value = p.price;
                 document.getElementById('form-product-stock').value = p.stock;
                 document.getElementById('form-product-spec').value = p.spec || '';
-                
+
                 // images list
                 if (p.images && Array.isArray(p.images)) {
                     p.images.forEach((imgUrl, idx) => {
@@ -2686,7 +2893,7 @@ class KmapStoreApp {
             title.innerText = "Add New Product";
             document.getElementById('form-product-id').value = '';
         }
-        
+
         this.refreshModalImagePreviews();
         modal.classList.add('active');
         this.updateScrollLock();
@@ -2712,7 +2919,7 @@ class KmapStoreApp {
         const preset = document.getElementById('report-preset').value;
         const startGroup = document.getElementById('report-start-date-group');
         const endGroup = document.getElementById('report-end-date-group');
-        
+
         if (preset === 'custom') {
             startGroup.style.display = 'block';
             endGroup.style.display = 'block';
@@ -2727,29 +2934,29 @@ class KmapStoreApp {
         let start = new Date();
         let end = new Date();
 
-        switch(preset) {
+        switch (preset) {
             case 'today':
-                start.setHours(0,0,0,0);
-                end.setHours(23,59,59,999);
+                start.setHours(0, 0, 0, 0);
+                end.setHours(23, 59, 59, 999);
                 break;
             case 'yesterday':
                 start.setDate(start.getDate() - 1);
-                start.setHours(0,0,0,0);
+                start.setHours(0, 0, 0, 0);
                 end.setDate(end.getDate() - 1);
-                end.setHours(23,59,59,999);
+                end.setHours(23, 59, 59, 999);
                 break;
             case 'this_week':
                 const day = start.getDay();
                 start.setDate(start.getDate() - day);
-                start.setHours(0,0,0,0);
+                start.setHours(0, 0, 0, 0);
                 break;
             case 'this_month':
                 start.setDate(1);
-                start.setHours(0,0,0,0);
+                start.setHours(0, 0, 0, 0);
                 break;
             case 'this_year':
                 start.setMonth(0, 1);
-                start.setHours(0,0,0,0);
+                start.setHours(0, 0, 0, 0);
                 break;
             case 'custom':
                 const customStart = document.getElementById('report-start-date').value;
@@ -2759,9 +2966,9 @@ class KmapStoreApp {
                     return;
                 }
                 start = new Date(customStart);
-                start.setHours(0,0,0,0);
+                start.setHours(0, 0, 0, 0);
                 end = new Date(customEnd);
-                end.setHours(23,59,59,999);
+                end.setHours(23, 59, 59, 999);
                 break;
         }
 
@@ -2841,15 +3048,15 @@ class KmapStoreApp {
                 <td>${t.clientName}</td>
                 <td>${t.type}</td>
                 <td><span class="badge badge-success">COMPLETED</span></td>
-                <td style="text-align: right; font-weight:700;">GH₵ ${t.total.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                <td style="text-align: right; font-weight:700;">GH₵ ${t.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
             `;
             tbody.appendChild(tr);
         });
 
-        document.getElementById('report-stat-revenue').innerText = `GH₵ ${totalRevenue.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+        document.getElementById('report-stat-revenue').innerText = `GH₵ ${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
         document.getElementById('report-stat-count').innerText = allTransactions.length;
-        document.getElementById('report-stat-average').innerText = `GH₵ ${(totalRevenue / allTransactions.length).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-        
+        document.getElementById('report-stat-average').innerText = `GH₵ ${(totalRevenue / allTransactions.length).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+
         document.getElementById('report-subtitle').innerText = `Sales Analysis (${start.toLocaleDateString()} - ${end.toLocaleDateString()})`;
     }
 
@@ -2857,11 +3064,11 @@ class KmapStoreApp {
     downloadReportPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        
+
         doc.setFont("helvetica", "bold");
         doc.setFontSize(22);
         doc.text("Kmap Computers - Sales Assessment Report", 14, 20);
-        
+
         doc.setFontSize(12);
         doc.setFont("helvetica", "normal");
         doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28);
@@ -2876,16 +3083,16 @@ class KmapStoreApp {
         doc.text(`Average Order Size: ${avg}`, 14, 58);
 
         doc.line(14, 64, 196, 64);
-        
+
         doc.setFont("helvetica", "bold");
         doc.text("Recent Transactions Summary", 14, 72);
-        
+
         // Loop table content
         const rows = document.querySelectorAll('#report-orders-tbody tr');
         let y = 82;
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
-        
+
         rows.forEach((row, i) => {
             const text = `${row.cells[0].innerText} | ID: ${row.cells[1].innerText} | ${row.cells[2].innerText} (${row.cells[3].innerText}) | ${row.cells[5].innerText}`;
             doc.text(text, 14, y);
@@ -2915,8 +3122,8 @@ class KmapStoreApp {
         };
 
         const str = JSON.stringify(backupData, null, 4);
-        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(str);
-        
+        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(str);
+
         const link = document.createElement('a');
         link.setAttribute('href', dataUri);
         link.setAttribute('download', `kmap_backup_${new Date().toISOString().split('T')[0]}.json`);
@@ -2944,7 +3151,7 @@ class KmapStoreApp {
                     safeLocalStorage.setItem('kmap_users', JSON.stringify(parsed.users));
                     safeLocalStorage.setItem('kmap_orders', JSON.stringify(parsed.orders));
                     if (parsed.logs) safeLocalStorage.setItem('kmap_logs', JSON.stringify(parsed.logs));
-                    
+
                     this.showToast("Database restored successfully!");
                     this.initDatabase();
                     this.switchView('admin-dashboard');
@@ -3003,14 +3210,14 @@ class KmapStoreApp {
         const toast = document.createElement('div');
         toast.className = 'toast';
         if (type === 'error') toast.style.borderLeftColor = 'var(--error)';
-        
+
         toast.innerHTML = `
             <i class="fa-solid ${type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-check'}" 
                style="color: ${type === 'error' ? 'var(--error)' : 'var(--accent)'};"></i>
             <span>${msg}</span>
         `;
         container.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.remove();
         }, 4000);
@@ -3024,11 +3231,11 @@ class KmapStoreApp {
     openHPModal() {
         document.getElementById('modal-hp-form').classList.add('active');
         this.updateScrollLock();
-        
+
         // Populate products select list
         const select = document.getElementById('form-hp-product-select');
         select.innerHTML = '';
-        
+
         const products = this.db.getProducts();
         products.forEach(p => {
             const opt = document.createElement('option');
@@ -3036,20 +3243,20 @@ class KmapStoreApp {
             opt.innerText = `${p.name} (GH₵ ${p.price.toLocaleString()})`;
             select.appendChild(opt);
         });
-        
+
         // Add custom machine option
         const optCustom = document.createElement('option');
         optCustom.value = 'custom';
         optCustom.innerText = '-- Type Custom Item / Machine --';
         select.appendChild(optCustom);
-        
+
         // Set default date to today
         document.getElementById('form-hp-date').value = new Date().toISOString().substring(0, 10);
-        
+
         // Reset custom input
         document.getElementById('form-hp-product-custom').style.display = 'none';
         document.getElementById('form-hp-product-custom').required = false;
-        
+
         // Trigger default product change to auto-fill price
         this.handleHPProductChange();
     }
@@ -3064,7 +3271,7 @@ class KmapStoreApp {
         const select = document.getElementById('form-hp-product-select');
         const customInput = document.getElementById('form-hp-product-custom');
         const priceInput = document.getElementById('form-hp-price');
-        
+
         if (select.value === 'custom') {
             customInput.style.display = 'block';
             customInput.required = true;
@@ -3073,7 +3280,7 @@ class KmapStoreApp {
         } else {
             customInput.style.display = 'none';
             customInput.required = false;
-            
+
             const products = this.db.getProducts();
             const product = products.find(p => p.id === select.value);
             if (product) {
@@ -3087,7 +3294,7 @@ class KmapStoreApp {
         const priceVal = parseFloat(price);
         const depositVal = parseFloat(deposit);
         const monthsVal = parseInt(months);
-        
+
         if (depositVal >= priceVal) {
             this.showToast("Deposit cannot be equal to or larger than price.", 'error');
             return;
@@ -3095,7 +3302,7 @@ class KmapStoreApp {
 
         const remaining = priceVal - depositVal;
         const monthlyAmount = parseFloat((remaining / monthsVal).toFixed(2));
-        
+
         const start = new Date(startDateStr);
         const installments = [];
         for (let i = 1; i <= monthsVal; i++) {
@@ -3136,9 +3343,9 @@ class KmapStoreApp {
     renderHPList() {
         const filterStatus = document.getElementById('admin-hp-status-filter').value;
         const query = document.getElementById('admin-hp-search').value.toLowerCase();
-        
+
         const hps = this.db.getHP();
-        
+
         // Dynamically update status of hps first
         hps.forEach(hp => {
             const allPaid = hp.installments.every(inst => inst.status === 'paid');
@@ -3155,7 +3362,7 @@ class KmapStoreApp {
                 }
             }
         });
-        
+
         // Save dynamically updated statuses back
         this.db.saveHP(hps);
 
@@ -3175,7 +3382,7 @@ class KmapStoreApp {
                 // Outstanding balance is total price minus deposit minus paid installments
                 const paidAmt = hp.installments.filter(inst => inst.status === 'paid').reduce((sum, inst) => sum + inst.amount, 0);
                 outstandingBalance += (hp.price - hp.deposit - paidAmt);
-                
+
                 // Count near due (due in 3 days or less) or overdue
                 hp.installments.forEach(inst => {
                     if (inst.status === 'pending') {
@@ -3189,18 +3396,18 @@ class KmapStoreApp {
         });
 
         document.getElementById('hp-stat-active').innerText = activeCount;
-        document.getElementById('hp-stat-balance').innerText = `GH₵ ${outstandingBalance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+        document.getElementById('hp-stat-balance').innerText = `GH₵ ${outstandingBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
         document.getElementById('hp-stat-alerts').innerText = nearOverdueAlerts;
         document.getElementById('hp-stat-completed').innerText = completedCount;
-        
+
         const tbody = document.getElementById('admin-hp-tbody');
         if (!tbody) return;
         tbody.innerHTML = '';
 
         const filtered = hps.filter(hp => {
-            const matchesSearch = hp.clientName.toLowerCase().includes(query) || 
-                                  hp.phone.toLowerCase().includes(query) || 
-                                  hp.machine.toLowerCase().includes(query);
+            const matchesSearch = hp.clientName.toLowerCase().includes(query) ||
+                hp.phone.toLowerCase().includes(query) ||
+                hp.machine.toLowerCase().includes(query);
             const matchesFilter = filterStatus === 'all' || hp.status === filterStatus;
             return matchesSearch && matchesFilter;
         });
@@ -3212,16 +3419,16 @@ class KmapStoreApp {
 
         filtered.forEach(hp => {
             const tr = document.createElement('tr');
-            
+
             // Calculate next due installment
             const nextDueInst = hp.installments.find(inst => inst.status === 'pending');
             let nextDueStr = 'N/A';
             let nextDueStyle = '';
-            
+
             if (nextDueInst) {
                 const dueDate = new Date(nextDueInst.dueDate);
                 nextDueStr = dueDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                
+
                 if (dueDate < now) {
                     nextDueStyle = 'color: var(--error); font-weight: 700;';
                 } else if (dueDate <= threeDaysFromNow) {
@@ -3231,9 +3438,9 @@ class KmapStoreApp {
 
             const paidCount = hp.installments.filter(inst => inst.status === 'paid').length;
             const totalInst = hp.installments.length;
-            
+
             const unpaidBalance = hp.status === 'completed' ? 0 : (hp.price - hp.deposit - hp.installments.filter(inst => inst.status === 'paid').reduce((sum, inst) => sum + inst.amount, 0));
-            
+
             let statusBadge = '';
             if (hp.status === 'completed') statusBadge = '<span class="badge badge-success">Completed</span>';
             else if (hp.status === 'overdue') statusBadge = '<span class="badge" style="background: rgba(217, 48, 37, 0.1); color: var(--error); font-weight: 600; padding: 4px 8px;">Overdue</span>';
@@ -3245,9 +3452,9 @@ class KmapStoreApp {
                     <span style="font-size: 12px; color: var(--text-light);"><i class="fa-solid fa-phone"></i> ${hp.phone}</span>
                 </td>
                 <td><strong>${hp.machine}</strong></td>
-                <td>GH₵ ${hp.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-                <td>GH₵ ${hp.deposit.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-                <td style="font-weight: 600;">GH₵ ${unpaidBalance.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                <td>GH₵ ${hp.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                <td>GH₵ ${hp.deposit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                <td style="font-weight: 600;">GH₵ ${unpaidBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                 <td><strong>${paidCount} / ${totalInst}</strong></td>
                 <td style="${nextDueStyle}">${nextDueStr}</td>
                 <td>${statusBadge}</td>
@@ -3281,9 +3488,9 @@ class KmapStoreApp {
         document.getElementById('hp-details-info').innerHTML = `
             <div><strong>Client:</strong> ${hp.clientName} (${hp.phone})</div>
             <div><strong>Item:</strong> ${hp.machine}</div>
-            <div><strong>Total Price:</strong> GH₵ ${hp.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
-            <div><strong>Deposit:</strong> GH₵ ${hp.deposit.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
-            <div><strong>Outstanding:</strong> GH₵ ${unpaid.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+            <div><strong>Total Price:</strong> GH₵ ${hp.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+            <div><strong>Deposit:</strong> GH₵ ${hp.deposit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+            <div><strong>Outstanding:</strong> GH₵ ${unpaid.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
             <div><strong>Agreement Date:</strong> ${new Date(hp.startDate).toLocaleDateString()}</div>
         `;
 
@@ -3302,10 +3509,10 @@ class KmapStoreApp {
             const tr = document.createElement('tr');
             const dueDate = new Date(inst.dueDate);
             const dueStr = dueDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-            
+
             let statusText = '';
             let dueStyle = '';
-            
+
             if (inst.status === 'paid') {
                 statusText = '<span class="badge badge-success">Paid</span>';
             } else {
@@ -3327,7 +3534,7 @@ class KmapStoreApp {
             tr.innerHTML = `
                 <td><strong>Month ${inst.month}</strong></td>
                 <td style="${dueStyle}">${dueStr}</td>
-                <td>GH₵ ${inst.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                <td>GH₵ ${inst.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                 <td>${statusText}</td>
                 <td>${actionBtn}</td>
             `;
@@ -3391,10 +3598,10 @@ class KmapStoreApp {
         const hps = this.db.getHP();
         const now = new Date();
         const threeDaysFromNow = new Date(now.getTime() + 3600000 * 24 * 3);
-        
+
         let overdueCount = 0;
         let nearDueCount = 0;
-        
+
         hps.forEach(hp => {
             if (hp.status !== 'completed') {
                 hp.installments.forEach(inst => {
@@ -3409,7 +3616,7 @@ class KmapStoreApp {
                 });
             }
         });
-        
+
         if (overdueCount > 0) {
             this.showToast(`⚠️ Alert: You have ${overdueCount} overdue installment payment(s)!`, 'error');
         }
@@ -3420,7 +3627,7 @@ class KmapStoreApp {
 
     openUserProfileModal() {
         if (!this.currentUser) return;
-        
+
         document.getElementById('profile-modal-name').innerText = this.currentUser.name;
         document.getElementById('profile-modal-username').innerText = this.currentUser.username;
         document.getElementById('profile-modal-avatar').innerText = this.currentUser.name.charAt(0).toUpperCase();
@@ -3459,7 +3666,7 @@ class KmapStoreApp {
             this.showToast("New passwords do not match.", 'error');
             return;
         }
-        
+
         if (currentPw !== this.currentUser.password) {
             this.showToast("Incorrect current password.", 'error');
             return;
@@ -3467,7 +3674,7 @@ class KmapStoreApp {
 
         const users = this.db.getUsers();
         const user = users.find(u => u.username === this.currentUser.username);
-        
+
         if (user) {
             user.password = newPw;
             this.currentUser.password = newPw;
@@ -3510,7 +3717,7 @@ class KmapStoreApp {
         this.currentUser = { username: 'guest', role: 'guest', name: 'Guest Viewer' };
         if (!preserveCart) this.cart = [];
         safeLocalStorage.removeItem('kmap_current_user');
-        
+
         this.closeLoginModal();
         this.updateProfileHeader(this.currentUser);
         this.renderSidebar();
