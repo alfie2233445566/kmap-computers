@@ -1200,3 +1200,49 @@ input[type="password"]::-ms-clear {
     color: var(--text-light);
     margin-top: 1px;
 }
+
+/* Product Card Favorite Toggle Button */
+.btn-fav-card {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888888;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 6;
+    touch-action: manipulation;
+}
+
+.btn-fav-card:hover {
+    transform: scale(1.12);
+    color: #e53e3e;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(229, 62, 62, 0.25);
+}
+
+.btn-fav-card.active {
+    color: #e53e3e;
+    background: #ffffff;
+    border-color: rgba(229, 62, 62, 0.35);
+}
+
+.btn-fav-card.active i {
+    animation: heartBeat 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.35); }
+    100% { transform: scale(1); }
+}

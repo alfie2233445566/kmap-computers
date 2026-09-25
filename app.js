@@ -93,6 +93,7 @@ class KmapStoreApp {
         this.activeView = 'client-store';
         this.activeCategory = 'All';
         this.cart = [];
+        this.favorites = [];
         this.salesChart = null;
         this.inspectBackView = null;
 
@@ -277,6 +278,187 @@ class KmapStoreApp {
         } catch (e) { }
     }
 
+    loadFavorites() {
+        try {
+            const saved = safeLocalStorage.getItem('kmap_favorites');
+            this.favorites = saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            this.favorites = [];
+        }
+        this.updateFavoritesBadges();
+        return this.favorites;
+    }
+
+    saveFavorites() {
+        try {
+            safeLocalStorage.setItem('kmap_favorites', JSON.stringify(this.favorites));
+        } catch (e) { }
+        this.updateFavoritesBadges();
+    }
+
+    isFavorite(productId) {
+        return Array.isArray(this.favorites) && this.favorites.includes(productId);
+    }
+
+    toggleFavorite(productId) {
+        if (!Array.isArray(this.favorites)) this.favorites = [];
+        const products = this.db.getProducts();
+        const prod = products.find(p => p.id === productId);
+        const name = prod ? prod.name : 'Machine';
+
+        const index = this.favorites.indexOf(productId);
+        if (index > -1) {
+            this.favorites.splice(index, 1);
+            this.saveFavorites();
+            this.showToast(`Removed ${name} from Favorites.`);
+        } else {
+            this.favorites.push(productId);
+            this.saveFavorites();
+            this.showToast(`Saved ${name} to Favorites! You can buy it later. ❤️`);
+        }
+
+        // Update card buttons across any active grids
+        document.querySelectorAll(`.btn-fav-card[data-id="${productId}"]`).forEach(btn => {
+            const isFav = this.isFavorite(productId);
+            btn.className = `btn-fav-card ${isFav ? 'active' : ''}`;
+            btn.title = isFav ? 'Remove from Favorites' : 'Save to Favorites';
+            btn.innerHTML = `<i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>`;
+        });
+
+        // Update inspect modal favorite button if open
+        if (this.currentInspectProductId === productId) {
+            const favBtn = document.getElementById('inspect-fav-btn');
+            if (favBtn) {
+                const isFav = this.isFavorite(productId);
+                favBtn.innerHTML = `<i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>`;
+                favBtn.style.color = isFav ? '#e53e3e' : 'var(--text-light)';
+                favBtn.title = isFav ? 'Remove from Favorites' : 'Save to Favorites';
+            }
+        }
+
+        // Re-render favorites view if currently open
+        if (this.activeView === 'client-favorites') {
+            this.renderFavorites();
+        }
+    }
+
+    updateFavoritesBadges() {
+        const count = Array.isArray(this.favorites) ? this.favorites.length : 0;
+        document.querySelectorAll('.favorites-count').forEach(el => {
+            el.innerText = count;
+        });
+    }
+
+    renderFavorites() {
+        this.updateFavoritesBadges();
+        const grid = document.getElementById('favorites-catalog-grid');
+        const emptyMsg = document.getElementById('favorites-empty-msg');
+        const addAllBtn = document.getElementById('btn-fav-add-all');
+        if (!grid) return;
+
+        grid.innerHTML = '';
+        const allProducts = this.db.getProducts();
+        const favProducts = allProducts.filter(p => this.favorites.includes(p.id));
+
+        if (favProducts.length === 0) {
+            if (emptyMsg) emptyMsg.style.display = 'block';
+            if (addAllBtn) addAllBtn.style.display = 'none';
+            return;
+        }
+
+        if (emptyMsg) emptyMsg.style.display = 'none';
+        if (addAllBtn) addAllBtn.style.display = 'inline-flex';
+
+        favProducts.forEach(p => {
+            const discPrice = this.getDiscountedPrice(p);
+            const hasPromo = discPrice < p.price;
+            const priceHtml = hasPromo
+                ? `<div class="product-price"><span class="original-price">GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span><span class="promo-price">GH₵ ${discPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>`
+                : `<div class="product-price">GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>`;
+
+            const promoBadge = hasPromo ? `<div class="promo-badge">PROMO</div>` : '';
+
+            const mainImg = (p.images && p.images.length > 0 && p.images[0])
+                ? `<img src="${p.images[0]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;">`
+                : `<span style="font-size: 56px; color: var(--primary); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${p.icon || '💻'}</span>`;
+
+            const specsArray = p.spec ? p.spec.split(/,|\n/).map(s => s.trim()).filter(s => s.length > 0) : [];
+            const shortSpec = specsArray.length > 2
+                ? `${specsArray[0]}, ${specsArray[1]}... <span style="color: var(--primary); font-weight: 700; text-decoration: underline;">See Details</span>`
+                : (p.spec || 'No specifications listed.');
+
+            const card = document.createElement('div');
+            card.className = 'card product-card';
+            card.style.position = 'relative';
+            card.style.cursor = 'pointer';
+            card.onclick = (e) => {
+                if (!e.target.closest('button')) {
+                    this.openInspectModal(p.id);
+                }
+            };
+
+            card.innerHTML = `
+                ${promoBadge}
+                <button class="btn-fav-card active" data-id="${p.id}" onclick="event.stopPropagation(); app.toggleFavorite('${p.id}')" title="Remove from Favorites" aria-label="Favorite">
+                    <i class="fa-solid fa-heart"></i>
+                </button>
+                <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; pointer-events: none;">
+                    <div>
+                        <div class="product-img">${mainImg}</div>
+                        <h4 style="font-weight: 700; color: var(--text-dark); height: 44px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-top: 8px; font-size: 15px; line-height: 1.4;">${p.name}</h4>
+                        <p style="font-size: 12px; color: var(--text-light); margin-top: 4px; line-height: 1.4;">${shortSpec}</p>
+                    </div>
+                    ${priceHtml}
+                </div>
+                <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px; position: relative; z-index: 5;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12px; font-weight: 600; color: ${p.stock <= 0 ? 'var(--error)' : 'var(--success)'};">
+                            ${p.stock <= 0 ? 'Out of Stock' : 'In Stock'}
+                        </span>
+                        <span style="font-size: 11px; color: var(--text-light);"><i class="fa-solid fa-clock-rotate-left"></i> Saved for later</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-outline" style="flex: 1; padding: 8px 10px; font-size: 13px;" onclick="event.stopPropagation(); app.addToCart('${p.id}')" ${p.stock <= 0 ? 'disabled' : ''}>
+                            <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                        </button>
+                        <button class="btn btn-primary" style="flex: 1; padding: 8px 10px; font-size: 13px;" onclick="event.stopPropagation(); app.buyFavoriteNow('${p.id}')" ${p.stock <= 0 ? 'disabled' : ''}>
+                            <i class="fa-solid fa-bolt"></i> Buy Now
+                        </button>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    buyFavoriteNow(productId) {
+        this.addToCart(productId);
+        this.switchView('client-cart');
+    }
+
+    addAllFavoritesToCart() {
+        const allProducts = this.db.getProducts();
+        const favProducts = allProducts.filter(p => this.favorites.includes(p.id) && p.stock > 0);
+        if (favProducts.length === 0) {
+            this.showToast('No in-stock favorite machines to add.', 'error');
+            return;
+        }
+
+        let addedCount = 0;
+        favProducts.forEach(p => {
+            const existing = this.cart.find(item => item.id === p.id);
+            if (!existing) {
+                const activePrice = this.getDiscountedPrice(p);
+                this.cart.push({ id: p.id, name: p.name, price: activePrice, qty: 1, icon: p.icon });
+                addedCount++;
+            }
+        });
+
+        this.saveCart();
+        this.showToast(`Added ${favProducts.length} favorite machine(s) to your cart!`);
+        this.switchView('client-cart');
+    }
+
     initSession() {
         const savedUser = safeLocalStorage.getItem('kmap_current_user');
         if (savedUser) {
@@ -293,6 +475,7 @@ class KmapStoreApp {
         this.updateProfileHeader(this.currentUser);
         this.renderSidebar();
         this.loadCart();
+        this.loadFavorites();
 
         // Initialize starting view with browser navigation support
         const hashView = window.location.hash ? window.location.hash.replace('#', '') : null;
@@ -1422,6 +1605,12 @@ class KmapStoreApp {
                 pageSubtitle.innerText = "Review your items and complete payment";
                 this.renderCart();
                 break;
+            case 'client-favorites':
+                document.getElementById('view-client-favorites').style.display = 'block';
+                pageTitle.innerText = "Saved Favorites & Wishlist";
+                pageSubtitle.innerText = "Machines you saved to buy later";
+                this.renderFavorites();
+                break;
             case 'client-orders':
                 document.getElementById('view-client-orders').style.display = 'block';
                 pageTitle.innerText = "My Purchase Orders";
@@ -1510,6 +1699,9 @@ class KmapStoreApp {
                 <button class="nav-item" id="nav-btn-client-store" onclick="app.switchView('client-store')">
                     <i class="fa-solid fa-store"></i> Store
                 </button>
+                <button class="nav-item" id="nav-btn-client-favorites" onclick="app.switchView('client-favorites')">
+                    <i class="fa-solid fa-heart" style="color: #e53e3e;"></i> Saved Favorites (<span class="favorites-count">${this.favorites ? this.favorites.length : 0}</span>)
+                </button>
                 ${cartBtn}
                 ${ordersBtn}
                 <button class="nav-item" id="nav-btn-client-find-us" onclick="app.switchView('client-find-us')">
@@ -1522,6 +1714,9 @@ class KmapStoreApp {
                 <div style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 16px 4px;">Shop & Browse</div>
                 <button class="nav-item" id="nav-btn-client-store" onclick="app.switchView('client-store')">
                     <i class="fa-solid fa-store"></i> Store
+                </button>
+                <button class="nav-item" id="nav-btn-client-favorites" onclick="app.switchView('client-favorites')">
+                    <i class="fa-solid fa-heart" style="color: #e53e3e;"></i> Saved Favorites (<span class="favorites-count">${this.favorites ? this.favorites.length : 0}</span>)
                 </button>
                 <div style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px 4px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;" onclick="app.switchView('admin-staff')">
                     <span>Staff Management</span>
@@ -1646,8 +1841,12 @@ class KmapStoreApp {
             };
 
             // Clicking card opens the product inspect view
+            const isFav = this.isFavorite(p.id);
             card.innerHTML = `
                 ${promoBadge}
+                <button class="btn-fav-card ${isFav ? 'active' : ''}" data-id="${p.id}" onclick="event.stopPropagation(); app.toggleFavorite('${p.id}')" title="${isFav ? 'Remove from Favorites' : 'Save to Favorites'}" aria-label="Favorite">
+                    <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+                </button>
                 <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; pointer-events: none;">
                     <div>
                         <div class="product-img">${mainImg}</div>
@@ -2152,6 +2351,21 @@ class KmapStoreApp {
             cartBtn.onclick = () => {
                 this.addToCart(p.id);
                 this.closeInspectModal();
+            };
+        }
+
+        const favBtn = document.getElementById('inspect-fav-btn');
+        if (favBtn) {
+            const isFav = this.isFavorite(p.id);
+            favBtn.innerHTML = `<i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>`;
+            favBtn.style.color = isFav ? '#e53e3e' : 'var(--text-light)';
+            favBtn.title = isFav ? 'Remove from Favorites' : 'Save to Favorites';
+            favBtn.onclick = () => {
+                this.toggleFavorite(p.id);
+                const updatedFav = this.isFavorite(p.id);
+                favBtn.innerHTML = `<i class="${updatedFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>`;
+                favBtn.style.color = updatedFav ? '#e53e3e' : 'var(--text-light)';
+                favBtn.title = updatedFav ? 'Remove from Favorites' : 'Save to Favorites';
             };
         }
 

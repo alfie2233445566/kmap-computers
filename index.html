@@ -205,6 +205,13 @@
                                 style="flex: 1; min-width: 250px; display: flex; gap: 8px; align-items: center; justify-content: flex-end;">
                                 <select id="client-category-select" class="form-control"
                                     style="flex-grow: 1; max-width: 100%;"></select>
+                                <button class="btn btn-outline" id="btn-store-favorites" onclick="app.switchView('client-favorites')"
+                                    title="View Saved Favorites"
+                                    style="height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; flex-shrink: 0; color: #e53e3e; border-color: rgba(229, 62, 62, 0.25);">
+                                    <i class="fa-solid fa-heart" style="font-size: 16px;"></i>
+                                    <span class="favorites-count badge-count"
+                                        style="background: #e53e3e; color: white; border-radius: 50%; font-size: 10px; font-weight: 700; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;">0</span>
+                                </button>
                                 <button class="btn btn-outline" onclick="app.switchView('client-cart')"
                                     title="View Shopping Cart"
                                     style="height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; flex-shrink: 0;">
@@ -267,6 +274,41 @@
                             onclick="app.checkoutCart(true)">
                             <i class="fa-solid fa-phone-volume"></i> Pay & Order Now
                         </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW A.3: Client Saved Favorites & Wishlist -->
+            <section id="view-client-favorites" class="app-view" style="display: none; width: 100%;">
+                <div style="width: 100%; max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+                    <div class="card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <h3 class="card-title" style="margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-heart" style="color: #e53e3e;"></i> Saved Favorites & Wishlist
+                            </h3>
+                            <p style="color: var(--text-light); font-size: 13px;">Bookmark machines you like and buy later with a single click</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-outline" onclick="app.switchView('client-store')">
+                                <i class="fa-solid fa-arrow-left"></i> Continue Shopping
+                            </button>
+                            <button class="btn btn-primary" id="btn-fav-add-all" onclick="app.addAllFavoritesToCart()" style="display: none;">
+                                <i class="fa-solid fa-cart-plus"></i> Add All to Cart
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="favorites-empty-msg" class="card" style="text-align: center; padding: 48px 24px; color: var(--text-light); display: none;">
+                        <i class="fa-regular fa-heart" style="font-size: 54px; color: var(--border); margin-bottom: 16px;"></i>
+                        <h4 style="color: var(--text-dark); margin-bottom: 8px;">You haven't saved any machines yet</h4>
+                        <p style="font-size: 14px; max-width: 440px; margin: 0 auto 20px;">Browse our quality laptops and computers, click the heart icon on any machine, and it will be saved here for you to buy later.</p>
+                        <button class="btn btn-primary" onclick="app.switchView('client-store')" style="padding: 10px 24px;">
+                            <i class="fa-solid fa-laptop"></i> Explore Laptops & Desktops
+                        </button>
+                    </div>
+
+                    <div class="grid grid-3" id="favorites-catalog-grid">
+                        <!-- Favorited Product Cards injected dynamically -->
                     </div>
                 </div>
             </section>
@@ -1063,10 +1105,17 @@
                         </div>
                     </div>
 
-                    <button id="inspect-add-to-cart-btn" class="btn btn-primary"
-                        style="width: 100%; height: 48px; font-size: 15px;">
-                        <i class="fa-solid fa-cart-plus"></i> Add to Shopping Cart
-                    </button>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="inspect-add-to-cart-btn" class="btn btn-primary"
+                            style="flex: 1; height: 48px; font-size: 15px;">
+                            <i class="fa-solid fa-cart-plus"></i> Add to Shopping Cart
+                        </button>
+                        <button type="button" id="inspect-fav-btn" class="btn btn-outline"
+                            style="width: 52px; height: 48px; font-size: 18px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; color: #e53e3e; border-color: rgba(229, 62, 62, 0.35);"
+                            title="Save to Favorites" aria-label="Save to Favorites">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
