@@ -1852,10 +1852,10 @@ class KmapStoreApp {
                     
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <div style="display: flex; gap: 12px;">
-                            <a href="tel:+233240000000" onclick="app.closeModal()" class="btn btn-primary" style="text-decoration: none; height: 48px; color: #000000; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px;">
+                            <a href="tel:+233208341561" onclick="app.closeModal()" class="btn btn-primary" style="text-decoration: none; height: 48px; color: #000000; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px;">
                                 <i class="fa-solid fa-phone"></i> Call to Complete
                             </a>
-                            <a href="https://wa.me/233240000000?text=Hi,%20I'd%20like%20to%20complete%20my%20hire%20purchase%20request%20${uniqueId}" target="_blank" onclick="app.closeModal()" class="btn btn-success" style="text-decoration: none; height: 48px; color: white; background-color: #25D366; border-color: #25D366; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px;">
+                            <a href="https://wa.me/233208341561?text=Hi,%20I'd%20like%20to%20complete%20my%20hire%20purchase%20request%20${uniqueId}" target="_blank" onclick="app.closeModal()" class="btn btn-success" style="text-decoration: none; height: 48px; color: white; background-color: #25D366; border-color: #25D366; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px;">
                                 <i class="fa-brands fa-whatsapp"></i> WhatsApp Us
                             </a>
                         </div>
@@ -1884,10 +1884,10 @@ class KmapStoreApp {
                     
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <div style="display: flex; gap: 12px;">
-                            <a href="tel:+233240000000" onclick="app.closeModal()" class="btn btn-primary" style="text-decoration: none; height: 48px; color: #000000; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px;">
+                            <a href="tel:+233208341561" onclick="app.closeModal()" class="btn btn-primary" style="text-decoration: none; height: 48px; color: #000000; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px;">
                                 <i class="fa-solid fa-phone"></i> Call to Complete
                             </a>
-                            <a href="https://wa.me/233240000000?text=Hi,%20I'd%20like%20to%20complete%20my%20order%20${uniqueId}" target="_blank" onclick="app.closeModal()" class="btn btn-success" style="text-decoration: none; height: 48px; color: white; background-color: #25D366; border-color: #25D366; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px;">
+                            <a href="https://wa.me/233208341561?text=Hi,%20I'd%20like%20to%20complete%20my%20order%20${uniqueId}" target="_blank" onclick="app.closeModal()" class="btn btn-success" style="text-decoration: none; height: 48px; color: white; background-color: #25D366; border-color: #25D366; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px;">
                                 <i class="fa-brands fa-whatsapp"></i> WhatsApp Us
                             </a>
                         </div>
