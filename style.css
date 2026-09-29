@@ -2532,9 +2532,10 @@ body.landing-mode .sidebar {
 }
 
 /* ============================================================
-   RESPONSIVE DESIGN FOR STOREFRONT LANDING PAGE
+   RESPONSIVE DESIGN — PROFESSIONAL MOBILE-FIRST
    ============================================================ */
 
+/* ── 1200px: Large tablets / small laptops ── */
 @media (max-width: 1200px) {
     .landing-cat-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -2553,14 +2554,57 @@ body.landing-mode .sidebar {
         grid-template-columns: repeat(3, 1fr);
     }
     .landing-footer-main {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
+        gap: 28px;
+    }
+    .hero-laptop-showcase {
+        max-width: 420px;
     }
 }
 
+/* ── 900px: Tablets ── */
 @media (max-width: 900px) {
+    /* Topbar */
+    .landing-topbar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 6px 0;
+    }
+    .landing-topbar-left,
+    .landing-topbar-right {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* Header */
+    .landing-header {
+        padding: 12px 16px;
+    }
+    .landing-header-inner {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .landing-search-wrap {
+        order: 3;
+        width: 100%;
+        max-width: 100%;
+        margin: 4px 0 0;
+    }
+    .landing-header-actions {
+        gap: 8px;
+    }
+
+    /* Hero */
+    .landing-hero {
+        padding: 28px 20px 24px;
+    }
     .landing-hero-inner {
         flex-direction: column;
+        align-items: center;
         text-align: center;
+        gap: 24px;
     }
     .landing-hero-left {
         max-width: 100%;
@@ -2570,16 +2614,28 @@ body.landing-mode .sidebar {
     }
     .hero-cta-group {
         justify-content: center;
-    }
-    .landing-header-inner {
         flex-wrap: wrap;
     }
-    .landing-search-wrap {
-        order: 3;
-        max-width: 100%;
-        margin: 10px 0 0;
+    .landing-hero-right {
         width: 100%;
+        min-height: auto;
     }
+    .hero-laptop-showcase {
+        max-width: 100%;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+    }
+    .hero-circular-badge {
+        right: 8px;
+        top: -12px;
+        width: 90px;
+        height: 90px;
+    }
+    .hero-brand-strip {
+        justify-content: center;
+    }
+
+    /* Grids */
     .why-cards-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -2588,34 +2644,328 @@ body.landing-mode .sidebar {
     }
 }
 
-@media (max-width: 640px) {
-    .landing-topbar-inner {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
+/* ── 768px: Large phones / small tablets ── */
+@media (max-width: 768px) {
+    /* Topbar — hide on very small screens to save space */
+    .landing-topbar {
+        display: none;
+    }
+
+    /* Header */
+    .landing-header {
+        padding: 10px 14px;
+    }
+    .landing-header-inner {
+        gap: 10px;
+    }
+    .landing-logo-img {
+        max-height: 38px;
+    }
+    .logo-title {
+        font-size: 18px;
+    }
+    .logo-subtitle {
+        font-size: 9px;
+    }
+    .logo-tagline {
+        display: none;
+    }
+    .landing-search-input {
+        font-size: 13px;
+        padding: 10px 14px;
+    }
+    .header-action-btn span {
+        display: none; /* icon only on mobile */
+    }
+    .header-action-btn {
+        padding: 8px;
+        min-width: 38px;
+        justify-content: center;
+    }
+    .header-cta-text {
+        display: none;
+    }
+    .header-cta-btn {
+        padding: 8px 10px;
+        min-width: 40px;
+        justify-content: center;
+    }
+    .header-cta-btn i {
+        font-size: 18px;
+    }
+
+    /* Nav — scrollable horizontal pill bar */
+    .landing-nav {
+        padding: 0 12px;
+    }
+    .landing-nav-link {
+        font-size: 12px;
+        padding: 10px 10px;
+    }
+
+    /* Hero */
+    .landing-hero {
+        padding: 24px 16px 20px;
+    }
+    .hero-eyebrow {
+        font-size: 11px;
+        letter-spacing: 1.5px;
     }
     .hero-headline {
-        font-size: 32px;
+        font-size: 30px;
+        letter-spacing: -0.8px;
     }
+    .hero-subtext {
+        font-size: 14px;
+    }
+    .hero-check-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    .hero-check-item {
+        font-size: 13px;
+    }
+    .hero-btn-primary,
+    .hero-btn-secondary {
+        font-size: 12px;
+        padding: 10px 16px;
+    }
+    .hero-laptop-showcase {
+        aspect-ratio: 4 / 3;
+        border-radius: 12px;
+    }
+    .hero-circular-badge {
+        width: 80px;
+        height: 80px;
+        right: 6px;
+        top: -10px;
+    }
+    .badge-bold { font-size: 9px; }
+    .badge-small, .badge-tag, .badge-sub { font-size: 7px; }
+
+    /* Category grid */
     .landing-cat-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
     }
+    .cat-card-thumb {
+        height: 120px;
+    }
+    .cat-card-title {
+        font-size: 13px;
+    }
+
+    /* Featured + Deals */
     .featured-cards-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
     }
     .deals-list {
         grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    /* Why section */
+    .why-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+
+    /* Footer */
+    .landing-footer-main {
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    .footer-col-brand {
+        grid-column: 1 / -1;
+    }
+}
+
+/* ── 480px: Phones ── */
+@media (max-width: 480px) {
+    /* Header */
+    .landing-header {
+        padding: 8px 12px;
+    }
+    .landing-logo-img {
+        max-height: 34px;
+    }
+    .landing-header-actions {
+        gap: 6px;
+    }
+
+    /* Hero */
+    .landing-hero {
+        padding: 20px 14px 18px;
+    }
+    .hero-headline {
+        font-size: 26px;
+    }
+    .hero-eyebrow {
+        font-size: 10px;
+    }
+    .hero-subtext {
+        font-size: 13px;
+    }
+    .hero-check-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+    }
+    .hero-check-item {
+        font-size: 12px;
+        gap: 5px;
+    }
+    .hero-check-item i {
+        font-size: 13px;
+    }
+    .hero-cta-group {
+        gap: 10px;
+    }
+    .hero-btn-primary,
+    .hero-btn-secondary {
+        font-size: 11.5px;
+        padding: 9px 14px;
+        width: 100%;
+        justify-content: center;
+    }
+    .hero-laptop-showcase {
+        aspect-ratio: 4 / 3;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    }
+    .hero-circular-badge {
+        width: 72px;
+        height: 72px;
+        right: 4px;
+        top: -8px;
+    }
+    .hero-brand-strip {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 5px 10px;
+    }
+    .brand-item {
+        font-size: 11px;
+    }
+    .slide-badge-title {
+        font-size: 11px;
+    }
+    .slide-badge-price {
+        font-size: 12px;
+    }
+
+    /* Category */
+    .landing-cat-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    .cat-card-thumb {
+        height: 100px;
+    }
+    .cat-card-body {
+        padding: 10px;
+    }
+    .cat-card-title {
+        font-size: 12px;
+    }
+    .cat-card-desc {
+        display: none;
+    }
+
+    /* Featured laptops */
+    .featured-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Deals */
+    .deals-list {
+        grid-template-columns: 1fr;
+    }
+    .deal-card {
+        padding: 14px 16px;
+    }
+    .deal-title {
+        font-size: 15px;
+    }
+
+    /* Why */
+    .why-cards-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+    .why-card {
+        padding: 16px 12px;
+    }
+    .why-icon-circle {
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+    }
+    .why-card-title {
+        font-size: 13px;
+    }
+    .why-card-desc {
+        font-size: 12px;
+    }
+
+    /* Section spacing */
+    .landing-section {
+        padding: 24px 14px;
+    }
+    .landing-section-title {
+        font-size: 18px;
+    }
+    .landing-section-subtitle {
+        font-size: 12px;
+    }
+
+    /* Footer */
+    .landing-footer {
+        padding: 0;
+    }
+    .landing-footer-main {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        padding: 24px 16px;
+    }
+    .footer-col-brand {
+        grid-column: auto;
+    }
+    .footer-heading {
+        font-size: 13px;
+    }
+    .footer-links li a,
+    .footer-contact-list li {
+        font-size: 13px;
+    }
+    .landing-footer-bottom {
+        padding: 14px 16px;
+        font-size: 11px;
+    }
+}
+
+/* ── 380px: Very small phones (iPhone SE, Galaxy A etc.) ── */
+@media (max-width: 380px) {
+    .hero-headline {
+        font-size: 23px;
+    }
+    .landing-nav-link {
+        font-size: 11px;
+        padding: 9px 8px;
+    }
+    .hero-btn-primary,
+    .hero-btn-secondary {
+        font-size: 11px;
+        padding: 8px 12px;
+    }
+    .landing-cat-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
     }
     .why-cards-grid {
         grid-template-columns: 1fr;
     }
-    .landing-footer-main {
-        grid-template-columns: 1fr;
-    }
-    .header-cta-btn {
-        padding: 6px 10px;
-    }
-    .header-cta-text {
-        display: none;
+    .hero-circular-badge {
+        display: none; /* too cramped at this size */
     }
 }
