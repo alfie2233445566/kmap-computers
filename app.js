@@ -479,7 +479,7 @@ class KmapStoreApp {
 
         // Initialize starting view with browser navigation support
         const hashView = window.location.hash ? window.location.hash.replace('#', '') : null;
-        const initialView = hashView && document.getElementById(`view-${hashView}`) ? hashView : 'client-store';
+        const initialView = hashView && document.getElementById(`view-${hashView}`) ? hashView : 'landing-page';
         this.switchView(initialView, false);
         if (window.history && window.history.replaceState) {
             window.history.replaceState({ view: initialView }, '', '#' + initialView);
@@ -1019,6 +1019,54 @@ class KmapStoreApp {
                     'images/products/PROD-031/1.jpg',
                     'images/products/PROD-031/2.jpg'
                 ]
+            },
+            {
+                id: 'PROD-ACC-001',
+                name: "2.5\" HDD/SSD External Enclosure Case",
+                category: 'Storage',
+                price: 120,
+                stock: 25,
+                spec: "High Speed USB 3.0 to SATA 2.5 inch HDD/SSD Enclosure case, plug and play, driver-free, intelligent sleep mode",
+                icon: '💾',
+                images: [
+                    'images/landing/hdd-ssd-case.jpg'
+                ]
+            },
+            {
+                id: 'PROD-ACC-002',
+                name: "Type-C to HDTV 8-in-1 Multifunction Adapter",
+                category: 'Accessories',
+                price: 350,
+                stock: 15,
+                spec: "4K UHD HDMI, Type-C Power Delivery, 2x USB 3.0, Type-C Data, SD/TF Card Reader, Gigabit RJ45 Ethernet Port",
+                icon: '🔌',
+                images: [
+                    'images/landing/typec-hdtv-8in1.jpg'
+                ]
+            },
+            {
+                id: 'PROD-ACC-003',
+                name: "Foldable Aluminum Laptop Stand",
+                category: 'Accessories',
+                price: 180,
+                stock: 20,
+                spec: "Ergonomic Multi-Angle Height Adjustment, Sturdy Premium Aluminum Alloy, Anti-Slip Silicone Pads, Heat Dissipation",
+                icon: '📐',
+                images: [
+                    'images/landing/laptop-stand.jpg'
+                ]
+            },
+            {
+                id: 'PROD-ACC-004',
+                name: "Type-C 7-in-1 Dual USB Hub Adapter",
+                category: 'Accessories',
+                price: 280,
+                stock: 18,
+                spec: "Dual Type-C & USB-A Host Connector, High Speed USB 3.0 & 2.0 Ports, Power LED Indicator, BC1.2 Fast Charging Support",
+                icon: '🔌',
+                images: [
+                    'images/landing/typec-adapter-7in1.jpg'
+                ]
             }
         ];
 
@@ -1041,7 +1089,6 @@ class KmapStoreApp {
                 let parsed = JSON.parse(existingProducts);
                 if (parsed.length === 0 ||
                     parsed.some(p => p.id === 'PROD-001' && p.name !== 'Hp Zbook 15u G6') ||
-                    parsed.some(p => p.category === 'Accessories') ||
                     parsed.some(p => !p.images || p.images.length === 0) ||
                     parsed.some(p => p.id === 'PROD-001' && (!p.images || !p.images.length || p.images[0].startsWith('data:')))) {
                     needsReset = true;
@@ -1576,6 +1623,18 @@ class KmapStoreApp {
         document.querySelectorAll('.app-view').forEach(view => view.style.display = 'none');
         document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
 
+        if (viewName === 'landing-page') {
+            document.body.classList.add('landing-mode');
+        } else {
+            document.body.classList.remove('landing-mode');
+            this.stopHeroSlider();
+        }
+
+        const backBtn = document.getElementById('btn-back-to-landing');
+        if (backBtn) {
+            backBtn.style.display = viewName === 'landing-page' ? 'none' : 'inline-flex';
+        }
+
         const pageTitle = document.getElementById('page-title');
         const pageSubtitle = document.getElementById('page-subtitle');
 
@@ -1593,6 +1652,16 @@ class KmapStoreApp {
         }
 
         switch (viewName) {
+            case 'landing-page':
+                const landingView = document.getElementById('view-landing-page');
+                if (landingView) landingView.style.display = 'block';
+                if (pageTitle) pageTitle.innerText = "KMAP COMPUTERS";
+                if (pageSubtitle) pageSubtitle.innerText = "Quality Laptops, Computers & Accessories | Sunyani";
+                const totalQty = this.cart ? this.cart.reduce((sum, item) => sum + item.qty, 0) : 0;
+                document.querySelectorAll('.cart-count').forEach(el => el.innerText = totalQty);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                this.startHeroSlider();
+                break;
             case 'client-store':
                 document.getElementById('view-client-store').style.display = 'flex';
                 pageTitle.innerText = "KMAP COMPUTERS";
@@ -1676,6 +1745,58 @@ class KmapStoreApp {
         }
     }
 
+    navigateToCategory(category) {
+        this.switchView('client-store');
+        this.activeCategory = category;
+        const catSelect = document.getElementById('client-category-select');
+        if (catSelect) {
+            catSelect.value = category;
+        }
+        this.renderClientCatalog();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    landingSearch(e) {
+        if (e) e.preventDefault();
+        const input = document.getElementById('landing-search-input');
+        const q = input ? input.value.trim() : '';
+        this.switchView('client-store');
+        const storeSearch = document.getElementById('client-search');
+        if (storeSearch) {
+            storeSearch.value = q;
+        }
+        this.renderClientCatalog();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    scrollToSection(sectionId) {
+        if (this.activeView !== 'landing-page') {
+            this.switchView('landing-page');
+        }
+        setTimeout(() => {
+            const el = document.getElementById(sectionId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 80);
+    }
+
+    openServicesModal() {
+        const modal = document.getElementById('modal-services');
+        if (modal) {
+            modal.classList.add('active');
+            this.updateScrollLock();
+        }
+    }
+
+    closeServicesModal() {
+        const modal = document.getElementById('modal-services');
+        if (modal) {
+            modal.classList.remove('active');
+            this.updateScrollLock();
+        }
+    }
+
     // Navigation generator depending on User Privileges
     renderSidebar() {
         const nav = document.getElementById('sidebar-nav-container');
@@ -1696,6 +1817,9 @@ class KmapStoreApp {
                 </button>
             `;
             nav.innerHTML = `
+                <button class="nav-item" id="nav-btn-landing-page" onclick="app.switchView('landing-page')">
+                    <i class="fa-solid fa-house"></i> Home
+                </button>
                 <button class="nav-item" id="nav-btn-client-store" onclick="app.switchView('client-store')">
                     <i class="fa-solid fa-store"></i> Store
                 </button>
@@ -1712,6 +1836,9 @@ class KmapStoreApp {
             // Admin & Super Admin navbar: Full access to Store AND Staff Management
             nav.innerHTML = `
                 <div style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 16px 4px;">Shop & Browse</div>
+                <button class="nav-item" id="nav-btn-landing-page" onclick="app.switchView('landing-page')">
+                    <i class="fa-solid fa-house"></i> Home
+                </button>
                 <button class="nav-item" id="nav-btn-client-store" onclick="app.switchView('client-store')">
                     <i class="fa-solid fa-store"></i> Store
                 </button>
@@ -4224,6 +4351,46 @@ class KmapStoreApp {
             overlay.classList.remove('active');
             this.updateScrollLock();
         }
+    }
+
+    // Hero Floater Slider Controls
+    _applyHeroSlide(index) {
+        // Internal: just change the visible slide, no interval side-effects
+        const slides = document.querySelectorAll('.hero-floater-slide');
+        const dots   = document.querySelectorAll('#hero-slider-dots .hero-dot');
+        if (!slides.length) return;
+        this.currentHeroSlide = (index + slides.length) % slides.length;
+        slides.forEach((s, i) => s.classList.toggle('active', i === this.currentHeroSlide));
+        dots.forEach((d, i)   => d.classList.toggle('active', i === this.currentHeroSlide));
+    }
+
+    setHeroSlide(index) {
+        // Called from dot clicks — change slide AND reset the auto-timer
+        this._applyHeroSlide(index);
+        this.stopHeroSlider();
+        this.startHeroSlider();
+    }
+
+    startHeroSlider() {
+        if (this.heroSliderInterval) return; // already running
+        this.heroSliderInterval = setInterval(() => {
+            const slides = document.querySelectorAll('.hero-floater-slide');
+            if (!slides.length) return;
+            const next = ((this.currentHeroSlide || 0) + 1) % slides.length;
+            this._applyHeroSlide(next);  // no interval restart inside auto-advance
+        }, 4500);
+    }
+
+    stopHeroSlider() {
+        if (this.heroSliderInterval) {
+            clearInterval(this.heroSliderInterval);
+            this.heroSliderInterval = null;
+        }
+    }
+
+    restartHeroSlider() {
+        this.stopHeroSlider();
+        this.startHeroSlider();
     }
 
     // UI action aliases

@@ -160,6 +160,9 @@
                         onclick="app.toggleSidebar()">
                         <i class="fa-solid fa-bars" style="font-size: 20px;"></i>
                     </button>
+                    <button id="btn-back-to-landing" class="btn btn-outline" style="padding: 8px 12px; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px;" onclick="app.switchView('landing-page')" title="Back to Homepage">
+                        <i class="fa-solid fa-house"></i> <span>Home</span>
+                    </button>
                     <div>
                         <h1 id="page-title" style="font-weight: 800; color: var(--primary); letter-spacing: -0.5px;">KMAP COMPUTERS</h1>
                         <p style="color: var(--text-light); font-size: 13px;" id="page-subtitle">Quality Laptops, Computers & Accessories | Sunyani</p>
@@ -194,8 +197,620 @@
 
             <!-- Dynamic View Containers -->
 
+            <!-- VIEW 0: Branded E-Commerce Landing Page (Replicating exact sample format) -->
+            <section id="view-landing-page" class="app-view landing-view-wrapper" style="display: block; width: 100%;">
+                
+                <!-- 1. Top Utility Info Bar -->
+                <div class="landing-topbar">
+                    <div class="landing-topbar-inner">
+                        <div class="landing-topbar-left">
+                            <a href="javascript:void(0)" onclick="app.switchView('client-find-us')" class="topbar-link"><i class="fa-solid fa-location-dot"></i> Sunyani Opposite High Court, Ghana</a>
+                            <span class="topbar-item"><i class="fa-regular fa-clock"></i> Mon - Sat: 8:00 AM - 7:00 PM</span>
+                        </div>
+                        <div class="landing-topbar-right">
+                            <a href="tel:+233241234567" class="topbar-link"><i class="fa-solid fa-phone"></i> +233 24 123 4567</a>
+                            <a href="mailto:sales@kmapcomputers.com" class="topbar-link"><i class="fa-regular fa-envelope"></i> sales@kmapcomputers.com</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Main Brand Header -->
+                <div class="landing-header">
+                    <div class="landing-header-inner">
+                        <!-- Logo -->
+                        <div class="landing-logo" onclick="app.switchView('landing-page')">
+                            <img src="images/landing/kmap-logo.jpg" alt="KMAP COMPUTERS" class="landing-logo-img" onerror="this.style.display='none'; document.getElementById('landing-logo-fallback').style.display='flex';">
+                            <div id="landing-logo-fallback" class="landing-logo-fallback" style="display: none;">
+                                <div class="logo-k-wrap">
+                                    <span class="logo-k-letter">K</span>
+                                    <i class="fa-solid fa-laptop logo-laptop-icon"></i>
+                                </div>
+                                <div class="logo-text-col">
+                                    <div class="logo-title">KMAP</div>
+                                    <div class="logo-subtitle">COMPUTERS</div>
+                                    <div class="logo-tagline">Computers • Laptops • Accessories • Repairs</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Search Bar -->
+                        <form class="landing-search-wrap" onsubmit="app.landingSearch(event)">
+                            <input type="text" id="landing-search-input" class="landing-search-input" placeholder="Search for new &amp; slightly used laptops, accessories, parts...">
+                            <button type="submit" class="landing-search-btn" title="Search">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </form>
+
+                        <!-- Header Right Controls -->
+                        <div class="landing-header-actions">
+                            <button type="button" class="header-action-btn" onclick="app.openLoginModal('signin')">
+                                <i class="fa-regular fa-user"></i>
+                                <span>Account</span>
+                            </button>
+                            <button type="button" class="header-action-btn header-cart-btn" onclick="app.switchView('client-cart')">
+                                <div class="cart-icon-wrapper">
+                                    <i class="fa-solid fa-cart-shopping"></i>
+                                    <span class="cart-count landing-cart-badge">0</span>
+                                </div>
+                                <span>Cart</span>
+                            </button>
+                            <a href="tel:+233241234567" class="header-cta-btn header-call-btn">
+                                <i class="fa-solid fa-phone"></i>
+                                <div class="header-cta-text">
+                                    <span class="cta-label">Call Us</span>
+                                    <span class="cta-val">+233 24 123 4567</span>
+                                </div>
+                            </a>
+                            <a href="https://wa.me/233241234567?text=Hello%20KMAP%20Computers,%20I%20am%20interested%20in%20your%20slightly%20used%20laptops%20and%20accessories." target="_blank" rel="noopener" class="header-cta-btn header-wa-btn">
+                                <i class="fa-brands fa-whatsapp"></i>
+                                <div class="header-cta-text">
+                                    <span class="cta-label">WhatsApp</span>
+                                    <span class="cta-val">+233 24 123 4567</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Royal Blue Navigation Bar -->
+                <nav class="landing-nav">
+                    <div class="landing-nav-inner">
+                        <a href="javascript:void(0)" onclick="app.switchView('landing-page')" class="landing-nav-link active">
+                            <i class="fa-solid fa-house"></i> Home
+                        </a>
+                        <a href="javascript:void(0)" onclick="app.switchView('client-store')" class="landing-nav-link">
+                            Shop
+                        </a>
+                        <a href="javascript:void(0)" onclick="app.navigateToCategory('Laptops')" class="landing-nav-link">
+                            Laptops
+                        </a>
+                        <a href="javascript:void(0)" onclick="app.navigateToCategory('Accessories')" class="landing-nav-link">
+                            Accessories
+                        </a>
+                        <a href="javascript:void(0)" onclick="app.navigateToCategory('Parts')" class="landing-nav-link">
+                            Parts
+                        </a>
+                        <a href="javascript:void(0)" onclick="app.navigateToCategory('Networking')" class="landing-nav-link">
+                            Networking
+                        </a>
+                        <a href="javascript:void(0)" onclick="app.navigateToCategory('Storage')" class="landing-nav-link">
+                            Storage
+                        </a>
+                        <a href="javascript:void(0)" onclick="app.openServicesModal()" class="landing-nav-link">
+                            Services
+                        </a>
+                        <a href="javascript:void(0)" onclick="app.scrollToSection('landing-deals-section')" class="landing-nav-link">
+                            Deals
+                        </a>
+                        <a href="javascript:void(0)" onclick="app.scrollToSection('landing-why-section')" class="landing-nav-link">
+                            About
+                        </a>
+                        <a href="javascript:void(0)" onclick="app.scrollToSection('landing-footer-section')" class="landing-nav-link">
+                            Contact
+                        </a>
+                    </div>
+                </nav>
+
+                <!-- 4. Hero Section (Vibrant Yellow Gradient) -->
+                <section class="landing-hero">
+                    <div class="landing-hero-inner">
+                        <div class="landing-hero-left">
+                            <span class="hero-eyebrow">NEW & SLIGHTLY USED LAPTOP SPECIALISTS</span>
+                            <h1 class="hero-headline">QUALITY LAPTOPS.<br>GREAT VALUE.</h1>
+                            <p class="hero-subtext">Carefully selected new and slightly used laptops for students, professionals and businesses.</p>
+                            
+                            <!-- Badges -->
+                            <div class="hero-check-grid">
+                                <div class="hero-check-item">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span>High Quality</span>
+                                </div>
+                                <div class="hero-check-item">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span>Tested & Verified</span>
+                                </div>
+                                <div class="hero-check-item">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span>Good Battery Life</span>
+                                </div>
+                                <div class="hero-check-item">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span>3 Months Warranty</span>
+                                </div>
+                            </div>
+
+                            <!-- CTA Buttons -->
+                            <div class="hero-cta-group">
+                                <button type="button" class="hero-btn-primary" onclick="app.navigateToCategory('Laptops')">
+                                    SHOP SLIGHTLY USED LAPTOPS <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                                <button type="button" class="hero-btn-secondary" onclick="app.scrollToSection('landing-deals-section')">
+                                    VIEW DEALS <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="landing-hero-right">
+                            <!-- Brand Logos Strip -->
+                            <div class="hero-brand-strip">
+                                <span class="brand-item brand-dell">DELL</span>
+                                <span class="brand-item brand-hp">hp</span>
+                                <span class="brand-item brand-lenovo">Lenovo</span>
+                                <span class="brand-item brand-asus">ASUS</span>
+                                <span class="brand-item brand-acer">acer</span>
+                            </div>
+
+                            <!-- Circular Seal Badge -->
+                            <div class="hero-circular-badge">
+                                <div class="badge-inner">
+                                    <span class="badge-small">NEW &amp;</span>
+                                    <span class="badge-bold">LAPTOPS</span>
+                                    <span class="badge-tag">SAVE MORE</span>
+                                    <span class="badge-sub">DO MORE</span>
+                                </div>
+                            </div>
+
+                            <!-- Hero Laptop Showcase Floater (Actual Store Machines) -->
+                            <div class="hero-laptop-showcase" id="hero-laptop-showcase">
+                                <!-- Slide 0: HP ZBook 15u G6 -->
+                                <div class="hero-floater-slide active" data-slide="0" onclick="app.openInspectModal('PROD-001')">
+                                    <div class="hero-slide-badge">
+                                        <span class="slide-badge-brand">HP WORKSTATION</span>
+                                        <span class="slide-badge-title">Hp Zbook 15u G6 (32GB / 1TB SSD)</span>
+                                        <span class="slide-badge-price">GH₵ 8,750</span>
+                                    </div>
+                                    <img src="images/products/PROD-001/1.jpg" alt="Hp Zbook 15u G6" class="hero-laptop-img">
+                                </div>
+
+                                <!-- Slide 1: HP Elitebook 840 G8 -->
+                                <div class="hero-floater-slide" data-slide="1" onclick="app.openInspectModal('PROD-018')">
+                                    <div class="hero-slide-badge">
+                                        <span class="slide-badge-brand">HP FLAGSHIP</span>
+                                        <span class="slide-badge-title">Hp Elitebook 840 G8 (Core i7 11th Gen)</span>
+                                        <span class="slide-badge-price">GH₵ 7,875</span>
+                                    </div>
+                                    <img src="images/products/PROD-018/1.jpg" alt="Hp Elitebook 840 G8" class="hero-laptop-img">
+                                </div>
+
+                                <!-- Slide 2: Dell Latitude 7420 -->
+                                <div class="hero-floater-slide" data-slide="2" onclick="app.openInspectModal('PROD-022')">
+                                    <div class="hero-slide-badge">
+                                        <span class="slide-badge-brand">DELL BUSINESS</span>
+                                        <span class="slide-badge-title">Dell Latitude 7420 (Core i5 11th Gen)</span>
+                                        <span class="slide-badge-price">GH₵ 5,625</span>
+                                    </div>
+                                    <img src="images/products/PROD-022/1.jpg" alt="Dell Latitude 7420" class="hero-laptop-img">
+                                </div>
+
+                                <!-- Slide 3: Lenovo Thinkpad T480s -->
+                                <div class="hero-floater-slide" data-slide="3" onclick="app.openInspectModal('PROD-023')">
+                                    <div class="hero-slide-badge">
+                                        <span class="slide-badge-brand">LENOVO THINKPAD</span>
+                                        <span class="slide-badge-title">Lenovo Thinkpad T480s (16GB RAM)</span>
+                                        <span class="slide-badge-price">GH₵ 3,600</span>
+                                    </div>
+                                    <img src="images/products/PROD-023/1.jpg" alt="Lenovo Thinkpad T480s" class="hero-laptop-img">
+                                </div>
+                            </div>
+
+                            <!-- Carousel Dots (Floater Navigation) -->
+                            <div class="hero-dots" id="hero-slider-dots">
+                                <span class="hero-dot active" onclick="app.setHeroSlide(0)" title="Hp Zbook 15u G6"></span>
+                                <span class="hero-dot" onclick="app.setHeroSlide(1)" title="Hp Elitebook 840 G8"></span>
+                                <span class="hero-dot" onclick="app.setHeroSlide(2)" title="Dell Latitude 7420"></span>
+                                <span class="hero-dot" onclick="app.setHeroSlide(3)" title="Lenovo Thinkpad T480s"></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. Shop By Category -->
+                <section class="landing-section landing-categories-section">
+                    <div class="landing-section-header">
+                        <h2 class="landing-section-title">SHOP BY CATEGORY</h2>
+                        <p class="landing-section-subtitle">Find exactly what you need</p>
+                    </div>
+
+                    <div class="landing-cat-grid">
+                        <!-- Cat 1: Slightly Used Laptops -->
+                        <div class="landing-cat-card" onclick="app.navigateToCategory('Laptops')">
+                            <div class="cat-card-thumb">
+                                <img src="images/products/PROD-008/1.jpg" alt="Slightly Used Laptops">
+                            </div>
+                            <div class="cat-card-body">
+                                <h3 class="cat-card-title">New & Slightly Used Laptops</h3>
+                                <p class="cat-card-desc">High-grade tested laptops</p>
+                                <span class="cat-card-link">Shop Laptops <i class="fa-solid fa-arrow-right"></i></span>
+                            </div>
+                        </div>
+
+                        <!-- Cat 2: Accessories -->
+                        <div class="landing-cat-card" onclick="app.navigateToCategory('Accessories')">
+                            <div class="cat-card-thumb">
+                                <img src="images/landing/cat-accessories.jpg" alt="Computer Accessories">
+                            </div>
+                            <div class="cat-card-body">
+                                <h3 class="cat-card-title">Accessories</h3>
+                                <p class="cat-card-desc">Keyboards, mice, bags, webcams and more</p>
+                                <span class="cat-card-link">Shop Accessories <i class="fa-solid fa-arrow-right"></i></span>
+                            </div>
+                        </div>
+
+                        <!-- Cat 3: Parts -->
+                        <div class="landing-cat-card" onclick="app.navigateToCategory('Parts')">
+                            <div class="cat-card-thumb">
+                                <img src="images/landing/cat-parts.jpg" alt="Computer Parts">
+                            </div>
+                            <div class="cat-card-body">
+                                <h3 class="cat-card-title">Parts</h3>
+                                <p class="cat-card-desc">RAM, SSDs, batteries and components</p>
+                                <span class="cat-card-link">Shop Parts <i class="fa-solid fa-arrow-right"></i></span>
+                            </div>
+                        </div>
+
+                        <!-- Cat 4: Networking -->
+                        <div class="landing-cat-card" onclick="app.navigateToCategory('Networking')">
+                            <div class="cat-card-thumb">
+                                <img src="images/landing/cat-networking.jpg" alt="Networking">
+                            </div>
+                            <div class="cat-card-body">
+                                <h3 class="cat-card-title">Networking</h3>
+                                <p class="cat-card-desc">Routers, switches and cables</p>
+                                <span class="cat-card-link">Shop Networking <i class="fa-solid fa-arrow-right"></i></span>
+                            </div>
+                        </div>
+
+                        <!-- Cat 5: Storage -->
+                        <div class="landing-cat-card" onclick="app.navigateToCategory('Storage')">
+                            <div class="cat-card-thumb">
+                                <img src="images/landing/cat-storage.jpg" alt="Storage Devices">
+                            </div>
+                            <div class="cat-card-body">
+                                <h3 class="cat-card-title">Storage</h3>
+                                <p class="cat-card-desc">SSDs, HDDs, USB drives and memory cards</p>
+                                <span class="cat-card-link">Shop Storage <i class="fa-solid fa-arrow-right"></i></span>
+                            </div>
+                        </div>
+
+                        <!-- Cat 6: Services -->
+                        <div class="landing-cat-card" onclick="app.openServicesModal()">
+                            <div class="cat-card-thumb">
+                                <img src="images/landing/cat-services.jpg" alt="Computer Services & Repairs">
+                            </div>
+                            <div class="cat-card-body">
+                                <h3 class="cat-card-title">Services</h3>
+                                <p class="cat-card-desc">Repairs, upgrades, installation and more</p>
+                                <span class="cat-card-link">Our Services <i class="fa-solid fa-arrow-right"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. Featured Slightly Used Laptops & KMAP Deals -->
+                <section class="landing-section landing-showcase-section" id="landing-deals-section">
+                    <div class="landing-showcase-grid">
+                        
+                        <!-- Left Column: Featured Slightly Used Laptops -->
+                        <div class="featured-laptops-col">
+                            <div class="showcase-header">
+                                <div>
+                                    <h2 class="landing-section-title">FEATURED NEW & SLIGHTLY USED LAPTOPS</h2>
+                                    <p class="landing-section-subtitle">Popular and reliable models at great prices</p>
+                                </div>
+                                <a href="javascript:void(0)" onclick="app.navigateToCategory('Laptops')" class="showcase-view-all">
+                                    View All Laptops <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            </div>
+
+                            <div class="featured-cards-grid">
+                                <!-- Laptop 1: Hp Zbook 15u G6 -->
+                                <div class="featured-laptop-card">
+                                    <div class="feat-card-badge brand-hp-pill">hp</div>
+                                    <div class="feat-card-thumb" onclick="app.openInspectModal('PROD-001')">
+                                        <img src="images/products/PROD-001/1.jpg" alt="Hp Zbook 15u G6">
+                                    </div>
+                                    <h3 class="feat-card-title" onclick="app.openInspectModal('PROD-001')">Hp Zbook 15u G6</h3>
+                                    <p class="feat-card-specs">Core i7 | 32GB RAM<br>1TB SSD | 15.6" FHD</p>
+                                    <div class="feat-card-price">GHS 8,750</div>
+                                    <div class="feat-card-stock"><span class="stock-dot"></span> In Stock</div>
+                                    <div class="feat-card-tags">
+                                        <span class="feat-tag">New &amp; Slightly Used</span>
+                                        <span class="feat-tag">3 Months Warranty</span>
+                                    </div>
+                                    <button type="button" class="feat-add-cart-btn" onclick="app.addToCart('PROD-001')">
+                                        <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                                    </button>
+                                </div>
+
+                                <!-- Laptop 2: Hp Elitebook 840 G8 -->
+                                <div class="featured-laptop-card">
+                                    <div class="feat-card-badge brand-hp-pill">hp</div>
+                                    <div class="feat-card-thumb" onclick="app.openInspectModal('PROD-018')">
+                                        <img src="images/products/PROD-018/1.jpg" alt="Hp Elitebook 840 G8">
+                                    </div>
+                                    <h3 class="feat-card-title" onclick="app.openInspectModal('PROD-018')">Hp Elitebook 840 G8</h3>
+                                    <p class="feat-card-specs">Core i7 | 32GB RAM<br>512GB SSD | 14.0" FHD</p>
+                                    <div class="feat-card-price">GHS 7,875</div>
+                                    <div class="feat-card-stock"><span class="stock-dot"></span> In Stock</div>
+                                    <div class="feat-card-tags">
+                                        <span class="feat-tag">New &amp; Slightly Used</span>
+                                        <span class="feat-tag">3 Months Warranty</span>
+                                    </div>
+                                    <button type="button" class="feat-add-cart-btn" onclick="app.addToCart('PROD-018')">
+                                        <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                                    </button>
+                                </div>
+
+                                <!-- Laptop 3: Dell Latitude 7420 -->
+                                <div class="featured-laptop-card">
+                                    <div class="feat-card-badge brand-dell-pill">DELL</div>
+                                    <div class="feat-card-thumb" onclick="app.openInspectModal('PROD-022')">
+                                        <img src="images/products/PROD-022/1.jpg" alt="Dell Latitude 7420">
+                                    </div>
+                                    <h3 class="feat-card-title" onclick="app.openInspectModal('PROD-022')">Dell Latitude 7420</h3>
+                                    <p class="feat-card-specs">Core i5 | 16GB RAM<br>512GB SSD | 13.3" FHD</p>
+                                    <div class="feat-card-price">GHS 5,625</div>
+                                    <div class="feat-card-stock"><span class="stock-dot"></span> In Stock</div>
+                                    <div class="feat-card-tags">
+                                        <span class="feat-tag">New &amp; Slightly Used</span>
+                                        <span class="feat-tag">3 Months Warranty</span>
+                                    </div>
+                                    <button type="button" class="feat-add-cart-btn" onclick="app.addToCart('PROD-022')">
+                                        <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                                    </button>
+                                </div>
+
+                                <!-- Laptop 4: Lenovo Thinkpad T480s -->
+                                <div class="featured-laptop-card">
+                                    <div class="feat-card-badge brand-lenovo-pill">Lenovo</div>
+                                    <div class="feat-card-thumb" onclick="app.openInspectModal('PROD-023')">
+                                        <img src="images/products/PROD-023/1.jpg" alt="Lenovo Thinkpad T480s">
+                                    </div>
+                                    <h3 class="feat-card-title" onclick="app.openInspectModal('PROD-023')">Lenovo Thinkpad T480s</h3>
+                                    <p class="feat-card-specs">Core i5 | 16GB RAM<br>256GB SSD | 14.0" FHD</p>
+                                    <div class="feat-card-price">GHS 3,600</div>
+                                    <div class="feat-card-stock"><span class="stock-dot"></span> In Stock</div>
+                                    <div class="feat-card-tags">
+                                        <span class="feat-tag">New &amp; Slightly Used</span>
+                                        <span class="feat-tag">3 Months Warranty</span>
+                                    </div>
+                                    <button type="button" class="feat-add-cart-btn" onclick="app.addToCart('PROD-023')">
+                                        <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: KMAP DEALS -->
+                        <div class="deals-col">
+                            <div class="showcase-header">
+                                <div>
+                                    <h2 class="landing-section-title">KMAP DEALS</h2>
+                                    <p class="landing-section-subtitle">Special offers on new &amp; slightly used laptops and accessories</p>
+                                </div>
+                            </div>
+
+                            <div class="deals-list">
+                                <!-- Deal 1: Student Laptop Deals (Lenovo Yoga 11e - budget laptop) -->
+                                <div class="deal-card deal-card-blue" onclick="app.navigateToCategory('Laptops')">
+                                    <div class="deal-content">
+                                        <h4 class="deal-title">Student Laptop Deals</h4>
+                                        <div class="deal-price-tag">From GHS 2,500</div>
+                                    </div>
+                                    <div class="deal-thumb">
+                                        <img src="images/products/PROD-030/1.jpg" alt="Student Laptop Deals">
+                                    </div>
+                                </div>
+
+                                <!-- Deal 2: Business Laptop Deals (Dell Latitude 5320 - premium business) -->
+                                <div class="deal-card deal-card-navy" onclick="app.navigateToCategory('Laptops')">
+                                    <div class="deal-content">
+                                        <h4 class="deal-title">Business Laptop Deals</h4>
+                                        <div class="deal-price-tag">From GHS 3,000</div>
+                                    </div>
+                                    <div class="deal-thumb">
+                                        <img src="images/products/PROD-013/1.jpg" alt="Business Laptop Deals">
+                                    </div>
+                                </div>
+
+                                <!-- Deal 3: Accessories Deals (Type-C HDTV 8-in-1 actual product) -->
+                                <div class="deal-card deal-card-orange" onclick="app.navigateToCategory('Accessories')">
+                                    <div class="deal-content">
+                                        <h4 class="deal-title">Accessories Deals</h4>
+                                        <div class="deal-price-tag">From GHS 150</div>
+                                    </div>
+                                    <div class="deal-thumb">
+                                        <img src="images/landing/typec-hdtv-8in1.jpg" alt="Accessories Deals">
+                                    </div>
+                                </div>
+
+                                <!-- Deal 4: SSD Upgrade Deals (HDD/SSD External Case actual product) -->
+                                <div class="deal-card deal-card-dark" onclick="app.navigateToCategory('Storage')">
+                                    <div class="deal-content">
+                                        <h4 class="deal-title">SSD Upgrade Deals</h4>
+                                        <div class="deal-price-tag">From GHS 400</div>
+                                    </div>
+                                    <div class="deal-thumb">
+                                        <img src="images/landing/hdd-ssd-case.jpg" alt="SSD Upgrade Deals">
+                                    </div>
+                                </div>
+
+                                <!-- View All Deals Button -->
+                                <button type="button" class="btn-all-deals" onclick="app.switchView('client-store')">
+                                    View All Deals <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- 7. Why Choose KMAP Computers? -->
+                <section class="landing-section landing-why-section" id="landing-why-section">
+                    <div class="landing-section-header text-center">
+                        <h2 class="landing-section-title">WHY CHOOSE KMAP COMPUTERS?</h2>
+                    </div>
+
+                    <div class="why-cards-grid">
+                        <!-- Value 1 -->
+                        <div class="why-card">
+                            <div class="why-icon-circle">
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                            <h4 class="why-card-title">Quality Products</h4>
+                            <p class="why-card-desc">Carefully selected new &amp; slightly used laptops</p>
+                        </div>
+
+                        <!-- Value 2 -->
+                        <div class="why-card">
+                            <div class="why-icon-circle">
+                                <i class="fa-regular fa-newspaper"></i>
+                            </div>
+                            <h4 class="why-card-title">Clear Specifications</h4>
+                            <p class="why-card-desc">Know exactly what you're buying</p>
+                        </div>
+
+                        <!-- Value 3 -->
+                        <div class="why-card">
+                            <div class="why-icon-circle">
+                                <i class="fa-solid fa-headset"></i>
+                            </div>
+                            <h4 class="why-card-title">Technical Support</h4>
+                            <p class="why-card-desc">Get assistance before and after your purchase</p>
+                        </div>
+
+                        <!-- Value 4 -->
+                        <div class="why-card">
+                            <div class="why-icon-circle">
+                                <i class="fa-solid fa-tag"></i>
+                            </div>
+                            <h4 class="why-card-title">Competitive Prices</h4>
+                            <p class="why-card-desc">Great value for students, professionals and businesses</p>
+                        </div>
+
+                        <!-- Value 5 -->
+                        <div class="why-card">
+                            <div class="why-icon-circle">
+                                <i class="fa-solid fa-truck"></i>
+                            </div>
+                            <h4 class="why-card-title">Reliable Service</h4>
+                            <p class="why-card-desc">Fast, friendly and expert support</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. Footer Section -->
+                <footer class="landing-footer" id="landing-footer-section">
+                    <div class="landing-footer-main">
+                        <div class="footer-col footer-col-brand">
+                            <div class="landing-logo footer-logo" onclick="app.switchView('landing-page')" style="cursor:pointer;">
+                                <span style="font-size: 22px; font-weight: 900; color: #f7bf00; letter-spacing: -0.5px;">KMAP</span>
+                                <span style="font-size: 22px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px;"> COMPUTERS</span>
+                            </div>
+                            <p class="footer-tagline-text">Your Trusted New &amp; Slightly Used Laptop Partner in Sunyani and beyond.</p>
+                        </div>
+
+                        <div class="footer-col">
+                            <h4 class="footer-heading">Quick Links</h4>
+                            <ul class="footer-links">
+                                <li><a href="javascript:void(0)" onclick="app.switchView('landing-page')">Home</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.switchView('client-store')">Shop</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.navigateToCategory('Laptops')">Laptops</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.navigateToCategory('Accessories')">Accessories</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.navigateToCategory('Networking')">Networking</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.navigateToCategory('Storage')">Storage</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.scrollToSection('landing-deals-section')">Deals</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="footer-col">
+                            <h4 class="footer-heading">Customer Service</h4>
+                            <ul class="footer-links">
+                                <li><a href="javascript:void(0)" onclick="app.openServicesModal()">FAQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.openServicesModal()">Delivery</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.openServicesModal()">Returns</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.openServicesModal()">Warranty</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.openServicesModal()">Terms & Conditions</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.openServicesModal()">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="footer-col">
+                            <h4 class="footer-heading">Contact Us</h4>
+                            <ul class="footer-contact-list">
+                                <li><a href="javascript:void(0)" onclick="app.switchView('client-find-us')"><i class="fa-solid fa-location-dot"></i> Sunyani Opposite High Court, Ghana</a></li>
+                                <li><a href="tel:+233241234567"><i class="fa-solid fa-phone"></i> +233 24 123 4567</a></li>
+                                <li><a href="https://wa.me/233241234567" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> +233 24 123 4567</a></li>
+                                <li><a href="mailto:sales@kmapcomputers.com"><i class="fa-regular fa-envelope"></i> sales@kmapcomputers.com</a></li>
+                                <li><i class="fa-regular fa-clock"></i> Mon - Sat: 8:00 AM - 7:00 PM</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="landing-footer-bottom">
+                        <div class="footer-bottom-copy">Quality Technology. Reliable Service. &copy; KMAP Computers. All Rights Reserved.</div>
+                    </div>
+                </footer>
+
+                <!-- Services & Support Modal -->
+                <div id="modal-services" class="modal-overlay" onclick="if(event.target===this) app.closeServicesModal()">
+                    <div class="card services-modal-card" style="max-width: 620px; margin: 30px auto; position: relative;">
+                        <button type="button" onclick="app.closeServicesModal()" class="modal-close-btn" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light);">&times;</button>
+                        <div style="text-align: center; margin-bottom: 24px;">
+                            <div style="font-size: 40px; color: #0d4cb5; margin-bottom: 8px;"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                            <h2 style="font-weight: 800; color: var(--primary);">KMAP Technical Services & Repairs</h2>
+                            <p style="color: var(--text-light); font-size: 14px;">Professional Computer Diagnostics, Hardware Upgrades & Maintenance</p>
+                        </div>
+                        <div class="services-list-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                            <div style="background: var(--bg-light); padding: 14px; border-radius: 6px;">
+                                <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 4px;"><i class="fa-solid fa-microchip" style="color: #0d4cb5;"></i> SSD & RAM Upgrades</h4>
+                                <p style="font-size: 12px; color: var(--text-light);">Fast NVMe/SATA SSD installations & RAM expansion to boost laptop speed.</p>
+                            </div>
+                            <div style="background: var(--bg-light); padding: 14px; border-radius: 6px;">
+                                <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 4px;"><i class="fa-solid fa-display" style="color: #0d4cb5;"></i> Screen & Keyboard Replacement</h4>
+                                <p style="font-size: 12px; color: var(--text-light);">Genuine screen panels, backlight keyboards and hinge fixes.</p>
+                            </div>
+                            <div style="background: var(--bg-light); padding: 14px; border-radius: 6px;">
+                                <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 4px;"><i class="fa-solid fa-battery-full" style="color: #0d4cb5;"></i> Battery & Charger Replacement</h4>
+                                <p style="font-size: 12px; color: var(--text-light);">High-health original OEM batteries and smart power adapters.</p>
+                            </div>
+                            <div style="background: var(--bg-light); padding: 14px; border-radius: 6px;">
+                                <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 4px;"><i class="fa-brands fa-windows" style="color: #0d4cb5;"></i> OS Installation & Clean-up</h4>
+                                <p style="font-size: 12px; color: var(--text-light);">Fresh Windows 10/11 setup, driver optimization & virus removal.</p>
+                            </div>
+                        </div>
+                        <div style="text-align: center;">
+                            <a href="https://wa.me/233241234567?text=Hello%20KMAP%20Computers,%20I%20would%20like%20to%20inquire%20about%20your%20laptop%20repairs%20and%20upgrade%20services." target="_blank" rel="noopener" class="btn btn-secondary" style="background: #25D366; color: white; border: none; padding: 12px 24px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; border-radius: 4px; text-decoration: none;">
+                                <i class="fa-brands fa-whatsapp" style="font-size: 18px;"></i> Inquire / Book Service on WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
             <!-- VIEW A: Open Marketplace (Amazon Storefront Logic - Active on Load) -->
-            <section id="view-client-store" class="app-view" style="display: flex;">
+            <section id="view-client-store" class="app-view" style="display: none;">
                 <div style="display: flex; gap: 24px; flex-wrap: wrap; width: 100%;">
 
                     <!-- Left: Catalog & Search -->
