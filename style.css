@@ -1277,6 +1277,13 @@ body.landing-mode .sidebar {
     overflow-x: hidden;
 }
 
+/* Sticky Header Wrapper (topbar + brand header + nav all stick together) */
+.landing-sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+}
+
 /* 2. Top Info Bar */
 .landing-topbar {
     background-color: #0b1523;
@@ -1590,9 +1597,7 @@ body.landing-mode .sidebar {
     background: #0d4cb5;
     padding: 0 24px;
     box-shadow: 0 2px 8px rgba(13, 76, 181, 0.2);
-    position: sticky;
-    top: 0;
-    z-index: 99;
+    /* sticky removed: parent .landing-sticky-header handles stickiness */
 }
 
 .landing-nav-inner {
