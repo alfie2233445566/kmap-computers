@@ -29,7 +29,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', 'Noto Sans', system-ui, -apple-system, 'Arial Unicode MS', sans-serif;
 }
 
 body {

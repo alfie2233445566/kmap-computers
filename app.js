@@ -1,4 +1,4 @@
-// Kmap Computers Application Engine
+﻿// Kmap Computers Application Engine
 let storage = {};
 
 const safeLocalStorage = {
@@ -1024,7 +1024,7 @@ class KmapStoreApp {
                 id: 'PROD-ACC-001',
                 name: "2.5\" HDD/SSD External Enclosure Case",
                 category: 'Storage',
-                price: 120,
+                price: 100,
                 stock: 25,
                 spec: "High Speed USB 3.0 to SATA 2.5 inch HDD/SSD Enclosure case, plug and play, driver-free, intelligent sleep mode",
                 icon: '💾',
@@ -1036,7 +1036,7 @@ class KmapStoreApp {
                 id: 'PROD-ACC-002',
                 name: "Type-C to HDTV 8-in-1 Multifunction Adapter",
                 category: 'Accessories',
-                price: 350,
+                price: 250,
                 stock: 15,
                 spec: "4K UHD HDMI, Type-C Power Delivery, 2x USB 3.0, Type-C Data, SD/TF Card Reader, Gigabit RJ45 Ethernet Port",
                 icon: '🔌',
@@ -1048,7 +1048,7 @@ class KmapStoreApp {
                 id: 'PROD-ACC-003',
                 name: "Foldable Aluminum Laptop Stand",
                 category: 'Accessories',
-                price: 180,
+                price: 100,
                 stock: 20,
                 spec: "Ergonomic Multi-Angle Height Adjustment, Sturdy Premium Aluminum Alloy, Anti-Slip Silicone Pads, Heat Dissipation",
                 icon: '📐',
@@ -1060,7 +1060,7 @@ class KmapStoreApp {
                 id: 'PROD-ACC-004',
                 name: "Type-C 7-in-1 Dual USB Hub Adapter",
                 category: 'Accessories',
-                price: 280,
+                price: 150,
                 stock: 18,
                 spec: "Dual Type-C & USB-A Host Connector, High Speed USB 3.0 & 2.0 Ports, Power LED Indicator, BC1.2 Fast Charging Support",
                 icon: '🔌',
@@ -1343,7 +1343,7 @@ class KmapStoreApp {
                         const genuinelyNewOrders = newOrders.filter(no => !this.knownOrderIds.has(no.id));
                         genuinelyNewOrders.forEach(o => {
                             this.knownOrderIds.add(o.id);
-                            this.showToast(`🔔 New Order Received: ${o.id} - GHS ${o.total.toLocaleString()} from ${o.clientName}!`);
+                            this.showToast(`🔔 New Order Received: ${o.id} - GH₵ ${o.total.toLocaleString()} from ${o.clientName}!`);
                         });
                     }
 
@@ -2948,7 +2948,7 @@ class KmapStoreApp {
         let y = nextY + 18;
         doc.setFont("helvetica", "normal");
         o.items.forEach((item, idx) => {
-            const text = `${idx + 1}. ${item.name} (x${item.qty}) - GHS ${item.price.toLocaleString()} each`;
+            const text = `${idx + 1}. ${item.name} (x${item.qty}) - GH₵ ${item.price.toLocaleString()} each`;
             doc.text(text, 14, y);
             y += 8;
         });
@@ -2956,7 +2956,7 @@ class KmapStoreApp {
         doc.line(14, y + 4, 196, y + 4);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(14);
-        doc.text(`Total Amount: GHS ${o.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, 14, y + 14);
+        doc.text(`Total Amount: GH₵ ${o.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, 14, y + 14);
 
         doc.save(`KMAP_Invoice_${o.id}.pdf`);
         this.db.addLog(`Downloaded invoice for order ${o.id}`);
@@ -3018,7 +3018,7 @@ class KmapStoreApp {
         filteredOrders.forEach((o, idx) => {
             const dateStr = new Date(o.date).toLocaleDateString();
             const itemsStr = o.items.map(i => `${i.name} (x${i.qty})`).join(', ');
-            const text = `${idx + 1}. ID: ${o.id} | ${o.clientName} | ${dateStr} | ${o.status.toUpperCase()} | GHS ${o.total.toLocaleString()}`;
+            const text = `${idx + 1}. ID: ${o.id} | ${o.clientName} | ${dateStr} | ${o.status.toUpperCase()} | GH₵ ${o.total.toLocaleString()}`;
             doc.text(text, 14, y);
             y += 8;
 
