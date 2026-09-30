@@ -1,4 +1,4 @@
-﻿/* Brand Colors and Custom Properties */
+/* Brand Colors and Custom Properties */
 :root {
     --primary: #DA9100;
     --primary-light: #F4B400;
@@ -303,7 +303,7 @@ body.sidebar-open {
 }
 
 .grid-2 {
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(400px, 100%), 1fr));
 }
 
 /* Forms */
@@ -343,7 +343,8 @@ body.sidebar-open {
     flex-direction: column;
     justify-content: space-between;
     transition: var(--transition);
-    height: 420px;
+    min-height: 420px;
+    height: auto;
     padding: 16px;
     background-color: var(--white);
     border: 1px solid var(--border);
@@ -589,7 +590,7 @@ body.modal-open {
 
 .analytics-summary {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
     gap: 20px;
     margin-bottom: 24px;
 }
