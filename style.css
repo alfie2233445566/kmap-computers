@@ -778,14 +778,14 @@ body.modal-open {
 /* Promo elements */
 .promo-badge {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    left: auto;
-    width: 54px;
-    height: 54px;
+    top: 8px;
+    left: 8px;
+    right: auto;
+    width: 72px;
+    height: 72px;
     background-color: var(--error);
     color: var(--white);
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -793,12 +793,12 @@ body.modal-open {
     align-items: center;
     justify-content: center;
     text-align: center;
-    line-height: 1.1;
+    line-height: 1.2;
     z-index: 3;
     /* 8-point starburst spike */
     clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-    transform: rotate(15deg);
-    box-shadow: 0 2px 8px rgba(217, 48, 37, 0.4);
+    transform: rotate(-15deg);
+    box-shadow: 0 2px 10px rgba(217, 48, 37, 0.45);
 }
 
 .original-price {
