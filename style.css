@@ -807,7 +807,7 @@ body.modal-open {
         20% 20%, 21% 10%, 31% 12%, 35% 3%,  43% 8%
     );
     transform: rotate(9deg);
-    box-shadow: 0 3px 12px rgba(217, 48, 37, 0.45);
+    filter: drop-shadow(0 3px 8px rgba(217, 48, 37, 0.45));
 }
 
 .original-price {
