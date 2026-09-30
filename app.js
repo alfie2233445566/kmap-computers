@@ -4402,3 +4402,16 @@ class KmapStoreApp {
 // Instantiate App
 const app = new KmapStoreApp();
 window.app = app;
+
+// ── Sync sticky header height to CSS variable so sub-toolbars offset correctly ──
+function syncHeaderHeight() {
+    const hdr = document.querySelector('.main-header');
+    if (hdr) {
+        document.documentElement.style.setProperty('--header-h', hdr.offsetHeight + 'px');
+    }
+}
+// Run on load and on any resize
+window.addEventListener('load', syncHeaderHeight);
+window.addEventListener('resize', syncHeaderHeight);
+// Also run after a short delay to catch late renders
+setTimeout(syncHeaderHeight, 300);
