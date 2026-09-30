@@ -1,4 +1,4 @@
-﻿/* Brand Colors and Custom Properties */
+/* Brand Colors and Custom Properties */
 :root {
     --primary: #DA9100;
     --primary-light: #F4B400;
@@ -1269,10 +1269,9 @@ body.landing-mode .sidebar {
 
 .landing-view-wrapper {
     width: 100%;
-    background-color: #f8fafc;
+    /* NOTE: do NOT add overflow-x:hidden here — it breaks position:sticky on .landing-sticky-header */
     color: #1e293b;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    overflow-x: hidden;
 }
 
 /* Sticky Header Wrapper (topbar + brand header + nav all stick together) */
