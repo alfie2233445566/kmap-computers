@@ -171,14 +171,13 @@
             <!-- Sign In Form -->
             <form id="login-form">
                 <div class="form-group">
-                    <label for="login-username">Email, Username, or Phone</label>
-                    <input type="text" id="login-username" class="form-control" placeholder="e.g. admin@kmapcomputers.com or 024..."
-                        required>
+                    <label for="login-username">User ID (Email / Phone / Username)</label>
+                    <input type="text" id="login-username" class="form-control" required>
                 </div>
                 <div class="form-group" style="margin-bottom: 8px;">
-                    <label for="login-password">Password</label>
+                    <label for="login-password">User Password</label>
                     <div style="position: relative;">
-                        <input type="password" id="login-password" class="form-control" placeholder="••••••••" required
+                        <input type="password" id="login-password" class="form-control" required
                             style="padding-right: 40px;">
                         <i class="fa-solid fa-eye" id="toggle-login-password"
                             style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);"
@@ -206,19 +205,17 @@
             <!-- Sign Up Form (Hidden by default) -->
             <form id="signup-form" style="display: none;">
                 <div class="form-group">
-                    <label for="signup-name">Full Name</label>
-                    <input type="text" id="signup-name" class="form-control" placeholder="Enter your full name"
-                        required>
+                    <label for="signup-name">User Full Name</label>
+                    <input type="text" id="signup-name" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="signup-username">Phone Number</label>
-                    <input type="text" id="signup-username" class="form-control" placeholder="e.g. 0241234567" required>
+                    <label for="signup-username">User Phone Number</label>
+                    <input type="text" id="signup-username" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="signup-password">Password</label>
+                    <label for="signup-password">User Password</label>
                     <div style="position: relative;">
-                        <input type="password" id="signup-password" class="form-control" placeholder="Create password"
-                            required style="padding-right: 40px;">
+                        <input type="password" id="signup-password" class="form-control" required style="padding-right: 40px;">
                         <i class="fa-solid fa-eye" id="toggle-signup-password"
                             style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);"
                             onclick="app.togglePasswordVisibility('signup-password', 'toggle-signup-password')"></i>
@@ -2206,14 +2203,14 @@
                 <div class="form-group">
                     <label>New Password</label>
                     <div style="position: relative;">
-                        <input type="password" id="form-pw-new" class="form-control" required placeholder="Enter new password" style="padding-right: 40px;" minlength="6">
+                        <input type="password" id="form-pw-new" class="form-control" required style="padding-right: 40px;" minlength="6">
                         <i class="fa-solid fa-eye" id="toggle-pw-new" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);" onclick="app.togglePasswordVisibility('form-pw-new', 'toggle-pw-new')"></i>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Confirm New Password</label>
                     <div style="position: relative;">
-                        <input type="password" id="form-pw-confirm" class="form-control" required placeholder="Re-type new password" style="padding-right: 40px;" minlength="6">
+                        <input type="password" id="form-pw-confirm" class="form-control" required style="padding-right: 40px;" minlength="6">
                         <i class="fa-solid fa-eye" id="toggle-pw-confirm" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);" onclick="app.togglePasswordVisibility('form-pw-confirm', 'toggle-pw-confirm')"></i>
                     </div>
                 </div>
