@@ -1622,7 +1622,7 @@ class KmapStoreApp {
         this.activeView = viewName;
 
         const viewTitles = {
-            'landing-page': 'Kmap Computers | Quality Laptops & Tech | Nationwide & Worldwide Delivery',
+            'landing-page': 'Kmap Computers | Quality Laptops & Tech | Nationwide Delivery',
             'client-store': 'Shop Laptops, Desktops & Accessories Online | Kmap Computers',
             'client-cart': 'Shopping Cart | Kmap Computers',
             'client-favorites': 'Saved Favorites & Wishlist | Kmap Computers',
