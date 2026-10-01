@@ -1622,8 +1622,8 @@ class KmapStoreApp {
         this.activeView = viewName;
 
         const viewTitles = {
-            'landing-page': 'Kmap Computers | Quality Laptops, Repairs & Accessories in Sunyani, Ghana',
-            'client-store': 'Browse Laptops & Accessories | Kmap Computers Sunyani',
+            'landing-page': 'Kmap Computers | Quality Laptops & Tech | Nationwide & Worldwide Delivery',
+            'client-store': 'Shop Laptops, Desktops & Accessories Online | Kmap Computers',
             'client-cart': 'Shopping Cart | Kmap Computers',
             'client-favorites': 'Saved Favorites & Wishlist | Kmap Computers',
             'client-orders': 'My Purchase Orders | Kmap Computers',
