@@ -74,7 +74,7 @@ export default async function handler(request, response) {
       // Prepare Hostinger SMTP configuration
       const smtpHost = process.env.SMTP_HOST || 'smtp.hostinger.com';
       const smtpPort = parseInt(process.env.SMTP_PORT || '465', 10);
-      const smtpUser = process.env.SMTP_USER || 'info@kmapcomputers.com';
+      const smtpUser = process.env.SMTP_USER || 'admin@kmapcomputers.com';
       const smtpPass = process.env.SMTP_PASS || process.env.HOSTINGER_EMAIL_PASS;
 
       let emailSent = false;
