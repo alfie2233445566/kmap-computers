@@ -1,4 +1,4 @@
-﻿// Kmap Computers Application Engine
+// Kmap Computers Application Engine
 let storage = {};
 
 const safeLocalStorage = {
@@ -1073,8 +1073,10 @@ class KmapStoreApp {
         this.defaultProductsList = defaultProducts;
 
         const defaultUsers = [
-            { username: 'superadmin', role: 'superadmin', name: 'Super Administrator', password: 'super123' },
-            { username: 'admin', role: 'admin', name: 'Admin Manager', password: 'admin123' }
+            { id: 'USR-001', username: 'admin', email: 'admin@kmapcomputers.com', role: 'superadmin', name: 'System Administrator', password: 'onlyAdmin@2012' },
+            { id: 'USR-002', username: 'alfred', email: 'alfred@kmapcomputers.com', role: 'superadmin', name: 'Alfred (Administrator)', password: 'Heythere@247' },
+            { id: 'USR-003', username: 'info', email: 'info@kmapcomputers.com', role: 'admin', name: 'Kmap Info & Support', password: 'onlyInfo@2012' },
+            { id: 'USR-004', username: 'sales', email: 'sales@kmapcomputers.com', role: 'admin', name: 'Kmap Sales Department', password: 'onlySales@2012' }
         ];
 
         const defaultOrders = [];
@@ -1162,10 +1164,31 @@ class KmapStoreApp {
 
         try {
             const currentUsers = JSON.parse(safeLocalStorage.getItem('kmap_users') || '[]');
-            const cleanedUsers = currentUsers.filter(u => u.username !== '0241234567' && u.name !== 'Kwame Mensah');
-            if (cleanedUsers.length !== currentUsers.length || !safeLocalStorage.getItem('kmap_users')) {
-                safeLocalStorage.setItem('kmap_users', JSON.stringify(cleanedUsers.length > 0 ? cleanedUsers : defaultUsers));
-            }
+            let cleanedUsers = currentUsers.filter(u => u.username !== '0241234567' && u.name !== 'Kwame Mensah' && u.username !== 'superadmin');
+
+            // Upsert the 4 production Hostinger email accounts into local/cloud storage
+            defaultUsers.forEach(defU => {
+                const existingIdx = cleanedUsers.findIndex(u =>
+                    (u.username && u.username.toLowerCase() === defU.username.toLowerCase()) ||
+                    (u.email && u.email.toLowerCase() === defU.email.toLowerCase())
+                );
+                if (existingIdx !== -1) {
+                    const existing = cleanedUsers[existingIdx];
+                    const keepPass = (existing.password && existing.password !== 'admin123' && existing.password !== 'super123') ? existing.password : defU.password;
+                    cleanedUsers[existingIdx] = {
+                        ...defU,
+                        ...existing,
+                        email: defU.email,
+                        role: defU.role,
+                        name: existing.name || defU.name,
+                        password: keepPass
+                    };
+                } else {
+                    cleanedUsers.push(defU);
+                }
+            });
+
+            safeLocalStorage.setItem('kmap_users', JSON.stringify(cleanedUsers));
         } catch (e) {
             safeLocalStorage.setItem('kmap_users', JSON.stringify(defaultUsers));
         }
@@ -1215,11 +1238,18 @@ class KmapStoreApp {
         // Handle Unified Login Form
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            const username = document.getElementById('login-username').value.trim();
+            const usernameInput = document.getElementById('login-username').value.trim();
             const pass = document.getElementById('login-password').value.trim();
 
             const users = this.db.getUsers();
-            const foundUser = users.find(u => u.username === username && u.password === pass);
+            const inputLower = usernameInput.toLowerCase();
+            const foundUser = users.find(u => {
+                const uName = (u.username || '').toLowerCase();
+                const uEmail = (u.email || '').toLowerCase();
+                const emailPrefix = uEmail.includes('@') ? uEmail.split('@')[0] : '';
+                const matchesIdentifier = (uName === inputLower || uEmail === inputLower || emailPrefix === inputLower);
+                return matchesIdentifier && u.password === pass;
+            });
 
             if (foundUser) {
                 this.currentUser = foundUser;
@@ -1230,7 +1260,7 @@ class KmapStoreApp {
                 // Set Header Profile
                 this.updateProfileHeader(foundUser);
 
-                this.db.addLog(`User ${username} authenticated successfully.`);
+                this.db.addLog(`User ${foundUser.name || foundUser.username} (${foundUser.role}) authenticated successfully.`);
                 this.renderSidebar();
 
                 if (foundUser.role === 'client') {
@@ -3794,29 +3824,49 @@ class KmapStoreApp {
         const users = this.db.getUsers().filter(u => u.role !== 'client' && u.role !== 'guest');
         users.forEach(u => {
             const tr = document.createElement('tr');
-            const isSuper = u.username === 'superadmin';
+            const isSuper = u.role === 'superadmin' || u.username === 'admin' || u.username === 'alfred';
             const badgeClass = u.role === 'superadmin' ? 'badge-primary' : 'badge-success';
             tr.innerHTML = `
                 <td>
                     <strong>${u.name || u.username}</strong><br>
-                    <span style="font-size: 12px; color: var(--text-light); font-family: monospace;">@${u.username}</span>
+                    <span style="font-size: 12px; color: var(--primary); font-family: monospace;">${u.email || '@' + u.username}</span>
                 </td>
                 <td><span class="badge ${badgeClass}">${u.role.toUpperCase()}</span></td>
                 <td>
-                    <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" 
-                        onclick="app.deleteStaff('${u.username}')" ${isSuper ? 'disabled title="Default Superadmin cannot be removed"' : ''}>
-                        <i class="fa-solid fa-trash"></i> Remove
-                    </button>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" 
+                            onclick="app.promptChangePassword('${u.username}')" title="Change Password">
+                            <i class="fa-solid fa-key"></i> Password
+                        </button>
+                        <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" 
+                            onclick="app.deleteStaff('${u.username}')" ${isSuper ? 'disabled title="Superadmin account cannot be removed"' : ''}>
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
                 </td>
             `;
             tbody.appendChild(tr);
         });
     }
 
+    promptChangePassword(username) {
+        const users = this.db.getUsers();
+        const user = users.find(u => u.username === username || (u.email && u.email.toLowerCase() === username.toLowerCase()));
+        if (!user) return;
+        const newPass = prompt(`Enter new password for ${user.name || user.username} (${user.email || user.username}):`);
+        if (!newPass || !newPass.trim()) return;
+        user.password = newPass.trim();
+        this.db.saveUsers(users);
+        this.db.addLog(`Updated password for account: ${user.username} (${user.email || ''})`);
+        this.showToast(`Password successfully updated for ${user.name || user.username}!`);
+        this.renderStaffList();
+        this.forceCloudSyncAll(false);
+    }
+
     deleteStaff(username) {
         if (!confirm(`Are you sure you want to remove staff account: ${username}?`)) return;
         let users = this.db.getUsers();
-        users = users.filter(u => u.username !== username);
+        users = users.filter(u => u.username !== username && u.email !== username);
         this.db.saveUsers(users);
         this.db.addLog(`Removed staff user: ${username}`);
         this.showToast(`User ${username} removed.`);
