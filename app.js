@@ -1620,6 +1620,21 @@ class KmapStoreApp {
         }
 
         this.activeView = viewName;
+
+        const viewTitles = {
+            'landing-page': 'Kmap Computers | Quality Laptops, Repairs & Accessories in Sunyani, Ghana',
+            'client-store': 'Browse Laptops & Accessories | Kmap Computers Sunyani',
+            'client-cart': 'Shopping Cart | Kmap Computers',
+            'client-favorites': 'Saved Favorites & Wishlist | Kmap Computers',
+            'client-orders': 'My Purchase Orders | Kmap Computers',
+            'client-find-us': 'Find Our Shop in Sunyani & Contact Us | Kmap Computers'
+        };
+        if (viewTitles[viewName]) {
+            document.title = viewTitles[viewName];
+        } else if (viewName && viewName.startsWith('admin-')) {
+            document.title = 'Admin Portal | Kmap Computers';
+        }
+
         document.querySelectorAll('.app-view').forEach(view => view.style.display = 'none');
         document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
 
@@ -2413,6 +2428,7 @@ class KmapStoreApp {
         const p = products.find(item => item.id === productId);
         if (!p) return;
 
+        document.title = (p.name || 'Product') + ' | Kmap Computers Sunyani';
         document.getElementById('inspect-product-name').innerText = p.name;
         document.getElementById('inspect-product-category').innerText = p.category;
         document.getElementById('inspect-product-spec').innerText = p.spec || 'No specifications listed.';
