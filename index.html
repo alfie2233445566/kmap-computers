@@ -63,7 +63,7 @@
       "description": "Kmap Computers offers quality new and slightly used laptops, desktops, computer accessories, and expert computer repair services in Sunyani, Ghana.",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Building between Tasty Joint and , Opposite Regional Court",
+        "streetAddress": "Building between NIA 24 HOUR PRESTIGE REGISTRATION CENTER and RADIANT FM (adjacent DISTRICT CAFE), Opposite Regional Court",
         "addressLocality": "Sunyani",
         "addressRegion": "Bono Region",
         "addressCountry": "GH"
@@ -77,8 +77,8 @@
         {
           "@type": "OpeningHoursSpecification",
           "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-          "opens": "08:00",
-          "closes": "18:00"
+          "opens": "08:30",
+          "closes": "19:00"
         }
       ],
       "hasOfferCatalog": {
@@ -127,7 +127,9 @@
     <!-- Google Fonts: Inter (UI) + Noto Sans (Cedi ₵ glyph support) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
@@ -138,16 +140,20 @@
     <!-- 1. Unified Login Modal (Pop-up on demand) -->
     <div id="modal-login" class="modal-overlay" onclick="if(event.target===this) app.closeLoginModal()">
         <div class="login-card" style="position: relative; max-width: 440px; margin: 20px;">
-            <button type="button" onclick="app.closeLoginModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light); line-height: 1; padding: 4px;" title="Close">&times;</button>
+            <button type="button" onclick="app.closeLoginModal()"
+                style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light); line-height: 1; padding: 4px;"
+                title="Close">&times;</button>
             <div style="text-align: center; margin-bottom: 20px;">
                 <div style="font-size: 36px; color: var(--primary); margin-bottom: 8px;"><i
                         class="fa-solid fa-laptop-code"></i></div>
                 <h2 style="color: var(--primary); font-weight: 800; font-size: 22px;">KMAP COMPUTERS</h2>
-                <p style="color: var(--text-light); font-size: 13px;" id="auth-modal-subtitle">Welcome! Sign in or create an account</p>
+                <p style="color: var(--text-light); font-size: 13px;" id="auth-modal-subtitle">Welcome! Sign in or
+                    create an account</p>
             </div>
 
             <!-- Tab Switcher: Sign In / Sign Up -->
-            <div style="display: flex; background: var(--bg); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 20px; gap: 4px;">
+            <div
+                style="display: flex; background: var(--bg); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 20px; gap: 4px;">
                 <button type="button" id="tab-btn-signin" onclick="app.showAuthTab('signin')"
                     style="flex: 1; height: 38px; font-size: 14px; font-weight: 700; border-radius: 4px; background: var(--white); color: var(--primary); border: 1px solid var(--border); cursor: pointer;">
                     Sign In
@@ -166,24 +172,29 @@
             <form id="login-form">
                 <div class="form-group">
                     <label for="login-username">Username or Phone</label>
-                    <input type="text" id="login-username" class="form-control"
-                        placeholder="Enter username or phone" required>
+                    <input type="text" id="login-username" class="form-control" placeholder="Enter username or phone"
+                        required>
                 </div>
                 <div class="form-group">
                     <label for="login-password">Password</label>
                     <div style="position: relative;">
-                        <input type="password" id="login-password" class="form-control" placeholder="••••••••" required style="padding-right: 40px;">
-                        <i class="fa-solid fa-eye" id="toggle-login-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);" onclick="app.togglePasswordVisibility('login-password', 'toggle-login-password')"></i>
+                        <input type="password" id="login-password" class="form-control" placeholder="••••••••" required
+                            style="padding-right: 40px;">
+                        <i class="fa-solid fa-eye" id="toggle-login-password"
+                            style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);"
+                            onclick="app.togglePasswordVisibility('login-password', 'toggle-login-password')"></i>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; margin-top: 12px; font-size: 15px;">
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; height: 48px; margin-top: 12px; font-size: 15px;">
                     <i class="fa-solid fa-right-to-bracket"></i> Sign In
                 </button>
 
                 <div style="text-align: center; margin-top: 16px;">
                     <span style="font-size: 13px; color: var(--text-dark);">New to Kmap? </span>
                     <a href="javascript:void(0)" onclick="app.showAuthTab('signup')"
-                        style="font-size: 13px; color: var(--secondary); font-weight: 700; text-decoration: none;">Create an Account</a>
+                        style="font-size: 13px; color: var(--secondary); font-weight: 700; text-decoration: none;">Create
+                        an Account</a>
                 </div>
             </form>
 
@@ -196,28 +207,33 @@
                 </div>
                 <div class="form-group">
                     <label for="signup-username">Phone Number</label>
-                    <input type="text" id="signup-username" class="form-control" placeholder="e.g. 0241234567"
-                        required>
+                    <input type="text" id="signup-username" class="form-control" placeholder="e.g. 0241234567" required>
                 </div>
                 <div class="form-group">
                     <label for="signup-password">Password</label>
                     <div style="position: relative;">
-                        <input type="password" id="signup-password" class="form-control" placeholder="Create password" required style="padding-right: 40px;">
-                        <i class="fa-solid fa-eye" id="toggle-signup-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);" onclick="app.togglePasswordVisibility('signup-password', 'toggle-signup-password')"></i>
+                        <input type="password" id="signup-password" class="form-control" placeholder="Create password"
+                            required style="padding-right: 40px;">
+                        <i class="fa-solid fa-eye" id="toggle-signup-password"
+                            style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);"
+                            onclick="app.togglePasswordVisibility('signup-password', 'toggle-signup-password')"></i>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-secondary" style="width: 100%; height: 48px; margin-top: 12px; font-size: 15px;">
+                <button type="submit" class="btn btn-secondary"
+                    style="width: 100%; height: 48px; margin-top: 12px; font-size: 15px;">
                     <i class="fa-solid fa-user-plus"></i> Create Account & Sign In
                 </button>
 
                 <div style="text-align: center; margin-top: 16px;">
                     <span style="font-size: 13px; color: var(--text-dark);">Already have an account? </span>
                     <a href="javascript:void(0)" onclick="app.showAuthTab('signin')"
-                        style="font-size: 13px; color: var(--primary); font-weight: 700; text-decoration: none;">Sign In</a>
+                        style="font-size: 13px; color: var(--primary); font-weight: 700; text-decoration: none;">Sign
+                        In</a>
                 </div>
             </form>
 
-            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+            <div
+                style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
                 <button type="button" id="btn-guest-browse" onclick="app.closeLoginModal()" class="btn btn-outline"
                     style="width: 100%; height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px;">
                     <i class="fa-solid fa-store" style="color: var(--primary);"></i> Continue Browsing Store
@@ -259,35 +275,49 @@
                         onclick="app.toggleSidebar()">
                         <i class="fa-solid fa-bars" style="font-size: 20px;"></i>
                     </button>
-                    <button id="btn-back-to-landing" class="btn btn-outline" style="padding: 8px 12px; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px;" onclick="app.switchView('landing-page')" title="Back to Homepage">
+                    <button id="btn-back-to-landing" class="btn btn-outline"
+                        style="padding: 8px 12px; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px;"
+                        onclick="app.switchView('landing-page')" title="Back to Homepage">
                         <i class="fa-solid fa-house"></i> <span>Home</span>
                     </button>
                     <div>
-                        <h1 id="page-title" style="font-weight: 800; color: var(--primary); letter-spacing: -0.5px;">KMAP COMPUTERS</h1>
-                        <p style="color: var(--text-light); font-size: 13px;" id="page-subtitle">Quality Laptops, Computers & Accessories | Sunyani</p>
+                        <h1 id="page-title" style="font-weight: 800; color: var(--primary); letter-spacing: -0.5px;">
+                            KMAP COMPUTERS</h1>
+                        <p style="color: var(--text-light); font-size: 13px;" id="page-subtitle">Quality Laptops,
+                            Computers & Accessories | Sunyani</p>
                     </div>
                 </div>
                 <div id="topbar-auth-section" style="display: flex; align-items: center; gap: 10px;">
                     <!-- Cloud Sync Indicator (Only shown for Admin/Staff) -->
-                    <div id="sync-status-indicator" style="display: none; font-size: 11px; padding: 4px 8px; border-radius: 12px; background: rgba(16,185,129,0.1); color: #059669; font-weight: 600; align-items: center; gap: 5px; cursor: default;" title="Connecting to cloud...">
-                        <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #059669;"></span> Cloud Sync
+                    <div id="sync-status-indicator"
+                        style="display: none; font-size: 11px; padding: 4px 8px; border-radius: 12px; background: rgba(16,185,129,0.1); color: #059669; font-weight: 600; align-items: center; gap: 5px; cursor: default;"
+                        title="Connecting to cloud...">
+                        <span
+                            style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #059669;"></span>
+                        Cloud Sync
                     </div>
 
                     <!-- Quick Admin / Store toggle for staff -->
-                    <button id="btn-topbar-admin-toggle" class="btn btn-secondary" onclick="app.toggleAdminMarketplaceView()" style="display: none; height: 38px; font-size: 13px; align-items: center; gap: 6px; padding: 0 12px; border-radius: var(--radius-sm);" title="Toggle Management / Store">
+                    <button id="btn-topbar-admin-toggle" class="btn btn-secondary"
+                        onclick="app.toggleAdminMarketplaceView()"
+                        style="display: none; height: 38px; font-size: 13px; align-items: center; gap: 6px; padding: 0 12px; border-radius: var(--radius-sm);"
+                        title="Toggle Management / Store">
                         <i class="fa-solid fa-gauge"></i> <span id="admin-toggle-text">Admin Panel</span>
                     </button>
 
                     <!-- Sign In / Sign Up button for guests -->
-                    <button id="btn-topbar-signin" class="btn btn-primary" onclick="app.openLoginModal('signin')" style="height: 38px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; border-radius: var(--radius-sm);">
+                    <button id="btn-topbar-signin" class="btn btn-primary" onclick="app.openLoginModal('signin')"
+                        style="height: 38px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; border-radius: var(--radius-sm);">
                         <i class="fa-solid fa-user"></i> Sign In / Sign Up
                     </button>
 
                     <!-- User profile widget (hidden for guests, visible when logged in) -->
-                    <div class="user-profile" id="topbar-user-profile" onclick="app.openUserProfileModal()" style="cursor: pointer; display: none;" title="View Profile">
+                    <div class="user-profile" id="topbar-user-profile" onclick="app.openUserProfileModal()"
+                        style="cursor: pointer; display: none;" title="View Profile">
                         <div style="text-align: right;">
                             <div style="font-weight: 700; font-size: 14px;" id="profile-name">Guest</div>
-                            <div style="font-size: 11px; color: var(--text-light); text-transform: uppercase;" id="profile-role"></div>
+                            <div style="font-size: 11px; color: var(--text-light); text-transform: uppercase;"
+                                id="profile-role"></div>
                         </div>
                         <div class="user-avatar" id="profile-avatar">G</div>
                     </div>
@@ -298,120 +328,139 @@
 
             <!-- VIEW 0: Branded E-Commerce Landing Page (Replicating exact sample format) -->
             <section id="view-landing-page" class="app-view landing-view-wrapper" style="display: block; width: 100%;">
-                
+
                 <!-- Sticky Header Wrapper: topbar + brand header + nav stick together -->
                 <div class="landing-sticky-header">
 
-                <!-- 1. Top Utility Info Bar -->
-                <div class="landing-topbar">
-                    <div class="landing-topbar-inner">
-                        <div class="landing-topbar-left">
-                            <a href="javascript:void(0)" onclick="app.switchView('client-find-us')" class="topbar-link"><i class="fa-solid fa-location-dot"></i> Sunyani Opposite High Court, Ghana</a>
-                            <span class="topbar-item"><i class="fa-regular fa-clock"></i> Mon - Sat: 8:00 AM - 7:00 PM</span>
-                        </div>
-                        <div class="landing-topbar-right">
-                            <a href="tel:+233241234567" class="topbar-link"><i class="fa-solid fa-phone"></i> +233 24 123 4567</a>
-                            <a href="mailto:sales@kmapcomputers.com" class="topbar-link"><i class="fa-regular fa-envelope"></i> sales@kmapcomputers.com</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Main Brand Header -->
-                <div class="landing-header">
-                    <div class="landing-header-inner">
-                        <!-- Logo -->
-                        <div class="landing-logo" onclick="app.switchView('landing-page')">
-                            <img src="images/landing/kmap-logo.jpg" alt="KMAP COMPUTERS" class="landing-logo-img" onerror="this.style.display='none'; document.getElementById('landing-logo-fallback').style.display='flex';">
-                            <div id="landing-logo-fallback" class="landing-logo-fallback" style="display: none;">
-                                <div class="logo-k-wrap">
-                                    <span class="logo-k-letter">K</span>
-                                    <i class="fa-solid fa-laptop logo-laptop-icon"></i>
-                                </div>
-                                <div class="logo-text-col">
-                                    <div class="logo-title">KMAP</div>
-                                    <div class="logo-subtitle">COMPUTERS</div>
-                                    <div class="logo-tagline">Computers • Laptops • Accessories • Repairs</div>
-                                </div>
+                    <!-- 1. Top Utility Info Bar -->
+                    <div class="landing-topbar">
+                        <div class="landing-topbar-inner">
+                            <div class="landing-topbar-left">
+                                <a href="javascript:void(0)" onclick="app.switchView('client-find-us')"
+                                    class="topbar-link"><i class="fa-solid fa-location-dot"></i> Sunyani Opposite High
+                                    Court, Ghana</a>
+                                <span class="topbar-item"><i class="fa-regular fa-clock"></i> Mon - Sat: 8:00 AM - 7:00
+                                    PM</span>
+                            </div>
+                            <div class="landing-topbar-right">
+                                <a href="tel:+233241234567" class="topbar-link"><i class="fa-solid fa-phone"></i> +233
+                                    24 123 4567</a>
+                                <a href="mailto:sales@kmapcomputers.com" class="topbar-link"><i
+                                        class="fa-regular fa-envelope"></i> sales@kmapcomputers.com</a>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Search Bar -->
-                        <form class="landing-search-wrap" onsubmit="app.landingSearch(event)">
-                            <input type="text" id="landing-search-input" class="landing-search-input" placeholder="Search for new &amp; slightly used laptops, accessories, parts...">
-                            <button type="submit" class="landing-search-btn" title="Search">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                            </button>
-                        </form>
+                    <!-- 2. Main Brand Header -->
+                    <div class="landing-header">
+                        <div class="landing-header-inner">
+                            <!-- Logo -->
+                            <div class="landing-logo" onclick="app.switchView('landing-page')">
+                                <img src="images/landing/kmap-logo.jpg" alt="KMAP COMPUTERS" class="landing-logo-img"
+                                    onerror="this.style.display='none'; document.getElementById('landing-logo-fallback').style.display='flex';">
+                                <div id="landing-logo-fallback" class="landing-logo-fallback" style="display: none;">
+                                    <div class="logo-k-wrap">
+                                        <span class="logo-k-letter">K</span>
+                                        <i class="fa-solid fa-laptop logo-laptop-icon"></i>
+                                    </div>
+                                    <div class="logo-text-col">
+                                        <div class="logo-title">KMAP</div>
+                                        <div class="logo-subtitle">COMPUTERS</div>
+                                        <div class="logo-tagline">Computers • Laptops • Accessories • Repairs</div>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <!-- Header Right Controls -->
-                        <div class="landing-header-actions">
-                            <button type="button" class="header-action-btn" onclick="app.openLoginModal('signin')">
-                                <i class="fa-regular fa-user"></i>
-                                <span>Account</span>
-                            </button>
-                            <button type="button" class="header-action-btn header-cart-btn" onclick="app.switchView('client-cart')">
-                                <div class="cart-icon-wrapper">
-                                    <i class="fa-solid fa-cart-shopping"></i>
-                                    <span class="cart-count landing-cart-badge">0</span>
-                                </div>
-                                <span>Cart</span>
-                            </button>
-                            <a href="tel:+233241234567" class="header-cta-btn header-call-btn">
-                                <i class="fa-solid fa-phone"></i>
-                                <div class="header-cta-text">
-                                    <span class="cta-label">Call Us</span>
-                                    <span class="cta-val">+233 24 123 4567</span>
-                                </div>
-                            </a>
-                            <a href="https://wa.me/233241234567?text=Hello%20KMAP%20Computers,%20I%20am%20interested%20in%20your%20slightly%20used%20laptops%20and%20accessories." target="_blank" rel="noopener" class="header-cta-btn header-wa-btn">
-                                <i class="fa-brands fa-whatsapp"></i>
-                                <div class="header-cta-text">
-                                    <span class="cta-label">WhatsApp</span>
-                                    <span class="cta-val">+233 24 123 4567</span>
-                                </div>
-                            </a>
+                            <!-- Search Bar -->
+                            <form class="landing-search-wrap" onsubmit="app.landingSearch(event)">
+                                <input type="text" id="landing-search-input" class="landing-search-input"
+                                    placeholder="Search for new &amp; slightly used laptops, accessories, parts...">
+                                <button type="submit" class="landing-search-btn" title="Search">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </form>
+
+                            <!-- Header Right Controls -->
+                            <div class="landing-header-actions">
+                                <button type="button" class="header-action-btn" onclick="app.openLoginModal('signin')">
+                                    <i class="fa-regular fa-user"></i>
+                                    <span>Account</span>
+                                </button>
+                                <button type="button" class="header-action-btn header-cart-btn"
+                                    onclick="app.switchView('client-cart')">
+                                    <div class="cart-icon-wrapper">
+                                        <i class="fa-solid fa-cart-shopping"></i>
+                                        <span class="cart-count landing-cart-badge">0</span>
+                                    </div>
+                                    <span>Cart</span>
+                                </button>
+                                <a href="tel:+233241234567" class="header-cta-btn header-call-btn">
+                                    <i class="fa-solid fa-phone"></i>
+                                    <div class="header-cta-text">
+                                        <span class="cta-label">Call Us</span>
+                                        <span class="cta-val">+233 24 123 4567</span>
+                                    </div>
+                                </a>
+                                <a href="https://wa.me/233241234567?text=Hello%20KMAP%20Computers,%20I%20am%20interested%20in%20your%20slightly%20used%20laptops%20and%20accessories."
+                                    target="_blank" rel="noopener" class="header-cta-btn header-wa-btn">
+                                    <i class="fa-brands fa-whatsapp"></i>
+                                    <div class="header-cta-text">
+                                        <span class="cta-label">WhatsApp</span>
+                                        <span class="cta-val">+233 24 123 4567</span>
+                                    </div>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 3. Royal Blue Navigation Bar -->
-                <nav class="landing-nav">
-                    <div class="landing-nav-inner">
-                        <a href="javascript:void(0)" onclick="app.switchView('landing-page')" class="landing-nav-link active">
-                            <i class="fa-solid fa-house"></i> Home
-                        </a>
-                        <a href="javascript:void(0)" onclick="app.switchView('client-store')" class="landing-nav-link">
-                            Shop
-                        </a>
-                        <a href="javascript:void(0)" onclick="app.navigateToCategory('Laptops')" class="landing-nav-link">
-                            Laptops
-                        </a>
-                        <a href="javascript:void(0)" onclick="app.navigateToCategory('Accessories')" class="landing-nav-link">
-                            Accessories
-                        </a>
-                        <a href="javascript:void(0)" onclick="app.navigateToCategory('Parts')" class="landing-nav-link">
-                            Parts
-                        </a>
-                        <a href="javascript:void(0)" onclick="app.navigateToCategory('Networking')" class="landing-nav-link">
-                            Networking
-                        </a>
-                        <a href="javascript:void(0)" onclick="app.navigateToCategory('Storage')" class="landing-nav-link">
-                            Storage
-                        </a>
-                        <a href="javascript:void(0)" onclick="app.openServicesModal()" class="landing-nav-link">
-                            Services
-                        </a>
-                        <a href="javascript:void(0)" onclick="app.scrollToSection('landing-deals-section')" class="landing-nav-link">
-                            Deals
-                        </a>
-                        <a href="javascript:void(0)" onclick="app.scrollToSection('landing-why-section')" class="landing-nav-link">
-                            About
-                        </a>
-                        <a href="javascript:void(0)" onclick="app.scrollToSection('landing-footer-section')" class="landing-nav-link">
-                            Contact
-                        </a>
-                    </div>
-                </nav>
+                    <!-- 3. Royal Blue Navigation Bar -->
+                    <nav class="landing-nav">
+                        <div class="landing-nav-inner">
+                            <a href="javascript:void(0)" onclick="app.switchView('landing-page')"
+                                class="landing-nav-link active">
+                                <i class="fa-solid fa-house"></i> Home
+                            </a>
+                            <a href="javascript:void(0)" onclick="app.switchView('client-store')"
+                                class="landing-nav-link">
+                                Shop
+                            </a>
+                            <a href="javascript:void(0)" onclick="app.navigateToCategory('Laptops')"
+                                class="landing-nav-link">
+                                Laptops
+                            </a>
+                            <a href="javascript:void(0)" onclick="app.navigateToCategory('Accessories')"
+                                class="landing-nav-link">
+                                Accessories
+                            </a>
+                            <a href="javascript:void(0)" onclick="app.navigateToCategory('Parts')"
+                                class="landing-nav-link">
+                                Parts
+                            </a>
+                            <a href="javascript:void(0)" onclick="app.navigateToCategory('Networking')"
+                                class="landing-nav-link">
+                                Networking
+                            </a>
+                            <a href="javascript:void(0)" onclick="app.navigateToCategory('Storage')"
+                                class="landing-nav-link">
+                                Storage
+                            </a>
+                            <a href="javascript:void(0)" onclick="app.openServicesModal()" class="landing-nav-link">
+                                Services
+                            </a>
+                            <a href="javascript:void(0)" onclick="app.scrollToSection('landing-deals-section')"
+                                class="landing-nav-link">
+                                Deals
+                            </a>
+                            <a href="javascript:void(0)" onclick="app.scrollToSection('landing-why-section')"
+                                class="landing-nav-link">
+                                About
+                            </a>
+                            <a href="javascript:void(0)" onclick="app.scrollToSection('landing-footer-section')"
+                                class="landing-nav-link">
+                                Contact
+                            </a>
+                        </div>
+                    </nav>
 
                 </div><!-- /.landing-sticky-header -->
 
@@ -421,8 +470,9 @@
                         <div class="landing-hero-left">
                             <span class="hero-eyebrow">NEW & SLIGHTLY USED LAPTOP SPECIALISTS</span>
                             <h1 class="hero-headline">QUALITY LAPTOPS.<br>GREAT VALUE.</h1>
-                            <p class="hero-subtext">Carefully selected new and slightly used laptops for students, professionals and businesses.</p>
-                            
+                            <p class="hero-subtext">Carefully selected new and slightly used laptops for students,
+                                professionals and businesses.</p>
+
                             <!-- Badges -->
                             <div class="hero-check-grid">
                                 <div class="hero-check-item">
@@ -445,10 +495,12 @@
 
                             <!-- CTA Buttons -->
                             <div class="hero-cta-group">
-                                <button type="button" class="hero-btn-primary" onclick="app.navigateToCategory('Laptops')">
+                                <button type="button" class="hero-btn-primary"
+                                    onclick="app.navigateToCategory('Laptops')">
                                     SHOP SLIGHTLY USED LAPTOPS <i class="fa-solid fa-arrow-right"></i>
                                 </button>
-                                <button type="button" class="hero-btn-secondary" onclick="app.scrollToSection('landing-deals-section')">
+                                <button type="button" class="hero-btn-secondary"
+                                    onclick="app.scrollToSection('landing-deals-section')">
                                     VIEW DEALS <i class="fa-solid fa-arrow-right"></i>
                                 </button>
                             </div>
@@ -477,52 +529,62 @@
                             <!-- Hero Laptop Showcase Floater (Actual Store Machines) -->
                             <div class="hero-laptop-showcase" id="hero-laptop-showcase">
                                 <!-- Slide 0: HP ZBook 15u G6 -->
-                                <div class="hero-floater-slide active" data-slide="0" onclick="app.openInspectModal('PROD-001')">
+                                <div class="hero-floater-slide active" data-slide="0"
+                                    onclick="app.openInspectModal('PROD-001')">
                                     <div class="hero-slide-badge">
                                         <span class="slide-badge-brand">HP WORKSTATION</span>
                                         <span class="slide-badge-title">Hp Zbook 15u G6 (32GB / 1TB SSD)</span>
                                         <span class="slide-badge-price">GH&#8373; 8,750</span>
                                     </div>
-                                    <img src="images/products/PROD-001/1.jpg" alt="Hp Zbook 15u G6" class="hero-laptop-img">
+                                    <img src="images/products/PROD-001/1.jpg" alt="Hp Zbook 15u G6"
+                                        class="hero-laptop-img">
                                 </div>
 
                                 <!-- Slide 1: HP Elitebook 840 G8 -->
-                                <div class="hero-floater-slide" data-slide="1" onclick="app.openInspectModal('PROD-018')">
+                                <div class="hero-floater-slide" data-slide="1"
+                                    onclick="app.openInspectModal('PROD-018')">
                                     <div class="hero-slide-badge">
                                         <span class="slide-badge-brand">HP FLAGSHIP</span>
                                         <span class="slide-badge-title">Hp Elitebook 840 G8 (Core i7 11th Gen)</span>
                                         <span class="slide-badge-price">GH&#8373; 7,875</span>
                                     </div>
-                                    <img src="images/products/PROD-018/1.jpg" alt="Hp Elitebook 840 G8" class="hero-laptop-img">
+                                    <img src="images/products/PROD-018/1.jpg" alt="Hp Elitebook 840 G8"
+                                        class="hero-laptop-img">
                                 </div>
 
                                 <!-- Slide 2: Dell Latitude 7420 -->
-                                <div class="hero-floater-slide" data-slide="2" onclick="app.openInspectModal('PROD-022')">
+                                <div class="hero-floater-slide" data-slide="2"
+                                    onclick="app.openInspectModal('PROD-022')">
                                     <div class="hero-slide-badge">
                                         <span class="slide-badge-brand">DELL BUSINESS</span>
                                         <span class="slide-badge-title">Dell Latitude 7420 (Core i5 11th Gen)</span>
                                         <span class="slide-badge-price">GH&#8373; 5,625</span>
                                     </div>
-                                    <img src="images/products/PROD-022/1.jpg" alt="Dell Latitude 7420" class="hero-laptop-img">
+                                    <img src="images/products/PROD-022/1.jpg" alt="Dell Latitude 7420"
+                                        class="hero-laptop-img">
                                 </div>
 
                                 <!-- Slide 3: Lenovo Thinkpad T480s -->
-                                <div class="hero-floater-slide" data-slide="3" onclick="app.openInspectModal('PROD-023')">
+                                <div class="hero-floater-slide" data-slide="3"
+                                    onclick="app.openInspectModal('PROD-023')">
                                     <div class="hero-slide-badge">
                                         <span class="slide-badge-brand">LENOVO THINKPAD</span>
                                         <span class="slide-badge-title">Lenovo Thinkpad T480s (16GB RAM)</span>
                                         <span class="slide-badge-price">GH&#8373; 3,600</span>
                                     </div>
-                                    <img src="images/products/PROD-023/1.jpg" alt="Lenovo Thinkpad T480s" class="hero-laptop-img">
+                                    <img src="images/products/PROD-023/1.jpg" alt="Lenovo Thinkpad T480s"
+                                        class="hero-laptop-img">
                                 </div>
                             </div>
 
                             <!-- Carousel Dots (Floater Navigation) -->
                             <div class="hero-dots" id="hero-slider-dots">
-                                <span class="hero-dot active" onclick="app.setHeroSlide(0)" title="Hp Zbook 15u G6"></span>
+                                <span class="hero-dot active" onclick="app.setHeroSlide(0)"
+                                    title="Hp Zbook 15u G6"></span>
                                 <span class="hero-dot" onclick="app.setHeroSlide(1)" title="Hp Elitebook 840 G8"></span>
                                 <span class="hero-dot" onclick="app.setHeroSlide(2)" title="Dell Latitude 7420"></span>
-                                <span class="hero-dot" onclick="app.setHeroSlide(3)" title="Lenovo Thinkpad T480s"></span>
+                                <span class="hero-dot" onclick="app.setHeroSlide(3)"
+                                    title="Lenovo Thinkpad T480s"></span>
                             </div>
                         </div>
                     </div>
@@ -556,7 +618,8 @@
                             <div class="cat-card-body">
                                 <h3 class="cat-card-title">Accessories</h3>
                                 <p class="cat-card-desc">Keyboards, mice, bags, webcams and more</p>
-                                <span class="cat-card-link">Shop Accessories <i class="fa-solid fa-arrow-right"></i></span>
+                                <span class="cat-card-link">Shop Accessories <i
+                                        class="fa-solid fa-arrow-right"></i></span>
                             </div>
                         </div>
 
@@ -580,7 +643,8 @@
                             <div class="cat-card-body">
                                 <h3 class="cat-card-title">Networking</h3>
                                 <p class="cat-card-desc">Routers, switches and cables</p>
-                                <span class="cat-card-link">Shop Networking <i class="fa-solid fa-arrow-right"></i></span>
+                                <span class="cat-card-link">Shop Networking <i
+                                        class="fa-solid fa-arrow-right"></i></span>
                             </div>
                         </div>
 
@@ -613,7 +677,7 @@
                 <!-- 6. Featured Slightly Used Laptops & KMAP Deals -->
                 <section class="landing-section landing-showcase-section" id="landing-deals-section">
                     <div class="landing-showcase-grid">
-                        
+
                         <!-- Left Column: Featured Slightly Used Laptops -->
                         <div class="featured-laptops-col">
                             <div class="showcase-header">
@@ -621,7 +685,8 @@
                                     <h2 class="landing-section-title">FEATURED NEW & SLIGHTLY USED LAPTOPS</h2>
                                     <p class="landing-section-subtitle">Popular and reliable models at great prices</p>
                                 </div>
-                                <a href="javascript:void(0)" onclick="app.navigateToCategory('Laptops')" class="showcase-view-all">
+                                <a href="javascript:void(0)" onclick="app.navigateToCategory('Laptops')"
+                                    class="showcase-view-all">
                                     View All Laptops <i class="fa-solid fa-arrow-right"></i>
                                 </a>
                             </div>
@@ -633,7 +698,8 @@
                                     <div class="feat-card-thumb" onclick="app.openInspectModal('PROD-001')">
                                         <img src="images/products/PROD-001/1.jpg" alt="Hp Zbook 15u G6">
                                     </div>
-                                    <h3 class="feat-card-title" onclick="app.openInspectModal('PROD-001')">Hp Zbook 15u G6</h3>
+                                    <h3 class="feat-card-title" onclick="app.openInspectModal('PROD-001')">Hp Zbook 15u
+                                        G6</h3>
                                     <p class="feat-card-specs">Core i7 | 32GB RAM<br>1TB SSD | 15.6" FHD</p>
                                     <div class="feat-card-price">GH&#8373; 8,750</div>
                                     <div class="feat-card-stock"><span class="stock-dot"></span> In Stock</div>
@@ -652,7 +718,8 @@
                                     <div class="feat-card-thumb" onclick="app.openInspectModal('PROD-018')">
                                         <img src="images/products/PROD-018/1.jpg" alt="Hp Elitebook 840 G8">
                                     </div>
-                                    <h3 class="feat-card-title" onclick="app.openInspectModal('PROD-018')">Hp Elitebook 840 G8</h3>
+                                    <h3 class="feat-card-title" onclick="app.openInspectModal('PROD-018')">Hp Elitebook
+                                        840 G8</h3>
                                     <p class="feat-card-specs">Core i7 | 32GB RAM<br>512GB SSD | 14.0" FHD</p>
                                     <div class="feat-card-price">GH&#8373; 7,875</div>
                                     <div class="feat-card-stock"><span class="stock-dot"></span> In Stock</div>
@@ -671,7 +738,8 @@
                                     <div class="feat-card-thumb" onclick="app.openInspectModal('PROD-022')">
                                         <img src="images/products/PROD-022/1.jpg" alt="Dell Latitude 7420">
                                     </div>
-                                    <h3 class="feat-card-title" onclick="app.openInspectModal('PROD-022')">Dell Latitude 7420</h3>
+                                    <h3 class="feat-card-title" onclick="app.openInspectModal('PROD-022')">Dell Latitude
+                                        7420</h3>
                                     <p class="feat-card-specs">Core i5 | 16GB RAM<br>512GB SSD | 13.3" FHD</p>
                                     <div class="feat-card-price">GH&#8373; 5,625</div>
                                     <div class="feat-card-stock"><span class="stock-dot"></span> In Stock</div>
@@ -690,7 +758,8 @@
                                     <div class="feat-card-thumb" onclick="app.openInspectModal('PROD-023')">
                                         <img src="images/products/PROD-023/1.jpg" alt="Lenovo Thinkpad T480s">
                                     </div>
-                                    <h3 class="feat-card-title" onclick="app.openInspectModal('PROD-023')">Lenovo Thinkpad T480s</h3>
+                                    <h3 class="feat-card-title" onclick="app.openInspectModal('PROD-023')">Lenovo
+                                        Thinkpad T480s</h3>
                                     <p class="feat-card-specs">Core i5 | 16GB RAM<br>256GB SSD | 14.0" FHD</p>
                                     <div class="feat-card-price">GH&#8373; 3,600</div>
                                     <div class="feat-card-stock"><span class="stock-dot"></span> In Stock</div>
@@ -710,7 +779,8 @@
                             <div class="showcase-header">
                                 <div>
                                     <h2 class="landing-section-title">KMAP DEALS</h2>
-                                    <p class="landing-section-subtitle">Special offers on new &amp; slightly used laptops and accessories</p>
+                                    <p class="landing-section-subtitle">Special offers on new &amp; slightly used
+                                        laptops and accessories</p>
                                 </div>
                             </div>
 
@@ -827,11 +897,16 @@
                 <footer class="landing-footer" id="landing-footer-section">
                     <div class="landing-footer-main">
                         <div class="footer-col footer-col-brand">
-                            <div class="landing-logo footer-logo" onclick="app.switchView('landing-page')" style="cursor:pointer;">
-                                <span style="font-size: 22px; font-weight: 900; color: #f7bf00; letter-spacing: -0.5px;">KMAP</span>
-                                <span style="font-size: 22px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px;"> COMPUTERS</span>
+                            <div class="landing-logo footer-logo" onclick="app.switchView('landing-page')"
+                                style="cursor:pointer;">
+                                <span
+                                    style="font-size: 22px; font-weight: 900; color: #f7bf00; letter-spacing: -0.5px;">KMAP</span>
+                                <span
+                                    style="font-size: 22px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px;">
+                                    COMPUTERS</span>
                             </div>
-                            <p class="footer-tagline-text">Your Trusted New &amp; Slightly Used Laptop Partner in Sunyani and beyond.</p>
+                            <p class="footer-tagline-text">Your Trusted New &amp; Slightly Used Laptop Partner in
+                                Sunyani and beyond.</p>
                         </div>
 
                         <div class="footer-col">
@@ -839,11 +914,16 @@
                             <ul class="footer-links">
                                 <li><a href="javascript:void(0)" onclick="app.switchView('landing-page')">Home</a></li>
                                 <li><a href="javascript:void(0)" onclick="app.switchView('client-store')">Shop</a></li>
-                                <li><a href="javascript:void(0)" onclick="app.navigateToCategory('Laptops')">Laptops</a></li>
-                                <li><a href="javascript:void(0)" onclick="app.navigateToCategory('Accessories')">Accessories</a></li>
-                                <li><a href="javascript:void(0)" onclick="app.navigateToCategory('Networking')">Networking</a></li>
-                                <li><a href="javascript:void(0)" onclick="app.navigateToCategory('Storage')">Storage</a></li>
-                                <li><a href="javascript:void(0)" onclick="app.scrollToSection('landing-deals-section')">Deals</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.navigateToCategory('Laptops')">Laptops</a>
+                                </li>
+                                <li><a href="javascript:void(0)"
+                                        onclick="app.navigateToCategory('Accessories')">Accessories</a></li>
+                                <li><a href="javascript:void(0)"
+                                        onclick="app.navigateToCategory('Networking')">Networking</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.navigateToCategory('Storage')">Storage</a>
+                                </li>
+                                <li><a href="javascript:void(0)"
+                                        onclick="app.scrollToSection('landing-deals-section')">Deals</a></li>
                             </ul>
                         </div>
 
@@ -854,58 +934,87 @@
                                 <li><a href="javascript:void(0)" onclick="app.openServicesModal()">Delivery</a></li>
                                 <li><a href="javascript:void(0)" onclick="app.openServicesModal()">Returns</a></li>
                                 <li><a href="javascript:void(0)" onclick="app.openServicesModal()">Warranty</a></li>
-                                <li><a href="javascript:void(0)" onclick="app.openServicesModal()">Terms & Conditions</a></li>
-                                <li><a href="javascript:void(0)" onclick="app.openServicesModal()">Privacy Policy</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.openServicesModal()">Terms &
+                                        Conditions</a></li>
+                                <li><a href="javascript:void(0)" onclick="app.openServicesModal()">Privacy Policy</a>
+                                </li>
                             </ul>
                         </div>
 
                         <div class="footer-col">
                             <h4 class="footer-heading">Contact Us</h4>
                             <ul class="footer-contact-list">
-                                <li><a href="javascript:void(0)" onclick="app.switchView('client-find-us')"><i class="fa-solid fa-location-dot"></i> Sunyani Opposite High Court, Ghana</a></li>
-                                <li><a href="tel:+233241234567"><i class="fa-solid fa-phone"></i> +233 24 123 4567</a></li>
-                                <li><a href="https://wa.me/233241234567" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> +233 24 123 4567</a></li>
-                                <li><a href="mailto:sales@kmapcomputers.com"><i class="fa-regular fa-envelope"></i> sales@kmapcomputers.com</a></li>
-                                <li><i class="fa-regular fa-clock"></i> Mon - Sat: 8:00 AM - 7:00 PM</li>
+                                <li><a href="javascript:void(0)" onclick="app.switchView('client-find-us')"><i
+                                            class="fa-solid fa-location-dot"></i> Sunyani Opposite High Court, Ghana</a>
+                                </li>
+                                <li><a href="tel:+233241234567"><i class="fa-solid fa-phone"></i> +233 24 123 4567</a>
+                                </li>
+                                <li><a href="https://wa.me/233241234567" target="_blank" rel="noopener"><i
+                                            class="fa-brands fa-whatsapp"></i> +233 24 123 4567</a></li>
+                                <li><a href="mailto:sales@kmapcomputers.com"><i class="fa-regular fa-envelope"></i>
+                                        sales@kmapcomputers.com</a></li>
+                                <li><i class="fa-regular fa-clock"></i> Mon - Sat: 8:30 AM - 7:00 PM</li>
                             </ul>
                         </div>
                     </div>
 
                     <div class="landing-footer-bottom">
-                        <div class="footer-bottom-copy">Quality Technology. Reliable Service. &copy; KMAP Computers. All Rights Reserved.</div>
+                        <div class="footer-bottom-copy">Quality Technology. Reliable Service. &copy; KMAP Computers. All
+                            Rights Reserved.</div>
                     </div>
                 </footer>
 
                 <!-- Services & Support Modal -->
-                <div id="modal-services" class="modal-overlay" onclick="if(event.target===this) app.closeServicesModal()">
-                    <div class="card services-modal-card" style="max-width: 620px; margin: 30px auto; position: relative;">
-                        <button type="button" onclick="app.closeServicesModal()" class="modal-close-btn" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light);">&times;</button>
+                <div id="modal-services" class="modal-overlay"
+                    onclick="if(event.target===this) app.closeServicesModal()">
+                    <div class="card services-modal-card"
+                        style="max-width: 620px; margin: 30px auto; position: relative;">
+                        <button type="button" onclick="app.closeServicesModal()" class="modal-close-btn"
+                            style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light);">&times;</button>
                         <div style="text-align: center; margin-bottom: 24px;">
-                            <div style="font-size: 40px; color: #0d4cb5; margin-bottom: 8px;"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                            <div style="font-size: 40px; color: #0d4cb5; margin-bottom: 8px;"><i
+                                    class="fa-solid fa-screwdriver-wrench"></i></div>
                             <h2 style="font-weight: 800; color: var(--primary);">KMAP Technical Services & Repairs</h2>
-                            <p style="color: var(--text-light); font-size: 14px;">Professional Computer Diagnostics, Hardware Upgrades & Maintenance</p>
+                            <p style="color: var(--text-light); font-size: 14px;">Professional Computer Diagnostics,
+                                Hardware Upgrades & Maintenance</p>
                         </div>
-                        <div class="services-list-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                        <div class="services-list-grid"
+                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
                             <div style="background: var(--bg-light); padding: 14px; border-radius: 6px;">
-                                <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 4px;"><i class="fa-solid fa-microchip" style="color: #0d4cb5;"></i> SSD & RAM Upgrades</h4>
-                                <p style="font-size: 12px; color: var(--text-light);">Fast NVMe/SATA SSD installations & RAM expansion to boost laptop speed.</p>
+                                <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 4px;"><i
+                                        class="fa-solid fa-microchip" style="color: #0d4cb5;"></i> SSD & RAM Upgrades
+                                </h4>
+                                <p style="font-size: 12px; color: var(--text-light);">Fast NVMe/SATA SSD installations &
+                                    RAM expansion to boost laptop speed.</p>
                             </div>
                             <div style="background: var(--bg-light); padding: 14px; border-radius: 6px;">
-                                <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 4px;"><i class="fa-solid fa-display" style="color: #0d4cb5;"></i> Screen & Keyboard Replacement</h4>
-                                <p style="font-size: 12px; color: var(--text-light);">Genuine screen panels, backlight keyboards and hinge fixes.</p>
+                                <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 4px;"><i
+                                        class="fa-solid fa-display" style="color: #0d4cb5;"></i> Screen & Keyboard
+                                    Replacement</h4>
+                                <p style="font-size: 12px; color: var(--text-light);">Genuine screen panels, backlight
+                                    keyboards and hinge fixes.</p>
                             </div>
                             <div style="background: var(--bg-light); padding: 14px; border-radius: 6px;">
-                                <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 4px;"><i class="fa-solid fa-battery-full" style="color: #0d4cb5;"></i> Battery & Charger Replacement</h4>
-                                <p style="font-size: 12px; color: var(--text-light);">High-health original OEM batteries and smart power adapters.</p>
+                                <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 4px;"><i
+                                        class="fa-solid fa-battery-full" style="color: #0d4cb5;"></i> Battery & Charger
+                                    Replacement</h4>
+                                <p style="font-size: 12px; color: var(--text-light);">High-health original OEM batteries
+                                    and smart power adapters.</p>
                             </div>
                             <div style="background: var(--bg-light); padding: 14px; border-radius: 6px;">
-                                <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 4px;"><i class="fa-brands fa-windows" style="color: #0d4cb5;"></i> OS Installation & Clean-up</h4>
-                                <p style="font-size: 12px; color: var(--text-light);">Fresh Windows 10/11 setup, driver optimization & virus removal.</p>
+                                <h4 style="font-weight: 700; font-size: 14px; margin-bottom: 4px;"><i
+                                        class="fa-brands fa-windows" style="color: #0d4cb5;"></i> OS Installation &
+                                    Clean-up</h4>
+                                <p style="font-size: 12px; color: var(--text-light);">Fresh Windows 10/11 setup, driver
+                                    optimization & virus removal.</p>
                             </div>
                         </div>
                         <div style="text-align: center;">
-                            <a href="https://wa.me/233241234567?text=Hello%20KMAP%20Computers,%20I%20would%20like%20to%20inquire%20about%20your%20laptop%20repairs%20and%20upgrade%20services." target="_blank" rel="noopener" class="btn btn-secondary" style="background: #25D366; color: white; border: none; padding: 12px 24px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; border-radius: 4px; text-decoration: none;">
-                                <i class="fa-brands fa-whatsapp" style="font-size: 18px;"></i> Inquire / Book Service on WhatsApp
+                            <a href="https://wa.me/233241234567?text=Hello%20KMAP%20Computers,%20I%20would%20like%20to%20inquire%20about%20your%20laptop%20repairs%20and%20upgrade%20services."
+                                target="_blank" rel="noopener" class="btn btn-secondary"
+                                style="background: #25D366; color: white; border: none; padding: 12px 24px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; border-radius: 4px; text-decoration: none;">
+                                <i class="fa-brands fa-whatsapp" style="font-size: 18px;"></i> Inquire / Book Service on
+                                WhatsApp
                             </a>
                         </div>
                     </div>
@@ -931,8 +1040,8 @@
                                 style="flex: 1; min-width: 250px; display: flex; gap: 8px; align-items: center; justify-content: flex-end;">
                                 <select id="client-category-select" class="form-control"
                                     style="flex-grow: 1; max-width: 100%;"></select>
-                                <button class="btn btn-outline" id="btn-store-favorites" onclick="app.switchView('client-favorites')"
-                                    title="View Saved Favorites"
+                                <button class="btn btn-outline" id="btn-store-favorites"
+                                    onclick="app.switchView('client-favorites')" title="View Saved Favorites"
                                     style="height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; flex-shrink: 0; color: #e53e3e; border-color: rgba(229, 62, 62, 0.25);">
                                     <i class="fa-solid fa-heart" style="font-size: 16px;"></i>
                                     <span class="favorites-count badge-count"
@@ -1006,29 +1115,39 @@
 
             <!-- VIEW A.3: Client Saved Favorites & Wishlist -->
             <section id="view-client-favorites" class="app-view" style="display: none; width: 100%;">
-                <div style="width: 100%; max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
-                    <div class="card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div
+                    style="width: 100%; max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+                    <div class="card"
+                        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                         <div>
-                            <h3 class="card-title" style="margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                            <h3 class="card-title"
+                                style="margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
                                 <i class="fa-solid fa-heart" style="color: #e53e3e;"></i> Saved Favorites & Wishlist
                             </h3>
-                            <p style="color: var(--text-light); font-size: 13px;">Bookmark machines you like and buy later with a single click</p>
+                            <p style="color: var(--text-light); font-size: 13px;">Bookmark machines you like and buy
+                                later with a single click</p>
                         </div>
                         <div style="display: flex; gap: 10px;">
                             <button class="btn btn-outline" onclick="app.switchView('client-store')">
                                 <i class="fa-solid fa-arrow-left"></i> Continue Shopping
                             </button>
-                            <button class="btn btn-primary" id="btn-fav-add-all" onclick="app.addAllFavoritesToCart()" style="display: none;">
+                            <button class="btn btn-primary" id="btn-fav-add-all" onclick="app.addAllFavoritesToCart()"
+                                style="display: none;">
                                 <i class="fa-solid fa-cart-plus"></i> Add All to Cart
                             </button>
                         </div>
                     </div>
 
-                    <div id="favorites-empty-msg" class="card" style="text-align: center; padding: 48px 24px; color: var(--text-light); display: none;">
-                        <i class="fa-regular fa-heart" style="font-size: 54px; color: var(--border); margin-bottom: 16px;"></i>
+                    <div id="favorites-empty-msg" class="card"
+                        style="text-align: center; padding: 48px 24px; color: var(--text-light); display: none;">
+                        <i class="fa-regular fa-heart"
+                            style="font-size: 54px; color: var(--border); margin-bottom: 16px;"></i>
                         <h4 style="color: var(--text-dark); margin-bottom: 8px;">You haven't saved any machines yet</h4>
-                        <p style="font-size: 14px; max-width: 440px; margin: 0 auto 20px;">Browse our quality laptops and computers, click the heart icon on any machine, and it will be saved here for you to buy later.</p>
-                        <button class="btn btn-primary" onclick="app.switchView('client-store')" style="padding: 10px 24px;">
+                        <p style="font-size: 14px; max-width: 440px; margin: 0 auto 20px;">Browse our quality laptops
+                            and computers, click the heart icon on any machine, and it will be saved here for you to buy
+                            later.</p>
+                        <button class="btn btn-primary" onclick="app.switchView('client-store')"
+                            style="padding: 10px 24px;">
                             <i class="fa-solid fa-laptop"></i> Explore Laptops & Desktops
                         </button>
                     </div>
@@ -1049,7 +1168,8 @@
                         <i class="fa-solid fa-magnifying-glass"
                             style="position: absolute; left: 16px; top: 14px; color: var(--text-light);"></i>
                     </div>
-                    <div style="flex: 1; min-width: 250px; display: flex; gap: 8px; align-items: center; justify-content: flex-end;">
+                    <div
+                        style="flex: 1; min-width: 250px; display: flex; gap: 8px; align-items: center; justify-content: flex-end;">
                         <button class="btn btn-secondary"
                             onclick="app.downloadSelectedInvoices('.client-order-select')">
                             <i class="fa-solid fa-file-pdf"></i> Download Selected
@@ -1057,8 +1177,7 @@
                         <button class="btn btn-outline" onclick="app.switchView('client-cart')"
                             title="View Shopping Cart"
                             style="height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; flex-shrink: 0;">
-                            <i class="fa-solid fa-cart-shopping"
-                                style="font-size: 16px; color: var(--primary);"></i>
+                            <i class="fa-solid fa-cart-shopping" style="font-size: 16px; color: var(--primary);"></i>
                             <span class="cart-count badge-count"
                                 style="background: var(--error); color: white; border-radius: 50%; font-size: 10px; font-weight: 700; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;">0</span>
                         </button>
@@ -1120,7 +1239,7 @@
                                             Opposite Sunyani Regional Court</p>
                                         <p
                                             style="color: var(--secondary); font-size: 13px; margin-top: 2px; font-weight: 600;">
-                                            (Building between Tasty Joint and Izwe)</p>
+                                            (Building between NIA 24 HOUR PRESTIGE REGISTRATION CENTER and RADIANT FM, adjacent DISTRICT CAFE)</p>
                                         <p style="color: var(--text-light); font-size: 13px; margin-top: 2px;">Sunyani,
                                             Bono Region, Ghana</p>
                                     </div>
@@ -1136,7 +1255,8 @@
                                         <p style="color: var(--text-dark); font-size: 14px; margin-top: 4px;">Call or
                                             WhatsApp us directly</p>
                                         <a href="tel:+233208341561"
-                                            style="color: var(--secondary); font-weight: 700; font-size: 16px; text-decoration: none; display: inline-block; margin-top: 2px;">+233 20 834 1561</a>
+                                            style="color: var(--secondary); font-weight: 700; font-size: 16px; text-decoration: none; display: inline-block; margin-top: 2px;">+233
+                                            20 834 1561</a>
                                     </div>
                                 </div>
 
@@ -1185,19 +1305,23 @@
             <section id="view-admin-dashboard" class="app-view" style="display: none;">
                 <!-- Quick Stats Grid -->
                 <div class="analytics-summary">
-                    <div class="stat-card" onclick="app.switchView('admin-reports')" style="cursor: pointer;" title="View Reports">
+                    <div class="stat-card" onclick="app.switchView('admin-reports')" style="cursor: pointer;"
+                        title="View Reports">
                         <span class="stat-desc">Total Sales Revenue</span>
                         <div class="stat-val" id="stat-revenue">GH&#8373; 0.00</div>
                     </div>
-                    <div class="stat-card" onclick="app.showActiveOrders()" style="cursor: pointer;" title="View Active Orders">
+                    <div class="stat-card" onclick="app.showActiveOrders()" style="cursor: pointer;"
+                        title="View Active Orders">
                         <span class="stat-desc">Active Orders</span>
                         <div class="stat-val" id="stat-active-orders">0</div>
                     </div>
-                    <div class="stat-card" onclick="app.showPendingOrders()" style="cursor: pointer;" title="View Pending Confirmations">
+                    <div class="stat-card" onclick="app.showPendingOrders()" style="cursor: pointer;"
+                        title="View Pending Confirmations">
                         <span class="stat-desc">Pending Confirmations</span>
                         <div class="stat-val" id="stat-pending-orders" style="color: var(--warning);">0</div>
                     </div>
-                    <div class="stat-card" onclick="app.showLowStockItems()" style="cursor: pointer;" title="View Low Stock Items">
+                    <div class="stat-card" onclick="app.showLowStockItems()" style="cursor: pointer;"
+                        title="View Low Stock Items">
                         <span class="stat-desc">Low Stock Items</span>
                         <div class="stat-val" id="stat-low-stock" style="color: var(--error);">0</div>
                     </div>
@@ -1291,7 +1415,8 @@
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
                         <h3 class="card-title" style="margin-bottom: 0;">Product Inventory</h3>
                         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                            <button class="btn btn-outline" onclick="app.forceCloudSyncAll()" title="Push all inventory and photos to cloud database">
+                            <button class="btn btn-outline" onclick="app.forceCloudSyncAll()"
+                                title="Push all inventory and photos to cloud database">
                                 <i class="fa-solid fa-cloud-arrow-up"></i> Sync to Cloud
                             </button>
                             <button class="btn btn-secondary" onclick="app.openProductModal()"><i
@@ -1347,12 +1472,17 @@
                         </div>
                         <button class="btn btn-primary" onclick="app.generateSalesReport()"><i
                                 class="fa-solid fa-chart-line"></i> Generate Report</button>
-                        <div class="report-download-dropdown" id="report-download-dropdown" style="position: relative; display: inline-block;">
-                            <button type="button" class="btn btn-secondary" id="btn-download-report" onclick="app.toggleReportDownloadDropdown(event)" aria-haspopup="true" aria-expanded="false" style="display: inline-flex; align-items: center; gap: 8px;">
-                                <i class="fa-solid fa-download"></i> Download Report <i class="fa-solid fa-chevron-down" style="font-size: 0.8rem; margin-left: 2px;"></i>
+                        <div class="report-download-dropdown" id="report-download-dropdown"
+                            style="position: relative; display: inline-block;">
+                            <button type="button" class="btn btn-secondary" id="btn-download-report"
+                                onclick="app.toggleReportDownloadDropdown(event)" aria-haspopup="true"
+                                aria-expanded="false" style="display: inline-flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-download"></i> Download Report <i class="fa-solid fa-chevron-down"
+                                    style="font-size: 0.8rem; margin-left: 2px;"></i>
                             </button>
                             <div class="dropdown-menu-download" id="report-download-menu" style="display: none;">
-                                <button type="button" class="dropdown-download-item" onclick="app.downloadReportExcel()">
+                                <button type="button" class="dropdown-download-item"
+                                    onclick="app.downloadReportExcel()">
                                     <i class="fa-solid fa-file-excel" style="color: #107c41;"></i>
                                     <div class="dropdown-download-text">
                                         <span class="dropdown-download-title">Excel Spreadsheet (.xlsx)</span>
@@ -1452,22 +1582,31 @@
 
                     <!-- Cloud Sync & Network Diagnostics Card -->
                     <div class="card">
-                        <h3 class="card-title"><i class="fa-solid fa-cloud-arrow-up"></i> Cloud Synchronization Settings</h3>
+                        <h3 class="card-title"><i class="fa-solid fa-cloud-arrow-up"></i> Cloud Synchronization Settings
+                        </h3>
                         <p style="color: var(--text-light); font-size: 14px; margin-bottom: 16px;">
-                            Configure live database replication with Vercel KV / Upstash Redis for seamless cross-device syncing.
+                            Configure live database replication with Vercel KV / Upstash Redis for seamless cross-device
+                            syncing.
                         </p>
                         <div style="display: flex; flex-direction: column; gap: 12px;">
                             <div>
-                                <label style="font-size: 12px; font-weight: 600; color: var(--text-dark);">Active Cloud Sync API</label>
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-dark);">Active Cloud
+                                    Sync API</label>
                                 <div style="display: flex; gap: 8px; margin-top: 4px;">
-                                    <input type="text" id="custom-sync-url-input" class="form-control" style="font-family: monospace; font-size: 12px;" readonly value="https://kmap-computers.vercel.app/api/sync">
-                                    <button class="btn btn-primary" onclick="app.forceCloudSyncAll()" style="font-size: 12px; padding: 6px 12px; white-space: nowrap;">
+                                    <input type="text" id="custom-sync-url-input" class="form-control"
+                                        style="font-family: monospace; font-size: 12px;" readonly
+                                        value="https://kmap-computers.vercel.app/api/sync">
+                                    <button class="btn btn-primary" onclick="app.forceCloudSyncAll()"
+                                        style="font-size: 12px; padding: 6px 12px; white-space: nowrap;">
                                         <i class="fa-solid fa-rotate"></i> Sync All Now
                                     </button>
                                 </div>
                             </div>
-                            <div style="background: var(--bg); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 12px;">
-                                <strong style="color: var(--primary);">Auto-Sync Status:</strong> Changes to products, inventory stock, promotions, orders, and staff are synced automatically across all connected devices in near real-time.
+                            <div
+                                style="background: var(--bg); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 12px;">
+                                <strong style="color: var(--primary);">Auto-Sync Status:</strong> Changes to products,
+                                inventory stock, promotions, orders, and staff are synced automatically across all
+                                connected devices in near real-time.
                             </div>
                         </div>
                     </div>
@@ -1508,7 +1647,8 @@
                                 <input type="password" id="staff-password" class="form-control" placeholder="••••••••"
                                     required>
                             </div>
-                            <button type="submit" class="btn btn-secondary" style="width: 100%; height: 44px; margin-top: 8px; font-weight: 700;">
+                            <button type="submit" class="btn btn-secondary"
+                                style="width: 100%; height: 44px; margin-top: 8px; font-weight: 700;">
                                 <i class="fa-solid fa-user-plus"></i> Create Staff Account
                             </button>
                         </form>
@@ -1516,9 +1656,12 @@
 
                     <!-- Staff Directory Table Card -->
                     <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                            <h3 class="card-title" style="margin-bottom: 0;"><i class="fa-solid fa-users-gear"></i> System Staff Directory</h3>
-                            <button class="btn btn-outline" style="font-size: 12px; padding: 4px 10px;" onclick="app.forceCloudSyncAll()">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 class="card-title" style="margin-bottom: 0;"><i class="fa-solid fa-users-gear"></i>
+                                System Staff Directory</h3>
+                            <button class="btn btn-outline" style="font-size: 12px; padding: 4px 10px;"
+                                onclick="app.forceCloudSyncAll()">
                                 <i class="fa-solid fa-cloud-arrow-up"></i> Sync Staff
                             </button>
                         </div>
@@ -1727,39 +1870,57 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <label style="margin: 0; font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-light);">Product Images (Up to 6)</label>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label
+                            style="margin: 0; font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-light);">Product
+                            Images (Up to 6)</label>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <span id="img-upload-status" style="font-size: 11px; font-weight: 600; color: var(--primary);"></span>
-                            <button type="button" onclick="app.clearAllModalImages()" class="btn btn-outline" style="padding: 2px 8px; font-size: 11px; height: 24px; color: var(--error); border-color: var(--border);">
+                            <span id="img-upload-status"
+                                style="font-size: 11px; font-weight: 600; color: var(--primary);"></span>
+                            <button type="button" onclick="app.clearAllModalImages()" class="btn btn-outline"
+                                style="padding: 2px 8px; font-size: 11px; height: 24px; color: var(--error); border-color: var(--border);">
                                 <i class="fa-solid fa-trash-can"></i> Clear All
                             </button>
                         </div>
                     </div>
-                    
+
                     <!-- Live Image Preview Gallery -->
-                    <div id="modal-image-previews" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; min-height: 40px; padding: 6px; border: 1px dashed var(--border); border-radius: var(--radius-sm); align-items: center;">
-                        <span id="preview-placeholder" style="font-size: 12px; color: var(--text-light); padding: 4px 8px;">No images uploaded yet. Select files below.</span>
+                    <div id="modal-image-previews"
+                        style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; min-height: 40px; padding: 6px; border: 1px dashed var(--border); border-radius: var(--radius-sm); align-items: center;">
+                        <span id="preview-placeholder"
+                            style="font-size: 12px; color: var(--text-light); padding: 4px 8px;">No images uploaded yet.
+                            Select files below.</span>
                     </div>
 
-                    <div style="background: var(--bg); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                    <div
+                        style="background: var(--bg); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
                         <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">
                             <i class="fa-solid fa-cloud-arrow-up"></i> Upload Photos from Device (JPEG, PNG, WEBP)
                         </label>
                         <input type="file" id="form-product-file-upload" class="form-control"
-                            style="font-size: 12px; padding: 6px;" multiple accept="image/jpeg,image/png,image/webp,image/gif,image/*">
+                            style="font-size: 12px; padding: 6px;" multiple
+                            accept="image/jpeg,image/png,image/webp,image/gif,image/*">
                     </div>
 
                     <!-- Hidden or expandable URL inputs for power users -->
                     <details style="margin-top: 8px; font-size: 12px; color: var(--text-light);">
-                        <summary style="cursor: pointer; font-size: 11px; color: var(--text-light); margin-bottom: 6px;">Advanced: Paste Direct Image URLs</summary>
+                        <summary
+                            style="cursor: pointer; font-size: 11px; color: var(--text-light); margin-bottom: 6px;">
+                            Advanced: Paste Direct Image URLs</summary>
                         <div class="image-input-grid" id="form-images-container">
-                            <input type="text" class="form-control product-img-url" placeholder="Image URL 1" style="font-size: 11px; padding: 4px 8px;">
-                            <input type="text" class="form-control product-img-url" placeholder="Image URL 2" style="font-size: 11px; padding: 4px 8px;">
-                            <input type="text" class="form-control product-img-url" placeholder="Image URL 3" style="font-size: 11px; padding: 4px 8px;">
-                            <input type="text" class="form-control product-img-url" placeholder="Image URL 4" style="font-size: 11px; padding: 4px 8px;">
-                            <input type="text" class="form-control product-img-url" placeholder="Image URL 5" style="font-size: 11px; padding: 4px 8px;">
-                            <input type="text" class="form-control product-img-url" placeholder="Image URL 6" style="font-size: 11px; padding: 4px 8px;">
+                            <input type="text" class="form-control product-img-url" placeholder="Image URL 1"
+                                style="font-size: 11px; padding: 4px 8px;">
+                            <input type="text" class="form-control product-img-url" placeholder="Image URL 2"
+                                style="font-size: 11px; padding: 4px 8px;">
+                            <input type="text" class="form-control product-img-url" placeholder="Image URL 3"
+                                style="font-size: 11px; padding: 4px 8px;">
+                            <input type="text" class="form-control product-img-url" placeholder="Image URL 4"
+                                style="font-size: 11px; padding: 4px 8px;">
+                            <input type="text" class="form-control product-img-url" placeholder="Image URL 5"
+                                style="font-size: 11px; padding: 4px 8px;">
+                            <input type="text" class="form-control product-img-url" placeholder="Image URL 6"
+                                style="font-size: 11px; padding: 4px 8px;">
                         </div>
                     </details>
                 </div>
@@ -1927,8 +2088,7 @@
                     <h3 style="color: var(--primary); font-weight: 800; font-size: 22px;">Installment Schedule & Status
                     </h3>
                 </div>
-                <button onclick="app.closeHPDetailsModal()"
-                    class="btn btn-outline"
+                <button onclick="app.closeHPDetailsModal()" class="btn btn-outline"
                     style="padding: 6px 12px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -1961,26 +2121,35 @@
     <!-- Modal for User Profile Details -->
     <div id="modal-user-profile" class="modal-overlay">
         <div class="modal-content" style="max-width: 450px; position: relative;">
-            <button onclick="app.closeUserProfileModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 4px; display: flex; align-items: center; justify-content: center;" aria-label="Close">
+            <button onclick="app.closeUserProfileModal()"
+                style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 4px; display: flex; align-items: center; justify-content: center;"
+                aria-label="Close">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 style="color: var(--primary); font-weight: 800; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+            <h3
+                style="color: var(--primary); font-weight: 800; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-user-gear"></i> User Profile
             </h3>
-            
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 24px; padding: 16px; background: var(--bg-light); border-radius: var(--radius-lg); border: 1px solid var(--border);">
-                <div id="profile-modal-avatar" style="width: 72px; height: 72px; background: var(--primary); color: #000000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; box-shadow: var(--shadow-sm);">U</div>
+
+            <div
+                style="display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 24px; padding: 16px; background: var(--bg-light); border-radius: var(--radius-lg); border: 1px solid var(--border);">
+                <div id="profile-modal-avatar"
+                    style="width: 72px; height: 72px; background: var(--primary); color: #000000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; box-shadow: var(--shadow-sm);">
+                    U</div>
                 <div style="text-align: center;">
                     <h4 id="profile-modal-name" style="font-weight: 700; font-size: 18px; margin: 0 0 4px 0;">Name</h4>
-                    <span id="profile-modal-username" style="font-family: monospace; font-size: 14px; background: var(--white); padding: 4px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);">Username</span>
+                    <span id="profile-modal-username"
+                        style="font-family: monospace; font-size: 14px; background: var(--white); padding: 4px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);">Username</span>
                 </div>
             </div>
-            
+
             <div style="display: flex; flex-direction: column; gap: 12px;">
-                <button class="btn btn-primary" onclick="app.openChangePasswordFromProfile()" style="height: 44px; width: 100%; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; color: #000000;">
+                <button class="btn btn-primary" onclick="app.openChangePasswordFromProfile()"
+                    style="height: 44px; width: 100%; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; color: #000000;">
                     <i class="fa-solid fa-key"></i> Change Password
                 </button>
-                <button class="btn btn-outline" onclick="app.closeUserProfileModal()" style="height: 44px; width: 100%;">Close</button>
+                <button class="btn btn-outline" onclick="app.closeUserProfileModal()"
+                    style="height: 44px; width: 100%;">Close</button>
             </div>
         </div>
     </div>
