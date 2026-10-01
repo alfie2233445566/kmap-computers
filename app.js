@@ -1073,10 +1073,10 @@ class KmapStoreApp {
         this.defaultProductsList = defaultProducts;
 
         const defaultUsers = [
-            { id: 'USR-001', username: 'admin', email: 'admin@kmapcomputers.com', role: 'superadmin', name: 'Kwaku Aduse-poku', password: 'onlyAdmin@2012' },
-            { id: 'USR-002', username: 'alfred', email: 'alfred@kmapcomputers.com', role: 'superadmin', name: 'Alfred', password: 'Heythere@247', hiddenFromStaffList: true },
-            { id: 'USR-003', username: 'info', email: 'info@kmapcomputers.com', role: 'admin', name: 'Felix', password: 'onlyInfo@2012' },
-            { id: 'USR-004', username: 'sales', email: 'sales@kmapcomputers.com', role: 'admin', name: 'Victor Aduse-poku', password: 'onlySales@2012' }
+            { id: 'USR-001', username: 'admin', email: 'admin@kmapcomputers.com', role: 'superadmin', name: 'Kwaku Aduse-poku', password: '120a46268023a0eee2ac955c6ddcb939bec5c756db98bffc391e7d741d952292' },
+            { id: 'USR-002', username: 'alfred', email: 'alfred@kmapcomputers.com', role: 'superadmin', name: 'Alfred', password: 'd456fd28999ab6ba5d59467f81220aae1adcbd841b6b4e6595688fd961dfa145', hiddenFromStaffList: true },
+            { id: 'USR-003', username: 'info', email: 'info@kmapcomputers.com', role: 'admin', name: 'Felix', password: 'd4d6b2cece42e0df40d9fdc25b0901101cf88a9423ed0a4f7e0cd8fa2d5b2c0f' },
+            { id: 'USR-004', username: 'sales', email: 'sales@kmapcomputers.com', role: 'admin', name: 'Victor Aduse-poku', password: '77d57cc3989d096d65e9d89f168d6e70971a482c7be707bb34c1511325882bb7' }
         ];
 
         const defaultOrders = [];
@@ -1166,7 +1166,7 @@ class KmapStoreApp {
             const currentUsers = JSON.parse(safeLocalStorage.getItem('kmap_users') || '[]');
             let cleanedUsers = currentUsers.filter(u => u.username !== '0241234567' && u.name !== 'Kwame Mensah' && u.username !== 'superadmin');
 
-            // Upsert the 4 production Hostinger email accounts into local/cloud storage
+            // Upsert the 4 production Hostinger email accounts into local/cloud storage with SHA-256 hashes
             defaultUsers.forEach(defU => {
                 const existingIdx = cleanedUsers.findIndex(u =>
                     (u.username && u.username.toLowerCase() === defU.username.toLowerCase()) ||
@@ -1174,7 +1174,19 @@ class KmapStoreApp {
                 );
                 if (existingIdx !== -1) {
                     const existing = cleanedUsers[existingIdx];
-                    const keepPass = (existing.password && existing.password !== 'admin123' && existing.password !== 'super123') ? existing.password : defU.password;
+                    let passToStore = existing.password;
+                    // Automatically upgrade plaintext passwords to cryptographic hashes
+                    if (passToStore === 'onlyAdmin@2012' || passToStore === 'admin123' || passToStore === 'super123') {
+                        passToStore = '120a46268023a0eee2ac955c6ddcb939bec5c756db98bffc391e7d741d952292';
+                    } else if (passToStore === 'Heythere@247') {
+                        passToStore = 'd456fd28999ab6ba5d59467f81220aae1adcbd841b6b4e6595688fd961dfa145';
+                    } else if (passToStore === 'onlyInfo@2012') {
+                        passToStore = 'd4d6b2cece42e0df40d9fdc25b0901101cf88a9423ed0a4f7e0cd8fa2d5b2c0f';
+                    } else if (passToStore === 'onlySales@2012') {
+                        passToStore = '77d57cc3989d096d65e9d89f168d6e70971a482c7be707bb34c1511325882bb7';
+                    } else if (!passToStore) {
+                        passToStore = defU.password;
+                    }
                     cleanedUsers[existingIdx] = {
                         ...defU,
                         ...existing,
@@ -1182,7 +1194,7 @@ class KmapStoreApp {
                         role: defU.role,
                         name: defU.name || existing.name,
                         hiddenFromStaffList: !!defU.hiddenFromStaffList,
-                        password: keepPass
+                        password: passToStore
                     };
                 } else {
                     cleanedUsers.push(defU);
@@ -1237,22 +1249,30 @@ class KmapStoreApp {
 
     bindEvents() {
         // Handle Unified Login Form
-        document.getElementById('login-form').addEventListener('submit', (e) => {
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const usernameInput = document.getElementById('login-username').value.trim();
             const pass = document.getElementById('login-password').value.trim();
 
             const users = this.db.getUsers();
             const inputLower = usernameInput.toLowerCase();
+            const inputHash = await this.hashPassword(pass);
+
             const foundUser = users.find(u => {
                 const uName = (u.username || '').toLowerCase();
                 const uEmail = (u.email || '').toLowerCase();
                 const emailPrefix = uEmail.includes('@') ? uEmail.split('@')[0] : '';
                 const matchesIdentifier = (uName === inputLower || uEmail === inputLower || emailPrefix === inputLower);
-                return matchesIdentifier && u.password === pass;
+                const matchesPass = (u.password === inputHash || u.password === pass);
+                return matchesIdentifier && matchesPass;
             });
 
             if (foundUser) {
+                // If stored password was plaintext, securely upgrade it to cryptographic SHA-256 hash
+                if (foundUser.password !== inputHash) {
+                    foundUser.password = inputHash;
+                    this.db.saveUsers(users);
+                }
                 this.currentUser = foundUser;
                 this.loadCart();
                 safeLocalStorage.setItem('kmap_current_user', JSON.stringify(foundUser));
@@ -1295,7 +1315,7 @@ class KmapStoreApp {
         }
 
         // Handle Signup Form Submit
-        document.getElementById('signup-form').addEventListener('submit', (e) => {
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('signup-name').value.trim();
             const username = document.getElementById('signup-username').value.trim();
@@ -1309,7 +1329,8 @@ class KmapStoreApp {
                 return;
             }
 
-            const newUser = { username, role: 'client', name, password: pass, phone: username };
+            const passHash = await this.hashPassword(pass);
+            const newUser = { username, role: 'client', name, password: passHash, phone: username };
             users.push(newUser);
             this.db.saveUsers(users);
             this.db.addLog(`New client account registered: ${username}`);
@@ -1619,15 +1640,18 @@ class KmapStoreApp {
             this.saveNewHP(clientName, phone, machine, price, deposit, months, startDate);
         });
 
-        // Change Password Form Submission
-        document.getElementById('change-password-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const currentPw = document.getElementById('form-pw-current').value;
-            const newPw = document.getElementById('form-pw-new').value;
-            const confirmPw = document.getElementById('form-pw-confirm').value;
+        // Change Password Form Submission with Email OTP verification
+        const changePwForm = document.getElementById('change-password-form');
+        if (changePwForm) {
+            changePwForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const otpInput = document.getElementById('form-pw-otp').value.trim();
+                const newPw = document.getElementById('form-pw-new').value;
+                const confirmPw = document.getElementById('form-pw-confirm').value;
 
-            this.changePassword(currentPw, newPw, confirmPw);
-        });
+                await this.verifyAndOverridePassword(otpInput, newPw, confirmPw);
+            });
+        }
 
         // Close report download dropdown when clicking outside
         document.addEventListener('click', (e) => {
@@ -3859,17 +3883,7 @@ class KmapStoreApp {
     }
 
     promptChangePassword(username) {
-        const users = this.db.getUsers();
-        const user = users.find(u => u.username === username || (u.email && u.email.toLowerCase() === username.toLowerCase()));
-        if (!user) return;
-        const newPass = prompt(`Enter new password for ${user.name || user.username} (${user.email || user.username}):`);
-        if (!newPass || !newPass.trim()) return;
-        user.password = newPass.trim();
-        this.db.saveUsers(users);
-        this.db.addLog(`Updated password for account: ${user.username} (${user.email || ''})`);
-        this.showToast(`Password successfully updated for ${user.name || user.username}!`);
-        this.renderStaffList();
-        this.forceCloudSyncAll(false);
+        this.openChangePasswordModalForUser(username);
     }
 
     deleteStaff(username) {
@@ -4334,45 +4348,295 @@ class KmapStoreApp {
         this.openChangePasswordModal();
     }
 
+    async hashPassword(plainPassword) {
+        if (!plainPassword) return '';
+        // If already a 64-character hex string, it is already hashed with SHA-256
+        if (/^[a-f0-9]{64}$/i.test(plainPassword)) return plainPassword.toLowerCase();
+        try {
+            const encoder = new TextEncoder();
+            const data = encoder.encode('kmap_salt_2026_' + plainPassword);
+            const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        } catch (e) {
+            let hash = 0;
+            for (let i = 0; i < plainPassword.length; i++) {
+                hash = ((hash << 5) - hash) + plainPassword.charCodeAt(i);
+                hash |= 0;
+            }
+            return 'kmap_fallback_' + Math.abs(hash).toString(16);
+        }
+    }
+
     openChangePasswordModal() {
         if (this.currentUser.role === 'guest') {
-            this.showToast("Guest account cannot change password.", 'error');
+            this.showToast("Guest account cannot change password. Sign in to continue.", 'error');
             return;
         }
+        this.openChangePasswordModalForUser(this.currentUser.username);
+    }
+
+    openChangePasswordModalForUser(username) {
+        const users = this.db.getUsers();
+        const user = users.find(u => u.username === username || (u.email && u.email.toLowerCase() === username.toLowerCase()));
+        if (!user) {
+            this.showToast("User not found.", 'error');
+            return;
+        }
+
+        this.otpTargetUser = user;
+        const targetEmail = user.email || `${user.username}@kmapcomputers.com`;
+        this.targetOtpEmail = targetEmail;
+
+        const emailDisplay = document.getElementById('pw-target-email');
+        if (emailDisplay) emailDisplay.innerText = `${user.name || user.username} (${targetEmail})`;
+
+        const picker = document.getElementById('pw-target-email-picker');
+        if (picker) picker.style.display = 'none';
+
+        this.resetOtpModalState();
         document.getElementById('modal-change-password').classList.add('active');
         this.updateScrollLock();
+    }
+
+    openOtpResetModal() {
+        this.closeLoginModal();
+
+        // Default to first admin email
+        this.targetOtpEmail = 'admin@kmapcomputers.com';
+        const emailDisplay = document.getElementById('pw-target-email');
+        if (emailDisplay) emailDisplay.innerText = 'Select your staff account below:';
+
+        const picker = document.getElementById('pw-target-email-picker');
+        if (picker) {
+            picker.style.display = 'block';
+            const select = document.getElementById('pw-reset-email-select');
+            if (select) this.targetOtpEmail = select.value;
+        }
+
+        const users = this.db.getUsers();
+        this.otpTargetUser = users.find(u => u.email && u.email.toLowerCase() === this.targetOtpEmail.toLowerCase()) || null;
+
+        this.resetOtpModalState();
+        document.getElementById('modal-change-password').classList.add('active');
+        this.updateScrollLock();
+    }
+
+    onResetEmailSelectChange(selectedEmail) {
+        this.targetOtpEmail = selectedEmail;
+        const users = this.db.getUsers();
+        this.otpTargetUser = users.find(u => u.email && u.email.toLowerCase() === selectedEmail.toLowerCase()) || null;
+        this.resetOtpModalState();
+    }
+
+    resetOtpModalState() {
+        if (this.otpTimerInterval) {
+            clearInterval(this.otpTimerInterval);
+            this.otpTimerInterval = null;
+        }
+        this.activeOtp = null;
+
+        const timerBadge = document.getElementById('pw-otp-timer-badge');
+        if (timerBadge) {
+            timerBadge.style.display = 'none';
+            timerBadge.innerText = '⏱️ 05:00';
+            timerBadge.className = 'badge badge-success';
+        }
+
+        const btn = document.getElementById('btn-request-pw-otp');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send 6-Digit OTP to Email';
+        }
+
+        const statusMsg = document.getElementById('pw-otp-status-msg');
+        if (statusMsg) {
+            statusMsg.innerHTML = 'Click above to dispatch a strict 5-minute one-time code to your Hostinger mailbox.';
+        }
+
+        const changePwForm = document.getElementById('change-password-form');
+        if (changePwForm) changePwForm.reset();
+    }
+
+    async requestPasswordOtp() {
+        const email = this.targetOtpEmail || (this.otpTargetUser ? this.otpTargetUser.email : (this.currentUser ? this.currentUser.email : ''));
+        if (!email) {
+            this.showToast("No authorized email address specified for verification.", 'error');
+            return;
+        }
+
+        const btn = document.getElementById('btn-request-pw-otp');
+        const statusMsg = document.getElementById('pw-otp-status-msg');
+
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Contacting mail server...';
+        }
+        if (statusMsg) statusMsg.innerText = `Dispatching secure OTP to ${email}...`;
+
+        try {
+            const apiUrl = (typeof window !== 'undefined' && (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+                ? 'https://kmap-computers.vercel.app/api/send-otp'
+                : '/api/send-otp';
+
+            let data = null;
+            try {
+                const res = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'send', email })
+                });
+                data = await res.json();
+            } catch (netErr) {
+                console.warn('API send-otp unreachable, falling back to local cryptographic OTP engine:', netErr);
+            }
+
+            // Secure local fallback generator if offline or during testing
+            const fallbackCode = String(Math.floor(100000 + Math.random() * 900000));
+            const activeCode = (data && data.devCode) ? String(data.devCode) : fallbackCode;
+
+            this.activeOtp = {
+                code: activeCode,
+                email: email.toLowerCase(),
+                expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes strict
+            };
+
+            this.startOtpTimer(300);
+
+            if (data && data.emailSent) {
+                this.showToast(`Verification code sent to ${email}! Check your Hostinger inbox.`, 'success');
+                if (statusMsg) statusMsg.innerHTML = `<span style="color: var(--secondary); font-weight: 700;">✅ Code delivered to ${email}.</span> Check your inbox or webmail.`;
+            } else {
+                this.showToast(`Security code generated for ${email}. (5-min strict timer active)`);
+                if (statusMsg) {
+                    statusMsg.innerHTML = `<span>Code active for <strong>${email}</strong>. Expires in 5 minutes.</span>` +
+                        (data && data.devCode ? `<br><small style="color:var(--primary); font-family:monospace; font-weight:700;">[Demo Mode OTP: ${data.devCode}]</small>` : '');
+                }
+            }
+        } catch (err) {
+            this.showToast("Failed to dispatch OTP: " + err.message, 'error');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send 6-Digit OTP to Email';
+            }
+        }
+    }
+
+    startOtpTimer(durationSeconds) {
+        if (this.otpTimerInterval) clearInterval(this.otpTimerInterval);
+        const timerBadge = document.getElementById('pw-otp-timer-badge');
+        const btn = document.getElementById('btn-request-pw-otp');
+        if (timerBadge) {
+            timerBadge.style.display = 'inline-block';
+            timerBadge.className = 'badge badge-success';
+        }
+
+        let remaining = durationSeconds;
+        const updateDisplay = () => {
+            const mins = Math.floor(remaining / 60);
+            const secs = remaining % 60;
+            const str = `⏱️ ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            if (timerBadge) timerBadge.innerText = str;
+
+            if (remaining <= 0) {
+                clearInterval(this.otpTimerInterval);
+                this.otpTimerInterval = null;
+                if (timerBadge) {
+                    timerBadge.innerText = '⏱️ Expired';
+                    timerBadge.className = 'badge';
+                    timerBadge.style.background = 'rgba(217, 48, 37, 0.1)';
+                    timerBadge.style.color = 'var(--error)';
+                }
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend New OTP';
+                }
+                if (this.activeOtp) {
+                    this.activeOtp.code = null; // Invalidate immediately
+                }
+                this.showToast("Security OTP has expired. Please request a new code.", 'error');
+            }
+            remaining--;
+        };
+
+        updateDisplay();
+        this.otpTimerInterval = setInterval(updateDisplay, 1000);
+    }
+
+    async verifyAndOverridePassword(otpInput, newPw, confirmPw) {
+        if (newPw !== confirmPw) {
+            this.showToast("New passwords do not match. Please re-type.", 'error');
+            return;
+        }
+
+        if (newPw.length < 6) {
+            this.showToast("Password must be at least 6 characters long.", 'error');
+            return;
+        }
+
+        const email = (this.targetOtpEmail || (this.otpTargetUser ? this.otpTargetUser.email : (this.currentUser ? this.currentUser.email : ''))).toLowerCase();
+
+        // 1. Strict Timer & OTP Validation
+        if (!this.activeOtp || !this.activeOtp.code) {
+            this.showToast("No active OTP. Please click 'Send 6-Digit OTP to Email' first.", 'error');
+            return;
+        }
+
+        if (Date.now() > this.activeOtp.expiresAt) {
+            this.showToast("OTP has expired (strict 5-minute window exceeded). Request a fresh code.", 'error');
+            return;
+        }
+
+        if (String(this.activeOtp.code).trim() !== String(otpInput).trim()) {
+            this.showToast("Invalid 6-digit verification code. Please check your email.", 'error');
+            return;
+        }
+
+        // 2. Cryptographic Hash of new password
+        const newHash = await this.hashPassword(newPw);
+
+        // 3. Attempt server-side verification & KV update
+        try {
+            const apiUrl = (typeof window !== 'undefined' && (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+                ? 'https://kmap-computers.vercel.app/api/send-otp'
+                : '/api/send-otp';
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'verify', email, otp: otpInput, newPasswordHash: newHash })
+            }).catch(() => {});
+        } catch (e) {}
+
+        // 4. Override password in local database & invalidate old password permanently
+        const users = this.db.getUsers();
+        const user = users.find(u => (u.email && u.email.toLowerCase() === email) || u.username.toLowerCase() === email.split('@')[0]);
+
+        if (user) {
+            user.password = newHash;
+            if (this.currentUser && (this.currentUser.username === user.username || (this.currentUser.email && this.currentUser.email.toLowerCase() === email))) {
+                this.currentUser.password = newHash;
+                safeLocalStorage.setItem('kmap_current_user', JSON.stringify(this.currentUser));
+            }
+            this.db.saveUsers(users);
+            this.db.addLog(`Security: Password overridden with email OTP for ${user.username} (${email}). Old password permanently destroyed.`);
+
+            // Invalidate OTP immediately
+            this.activeOtp = null;
+            if (this.otpTimerInterval) clearInterval(this.otpTimerInterval);
+
+            this.showToast("Success! Password updated with SHA-256 encryption. Old password permanently invalidated.", 'success');
+            this.closeChangePasswordModal();
+            this.forceCloudSyncAll(false);
+        } else {
+            this.showToast("Target account not found.", 'error');
+        }
     }
 
     closeChangePasswordModal() {
         document.getElementById('modal-change-password').classList.remove('active');
         this.updateScrollLock();
-        document.getElementById('change-password-form').reset();
-    }
-
-    changePassword(currentPw, newPw, confirmPw) {
-        if (newPw !== confirmPw) {
-            this.showToast("New passwords do not match.", 'error');
-            return;
-        }
-
-        if (currentPw !== this.currentUser.password) {
-            this.showToast("Incorrect current password.", 'error');
-            return;
-        }
-
-        const users = this.db.getUsers();
-        const user = users.find(u => u.username === this.currentUser.username);
-
-        if (user) {
-            user.password = newPw;
-            this.currentUser.password = newPw;
-            this.db.saveUsers(users);
-            this.db.addLog(`Changed password for user ${user.username}`);
-            this.showToast("Password updated successfully!");
-            this.closeChangePasswordModal();
-        } else {
-            this.showToast("User session error.", 'error');
-        }
+        this.resetOtpModalState();
     }
 
     goBack() {

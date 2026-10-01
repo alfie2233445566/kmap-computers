@@ -175,7 +175,7 @@
                     <input type="text" id="login-username" class="form-control" placeholder="e.g. admin@kmapcomputers.com or 024..."
                         required>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="margin-bottom: 8px;">
                     <label for="login-password">Password</label>
                     <div style="position: relative;">
                         <input type="password" id="login-password" class="form-control" placeholder="••••••••" required
@@ -185,8 +185,13 @@
                             onclick="app.togglePasswordVisibility('login-password', 'toggle-login-password')"></i>
                     </div>
                 </div>
+                <div style="text-align: right; margin-bottom: 16px;">
+                    <a href="javascript:void(0)" onclick="app.openOtpResetModal()" style="font-size: 12px; color: var(--primary); font-weight: 600; text-decoration: none;">
+                        <i class="fa-solid fa-key" style="font-size: 11px;"></i> Forgot password? Reset via Email OTP
+                    </a>
+                </div>
                 <button type="submit" class="btn btn-primary"
-                    style="width: 100%; height: 48px; margin-top: 12px; font-size: 15px;">
+                    style="width: 100%; height: 48px; font-size: 15px;">
                     <i class="fa-solid fa-right-to-bracket"></i> Sign In
                 </button>
 
@@ -2153,32 +2158,70 @@
         </div>
     </div>
 
-    <!-- 9. Modal for Universal Change Password (All Users) -->
+    <!-- 9. Modal for Universal Change Password (All Users with Security OTP & Timer) -->
     <div id="modal-change-password" class="modal-overlay">
-        <div class="modal-content" style="max-width: 400px; padding: 24px;">
-            <h3 style="color: var(--primary); font-weight: 800; font-size: 20px; margin-bottom: 16px;">
-                <i class="fa-solid fa-key"></i> Change Password
-            </h3>
+        <div class="modal-content" style="max-width: 440px; padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="color: var(--primary); font-weight: 800; font-size: 20px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-shield-halved" style="color: var(--secondary);"></i> Secure Password Update
+                </h3>
+                <button type="button" class="btn btn-outline" onclick="app.closeChangePasswordModal()" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Target Account / Email Section -->
+            <div style="background: var(--bg-light); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 14px;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); font-weight: 700;">Account Email for Security OTP</div>
+                <div id="pw-target-email" style="font-family: monospace; font-size: 14px; font-weight: 700; color: var(--primary); margin-top: 4px;">admin@kmapcomputers.com</div>
+                <div id="pw-target-email-picker" style="display: none; margin-top: 8px;">
+                    <select id="pw-reset-email-select" class="form-control" style="font-size: 13px; padding: 6px 10px;" onchange="app.onResetEmailSelectChange(this.value)">
+                        <option value="admin@kmapcomputers.com">Kwaku Aduse-poku (admin@kmapcomputers.com)</option>
+                        <option value="alfred@kmapcomputers.com">Alfred (alfred@kmapcomputers.com)</option>
+                        <option value="info@kmapcomputers.com">Felix (info@kmapcomputers.com)</option>
+                        <option value="sales@kmapcomputers.com">Victor Aduse-poku (sales@kmapcomputers.com)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- OTP Dispatch & Strict Countdown Timer Block -->
+            <div id="pw-otp-countdown-container" style="background: rgba(13, 148, 136, 0.08); border: 1px dashed var(--secondary); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px; text-align: center;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-size: 12px; font-weight: 700; color: var(--secondary);"><i class="fa-solid fa-envelope-circle-check"></i> Email Verification OTP</span>
+                    <span id="pw-otp-timer-badge" class="badge badge-success" style="font-family: monospace; font-size: 12px; font-weight: 800; display: none;">⏱️ 05:00</span>
+                </div>
+                <button type="button" id="btn-request-pw-otp" class="btn btn-primary" onclick="app.requestPasswordOtp()" style="width: 100%; height: 38px; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-paper-plane"></i> Send 6-Digit OTP to Email
+                </button>
+                <div id="pw-otp-status-msg" style="font-size: 11px; color: var(--text-light); margin-top: 6px; line-height: 1.4;">
+                    Click above to send a strict 5-minute one-time code to your Hostinger mailbox.
+                </div>
+            </div>
+
             <form id="change-password-form">
                 <div class="form-group">
-                    <label>Current Password</label>
-                    <input type="password" id="form-pw-current" class="form-control" required
-                        placeholder="Enter current password">
+                    <label>6-Digit Verification OTP</label>
+                    <input type="text" id="form-pw-otp" class="form-control" placeholder="• • • • • •" maxlength="6" pattern="[0-9]{6}" required style="font-family: monospace; font-size: 18px; letter-spacing: 6px; text-align: center; font-weight: 900;" autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label>New Password</label>
-                    <input type="password" id="form-pw-new" class="form-control" required
-                        placeholder="Enter new password">
+                    <div style="position: relative;">
+                        <input type="password" id="form-pw-new" class="form-control" required placeholder="Enter new password" style="padding-right: 40px;" minlength="6">
+                        <i class="fa-solid fa-eye" id="toggle-pw-new" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);" onclick="app.togglePasswordVisibility('form-pw-new', 'toggle-pw-new')"></i>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Confirm New Password</label>
-                    <input type="password" id="form-pw-confirm" class="form-control" required
-                        placeholder="Re-type new password">
+                    <div style="position: relative;">
+                        <input type="password" id="form-pw-confirm" class="form-control" required placeholder="Re-type new password" style="padding-right: 40px;" minlength="6">
+                        <i class="fa-solid fa-eye" id="toggle-pw-confirm" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light);" onclick="app.togglePasswordVisibility('form-pw-confirm', 'toggle-pw-confirm')"></i>
+                    </div>
                 </div>
                 <div style="display: flex; gap: 12px; margin-top: 20px;">
-                    <button type="submit" class="btn btn-secondary" style="flex: 1;">Update Password</button>
-                    <button type="button" class="btn btn-outline"
-                        onclick="app.closeChangePasswordModal()">Cancel</button>
+                    <button type="submit" id="btn-submit-pw-change" class="btn btn-secondary" style="flex: 1; height: 44px; font-weight: 700;">
+                        <i class="fa-solid fa-lock"></i> Verify & Override Password
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="app.closeChangePasswordModal()" style="height: 44px;">Cancel</button>
                 </div>
             </form>
         </div>
