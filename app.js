@@ -1448,7 +1448,7 @@ class KmapStoreApp {
         // Staff Creation Form
         const createStaffForm = document.getElementById('create-staff-form');
         if (createStaffForm) {
-            createStaffForm.addEventListener('submit', (e) => {
+            createStaffForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const nameInput = document.getElementById('staff-name');
                 const user = document.getElementById('staff-username').value.trim();
@@ -1462,10 +1462,12 @@ class KmapStoreApp {
                     return;
                 }
 
-                users.push({ username: user, role, name, password });
+                const passHash = await this.hashPassword(password);
+                const email = user.includes('@') ? user : `${user}@kmapcomputers.com`;
+                users.push({ username: user, role, name, email, password: passHash });
                 this.db.saveUsers(users);
-                this.db.addLog(`Created new staff user: ${user} (${role})`);
-                this.showToast(`Staff user ${user} created successfully.`);
+                this.db.addLog(`Created new user account: ${user} (${role})`);
+                this.showToast(`User account ${user} created successfully.`);
                 createStaffForm.reset();
                 this.renderStaffList();
                 this.forceCloudSyncAll(false);

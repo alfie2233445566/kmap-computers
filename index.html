@@ -1622,24 +1622,24 @@
                 <div class="grid grid-2">
                     <!-- Staff Creation Card -->
                     <div class="card">
-                        <h3 class="card-title"><i class="fa-solid fa-user-plus"></i> Add New Staff Member</h3>
+                        <h3 class="card-title"><i class="fa-solid fa-user-plus"></i> Add New User</h3>
                         <p style="color: var(--text-light); font-size: 14px; margin-bottom: 16px;">
-                            Grant administrator or manager privileges to store employees.
+                            Grant administrator or manager privileges to store accounts.
                         </p>
                         <form id="create-staff-form" style="margin-bottom: 8px;">
                             <div class="form-group">
-                                <label>Staff Full Name</label>
+                                <label>User Full Name</label>
                                 <input type="text" id="staff-name" class="form-control"
-                                    placeholder="e.g. Samuel Kyeremeh" required>
+                                    required>
                             </div>
                             <div class="grid grid-2" style="gap: 12px;">
                                 <div class="form-group">
-                                    <label>Username / Login ID</label>
+                                    <label>User Login ID</label>
                                     <input type="text" id="staff-username" class="form-control"
-                                        placeholder="e.g. samuel" required>
+                                        required>
                                 </div>
                                 <div class="form-group">
-                                    <label>Role</label>
+                                    <label>User Role</label>
                                     <select id="staff-role" class="form-control" required>
                                         <option value="admin">Admin Manager</option>
                                         <option value="superadmin">Super Administrator</option>
@@ -1647,13 +1647,13 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Login Password</label>
-                                <input type="password" id="staff-password" class="form-control" placeholder="••••••••"
+                                <label>User Password</label>
+                                <input type="password" id="staff-password" class="form-control"
                                     required>
                             </div>
                             <button type="submit" class="btn btn-secondary"
                                 style="width: 100%; height: 44px; margin-top: 8px; font-weight: 700;">
-                                <i class="fa-solid fa-user-plus"></i> Create Staff Account
+                                <i class="fa-solid fa-user-plus"></i> Create User Account
                             </button>
                         </form>
                     </div>
