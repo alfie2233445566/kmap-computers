@@ -562,6 +562,9 @@ class KmapStoreApp {
         const userProfile = document.getElementById('topbar-user-profile');
         const changePwdBtn = document.getElementById('sidebar-change-pwd-btn');
         const adminToggleBtn = document.getElementById('btn-topbar-admin-toggle');
+        const landingAccountLabel = document.getElementById('landing-account-label');
+        const landingAccountBtn = document.getElementById('landing-account-btn');
+        const landingAccountIcon = document.getElementById('landing-account-icon');
 
         const syncIndicator = document.getElementById('sync-status-indicator');
         const isAdmin = user && ['admin', 'superadmin'].includes(user.role);
@@ -579,6 +582,16 @@ class KmapStoreApp {
             if (adminToggleBtn) {
                 adminToggleBtn.style.display = isAdmin ? 'inline-flex' : 'none';
             }
+            if (landingAccountLabel) {
+                const firstName = (user.name || user.username || '').trim().split(' ')[0];
+                landingAccountLabel.innerText = firstName || 'Account';
+            }
+            if (landingAccountBtn) {
+                landingAccountBtn.title = `Signed in as ${user.name || user.username} - View Profile`;
+            }
+            if (landingAccountIcon) {
+                landingAccountIcon.className = 'fa-solid fa-user-check';
+            }
         } else {
             if (profileName) profileName.innerText = 'Guest';
             if (profileAvatar) profileAvatar.innerText = 'G';
@@ -587,6 +600,9 @@ class KmapStoreApp {
             if (userProfile) userProfile.style.display = 'none';
             if (changePwdBtn) changePwdBtn.style.display = 'none';
             if (adminToggleBtn) adminToggleBtn.style.display = 'none';
+            if (landingAccountLabel) landingAccountLabel.innerText = 'Account';
+            if (landingAccountBtn) landingAccountBtn.title = 'Sign In / Create Account';
+            if (landingAccountIcon) landingAccountIcon.className = 'fa-regular fa-user';
         }
     }
 
@@ -4329,12 +4345,39 @@ class KmapStoreApp {
         }
     }
 
-    openUserProfileModal() {
-        if (!this.currentUser) return;
+    handleAccountAction() {
+        if (this.currentUser && this.currentUser.role !== 'guest') {
+            this.openUserProfileModal();
+        } else {
+            this.openLoginModal('signin');
+        }
+    }
 
-        document.getElementById('profile-modal-name').innerText = this.currentUser.name;
-        document.getElementById('profile-modal-username').innerText = this.currentUser.username;
-        document.getElementById('profile-modal-avatar').innerText = this.currentUser.name.charAt(0).toUpperCase();
+    openUserProfileModal() {
+        if (!this.currentUser || this.currentUser.role === 'guest') {
+            this.openLoginModal('signin');
+            return;
+        }
+
+        const nameEl = document.getElementById('profile-modal-name');
+        const userEl = document.getElementById('profile-modal-username');
+        const avatarEl = document.getElementById('profile-modal-avatar');
+        const emailEl = document.getElementById('profile-modal-email');
+        const roleEl = document.getElementById('profile-modal-role');
+        const adminBtn = document.getElementById('profile-modal-admin-btn');
+
+        if (nameEl) nameEl.innerText = this.currentUser.name || this.currentUser.username;
+        if (userEl) userEl.innerText = this.currentUser.username;
+        if (avatarEl) avatarEl.innerText = (this.currentUser.name || this.currentUser.username || 'U').charAt(0).toUpperCase();
+        if (emailEl) emailEl.innerText = this.currentUser.email || 'No email registered';
+        if (roleEl) {
+            const roleLabels = { superadmin: 'Super Admin', admin: 'Staff / Admin', user: 'Customer', client: 'Customer' };
+            roleEl.innerText = roleLabels[this.currentUser.role] || this.currentUser.role;
+        }
+        if (adminBtn) {
+            const isStaff = ['admin', 'superadmin'].includes(this.currentUser.role);
+            adminBtn.style.display = isStaff ? 'flex' : 'none';
+        }
 
         document.getElementById('modal-user-profile').classList.add('active');
         this.updateScrollLock();
