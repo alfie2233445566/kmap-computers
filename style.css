@@ -1377,6 +1377,35 @@ body.landing-mode .sidebar {
     color: #DA9100;
 }
 
+.topbar-social {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 6px;
+    padding-left: 14px;
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.topbar-social a {
+    color: #cbd5e1;
+    font-size: 13px;
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.topbar-social a:hover {
+    color: #ffffff;
+    background: #0d4cb5;
+    transform: translateY(-1px);
+}
+
 /* 3. Main Brand Header */
 .landing-header {
     background: #ffffff;
@@ -2537,13 +2566,14 @@ body.landing-mode .sidebar {
 
 .footer-social-row {
     display: flex;
-    gap: 12px;
+    gap: 10px;
+    margin-top: 14px;
     margin-bottom: 18px;
 }
 
 .footer-social-row a {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
     color: white;
@@ -2552,12 +2582,155 @@ body.landing-mode .sidebar {
     justify-content: center;
     font-size: 16px;
     text-decoration: none;
-    transition: background 0.2s, transform 0.2s;
+    transition: background 0.2s, transform 0.2s, color 0.2s, box-shadow 0.2s;
 }
 
-.footer-social-row a:hover {
-    background: #0d4cb5;
+.footer-social-row a.social-fb:hover {
+    background: #1877F2;
+    color: #ffffff;
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(24, 119, 242, 0.4);
+}
+
+.footer-social-row a.social-ig:hover {
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(214, 36, 159, 0.4);
+}
+
+.footer-social-row a.social-x:hover {
+    background: #000000;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.footer-social-row a.social-tt:hover {
+    background: #000000;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: -2px -2px 0px #25F4EE, 2px 2px 0px #FE2C55;
+}
+
+.footer-social-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.social-badge-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #cbd5e1;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.2s;
+}
+
+.social-badge-link i {
+    font-size: 14px;
+    width: 16px;
+    text-align: center;
+}
+
+.social-badge-link:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #f7bf00;
+    border-color: rgba(247, 191, 0, 0.3);
+    transform: translateX(3px);
+}
+
+/* Find Us Social Channels Grid */
+.social-channels-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.social-channel-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: var(--bg-light);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.social-channel-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--secondary);
+}
+
+.channel-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.social-channel-fb .channel-icon-wrap { background: #1877F2; }
+.social-channel-ig .channel-icon-wrap { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+.social-channel-x .channel-icon-wrap { background: #000000; }
+.social-channel-tt .channel-icon-wrap { background: #000000; box-shadow: -2px -2px 0px #25F4EE, 2px 2px 0px #FE2C55; }
+
+.channel-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.channel-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--primary);
+    line-height: 1.2;
+}
+
+.channel-handle {
+    font-size: 12px;
+    color: var(--text-light);
+    font-family: monospace;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.channel-action {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+@media (max-width: 992px) {
+    .social-channels-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 520px) {
+    .social-channels-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .payment-badge-img {
