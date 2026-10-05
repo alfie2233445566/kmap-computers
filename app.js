@@ -4369,7 +4369,15 @@ class KmapStoreApp {
         if (nameEl) nameEl.innerText = this.currentUser.name || this.currentUser.username;
         if (userEl) userEl.innerText = this.currentUser.username;
         if (avatarEl) avatarEl.innerText = (this.currentUser.name || this.currentUser.username || 'U').charAt(0).toUpperCase();
-        if (emailEl) emailEl.innerText = this.currentUser.email || 'No email registered';
+        if (emailEl) {
+            if (this.currentUser.email && this.currentUser.email.trim()) {
+                emailEl.innerText = this.currentUser.email.trim();
+                emailEl.style.display = 'block';
+            } else {
+                emailEl.innerText = '';
+                emailEl.style.display = 'none';
+            }
+        }
         if (roleEl) {
             const roleLabels = { superadmin: 'Super Admin', admin: 'Staff / Admin', user: 'Customer', client: 'Customer' };
             roleEl.innerText = roleLabels[this.currentUser.role] || this.currentUser.role;
