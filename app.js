@@ -165,6 +165,10 @@ class KmapStoreApp {
                                     'images/products/PROD-001/4.jpg'
                                 ];
                             }
+                            const pCase = data[key].find(p => p.id === 'PROD-ACC-001');
+                            if (pCase && pCase.category !== 'Accessories') {
+                                pCase.category = 'Accessories';
+                            }
                             if (this.defaultProductsList && Array.isArray(this.defaultProductsList)) {
                                 this.defaultProductsList.forEach(defProd => {
                                     if (!data[key].some(p => p.id === defProd.id)) {
@@ -1039,11 +1043,11 @@ class KmapStoreApp {
             {
                 id: 'PROD-ACC-001',
                 name: "2.5\" HDD/SSD External Enclosure Case",
-                category: 'Storage',
+                category: 'Accessories',
                 price: 100,
                 stock: 25,
                 spec: "High Speed USB 3.0 to SATA 2.5 inch HDD/SSD Enclosure case, plug and play, driver-free, intelligent sleep mode",
-                icon: '💾',
+                icon: '🔌',
                 images: [
                     'images/landing/hdd-ssd-case.jpg'
                 ]
@@ -1134,6 +1138,12 @@ class KmapStoreApp {
                             modified = true;
                         } else if ((!existing.images || existing.images.length === 0) && defProd.images && defProd.images.length > 0) {
                             existing.images = defProd.images;
+                            modified = true;
+                        }
+                    });
+                    parsed.forEach(p => {
+                        if (p.id === 'PROD-ACC-001' && p.category !== 'Accessories') {
+                            p.category = 'Accessories';
                             modified = true;
                         }
                     });
