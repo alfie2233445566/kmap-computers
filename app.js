@@ -375,10 +375,15 @@ class KmapStoreApp {
 
         favProducts.forEach(p => {
             const discPrice = this.getDiscountedPrice(p);
-            const hasPromo = discPrice < p.price;
-            const priceHtml = hasPromo
-                ? `<div class="product-price"><span class="original-price">GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span><span class="promo-price">GH₵ ${discPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>`
-                : `<div class="product-price">GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>`;
+            const hasPromo = !p.priceDisplay && discPrice < p.price;
+            let priceHtml = '';
+            if (p.priceDisplay) {
+                priceHtml = `<div class="product-price" style="font-weight: 800; color: #1e3a8a; letter-spacing: -0.2px;"><strong style="font-weight: 800;">${p.priceDisplay}</strong></div>`;
+            } else if (hasPromo) {
+                priceHtml = `<div class="product-price"><span class="original-price">GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span><span class="promo-price">GH₵ ${discPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>`;
+            } else {
+                priceHtml = `<div class="product-price">GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>`;
+            }
 
             const promoBadge = hasPromo ? `<div class="promo-badge">PROMO</div>` : '';
 
@@ -1333,6 +1338,7 @@ class KmapStoreApp {
                 name: "Apple MacBook MagSafe 1 Power Adapter Charger (45W / 60W / 85W)",
                 category: 'Accessories',
                 price: 200,
+                priceDisplay: "GH₵ 200 – 350",
                 stock: 20,
                 spec: "Connector: MagSafe 1 (Magnetic L-Tip / T-Tip), Wattage Options: 45W (MacBook Air 11\"/13\" 2008-2011 - GH₵200), 60W (MacBook Pro 13\" 2009-2012 - GH₵250), 85W (MacBook Pro 15\"/17\" 2006-2012 - GH₵350), LED Charging Indicator, Magnetic Safety Breakaway",
                 icon: '🍏',
@@ -1345,6 +1351,7 @@ class KmapStoreApp {
                 name: "Apple MacBook MagSafe 2 Power Adapter Charger (45W / 60W / 85W)",
                 category: 'Accessories',
                 price: 250,
+                priceDisplay: "GH₵ 250 – 400",
                 stock: 20,
                 spec: "Connector: MagSafe 2 (Slim Magnetic T-Tip), Wattage Options: 45W (MacBook Air 11\"/13\" 2012-2017 - GH₵250), 60W (MacBook Pro Retina 13\" 2012-2015 - GH₵300), 85W (MacBook Pro Retina 15\" 2012-2015 - GH₵400), High Grade Protected Output",
                 icon: '🍏',
@@ -1405,6 +1412,7 @@ class KmapStoreApp {
                 name: "High-Speed 4K Ultra HD HDMI Cable (1m / 2m / 5m)",
                 category: 'Accessories',
                 price: 40,
+                priceDisplay: "GH₵ 40 – 100",
                 stock: 50,
                 spec: "Standard: HDMI 2.0 High Speed with Ethernet, Resolution: Supports 4K Ultra HD @ 60Hz, 3D, Audio Return Channel (ARC), 24K Gold-Plated Connectors with Multi-Layer Shielding. Available Lengths: 1 Meter (GH₵40), 2 Meters (GH₵60), 5 Meters (GH₵100)",
                 icon: '📺',
@@ -1489,6 +1497,7 @@ class KmapStoreApp {
                 name: "Replacement Inbuilt Laptop Battery (HP, Dell, Lenovo, Acer, Asus)",
                 category: 'Parts',
                 price: 300,
+                priceDisplay: "GH₵ 300 – 400",
                 stock: 25,
                 spec: "Type: High Grade Li-ion / Li-Polymer Internal Inbuilt Laptop Battery, Grade-A Japanese/Korean Battery Cells, Multi-Protection Circuit (Overcharge, Over-discharge, Overheating & Short Circuit), Price ranges GH₵300 - GH₵400 depending on exact laptop model",
                 icon: '🔋',
@@ -1501,6 +1510,7 @@ class KmapStoreApp {
                 name: "Replacement External Clip-On Laptop Battery",
                 category: 'Parts',
                 price: 200,
+                priceDisplay: "GH₵ 200 – 350",
                 stock: 25,
                 spec: "Type: External Removable Clip-on Laptop Battery for Dell Latitude, HP ProBook / EliteBook, Lenovo ThinkPad & Toshiba laptops, High Capacity 6-Cell / 9-Cell options, Long-lasting backup time. Price ranges GH₵200 - GH₵350 depending on laptop model",
                 icon: '🔋',
@@ -1513,6 +1523,7 @@ class KmapStoreApp {
                 name: "Replacement Laptop OEM Internal Keyboard",
                 category: 'Parts',
                 price: 100,
+                priceDisplay: "GH₵ 100 – 350",
                 stock: 30,
                 spec: "Type: OEM Internal Replacement Keyboard for HP, Dell, Lenovo, Toshiba, Acer, Asus laptops. Available in Backlit and Non-Backlit variants with standard US Layout. Professional installation available. Price ranges GH₵100 - GH₵350 depending on model",
                 icon: '⌨️',
@@ -1525,6 +1536,7 @@ class KmapStoreApp {
                 name: "Laptop LED / LCD Screen Replacement Panel (HD / FHD / Touch)",
                 category: 'Parts',
                 price: 350,
+                priceDisplay: "GH₵ 350 – 1,900",
                 stock: 25,
                 spec: "Type: Grade-A+ Brand New Replacement Laptop Screen Display (11.6\", 13.3\", 14.0\", 15.6\", 17.3\"), Slim 30-Pin / 40-Pin eDP Interface, HD / Full HD IPS / Touchscreen Options Available, 0 Dead Pixels, Professional Same-Day Installation Available. Price ranges GH₵350 - GH₵1,900",
                 icon: '🖥️',
@@ -1571,9 +1583,10 @@ class KmapStoreApp {
                             parsed.push(defProd);
                             modified = true;
                         } else {
-                            // Keep specs, price, name, category, and images up to date
-                            if (existing.price !== defProd.price || existing.name !== defProd.name || existing.category !== defProd.category || existing.spec !== defProd.spec) {
+                            // Keep specs, price, priceDisplay, name, category, and images up to date
+                            if (existing.price !== defProd.price || existing.name !== defProd.name || existing.category !== defProd.category || existing.spec !== defProd.spec || existing.priceDisplay !== defProd.priceDisplay) {
                                 existing.price = defProd.price;
+                                existing.priceDisplay = defProd.priceDisplay;
                                 existing.name = defProd.name;
                                 existing.category = defProd.category;
                                 existing.spec = defProd.spec;
@@ -2474,10 +2487,15 @@ class KmapStoreApp {
 
         filtered.forEach(p => {
             const discPrice = this.getDiscountedPrice(p);
-            const hasPromo = discPrice < p.price;
-            const priceHtml = hasPromo
-                ? `<div class="product-price"><span class="original-price">GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span><span class="promo-price">GH₵ ${discPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>`
-                : `<div class="product-price">GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>`;
+            const hasPromo = !p.priceDisplay && discPrice < p.price;
+            let priceHtml = '';
+            if (p.priceDisplay) {
+                priceHtml = `<div class="product-price" style="font-weight: 800; color: #1e3a8a; letter-spacing: -0.2px;"><strong style="font-weight: 800;">${p.priceDisplay}</strong></div>`;
+            } else if (hasPromo) {
+                priceHtml = `<div class="product-price"><span class="original-price">GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span><span class="promo-price">GH₵ ${discPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>`;
+            } else {
+                priceHtml = `<div class="product-price">GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>`;
+            }
 
             const promoBadge = hasPromo ? `<div class="promo-badge">PROMO</div>` : '';
 
@@ -2963,11 +2981,14 @@ class KmapStoreApp {
         }
 
         const discPrice = this.getDiscountedPrice(p);
-        const hasPromo = discPrice < p.price;
+        const hasPromo = !p.priceDisplay && discPrice < p.price;
         const originalPriceEl = document.getElementById('inspect-product-original-price');
         const priceEl = document.getElementById('inspect-product-price');
 
-        if (hasPromo) {
+        if (p.priceDisplay) {
+            originalPriceEl.style.display = 'none';
+            priceEl.innerHTML = `<span style="font-weight: 800; color: #1e3a8a; letter-spacing: -0.3px;">${p.priceDisplay}</span>`;
+        } else if (hasPromo) {
             originalPriceEl.style.display = 'inline';
             originalPriceEl.innerText = `GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
             priceEl.innerText = `GH₵ ${discPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
