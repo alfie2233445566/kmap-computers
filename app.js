@@ -1089,111 +1089,447 @@ class KmapStoreApp {
                 ]
             },
             {
-                id: 'PROD-USB-001',
-                name: "Kingston DataTraveler 16GB USB Flash Drive",
-                category: 'Accessories',
-                price: 55,
-                stock: 50,
-                spec: "Brand: Kingston, Model: DataTraveler Exodia, Capacity: 16GB, Interface: USB 3.2 Gen 1, Read Speed: up to 65MB/s, Cap Design with Keyring Loop, Compact & Durable, Compatible with Windows, Mac & Linux",
-                icon: '💾',
-                images: [
-                    'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=600&q=80'
-                ]
-            },
-            {
                 id: 'PROD-USB-002',
-                name: "Kingston DataTraveler 32GB USB Flash Drive",
+                name: "Kingston DataTraveler 32GB USB 3.2 Flash Drive",
                 category: 'Accessories',
-                price: 80,
+                price: 120,
                 stock: 50,
-                spec: "Brand: Kingston, Model: DataTraveler Exodia, Capacity: 32GB, Interface: USB 3.2 Gen 1, Read Speed: up to 65MB/s, Write Speed: up to 20MB/s, Cap Design with Keyring Loop, Compact & Durable",
+                spec: "Brand: Kingston, Model: DataTraveler Exodia, Capacity: 32GB, Interface: USB 3.2 Gen 1 (Backwards compatible with USB 2.0), Read Speed: up to 65MB/s, Protective Cap with Large Keyring Loop, Compact & Durable, Compatible with Windows, Mac OS & Linux",
                 icon: '💾',
                 images: [
-                    'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=600&q=80'
+                    'https://images.unsplash.com/photo-1624696941338-934bf86c28b4?w=600&auto=format&fit=crop&q=80'
                 ]
             },
             {
                 id: 'PROD-USB-003',
-                name: "Kingston DataTraveler 64GB USB Flash Drive",
+                name: "Kingston DataTraveler 64GB USB 3.2 Flash Drive",
                 category: 'Accessories',
-                price: 120,
-                stock: 40,
-                spec: "Brand: Kingston, Model: DataTraveler Exodia, Capacity: 64GB, Interface: USB 3.2 Gen 1, Read Speed: up to 70MB/s, Write Speed: up to 22MB/s, Cap Design with Keyring Loop, High Speed Portable Storage",
+                price: 150,
+                stock: 50,
+                spec: "Brand: Kingston, Model: DataTraveler Exodia, Capacity: 64GB, Interface: USB 3.2 Gen 1 High Speed, Read Speed: up to 70MB/s, Quick File Transfers for Documents, Music, Videos & Photos, Protective Cap Design with Loop, High Durability",
                 icon: '💾',
                 images: [
-                    'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=600&q=80'
+                    'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=600&auto=format&fit=crop&q=80'
                 ]
             },
             {
-                id: 'PROD-USB-004',
-                name: "Kingston DataTraveler 128GB USB Flash Drive",
+                id: 'PROD-ACC-M01',
+                name: "T-Wolf V1 Wired Optical Mouse",
+                category: 'Accessories',
+                price: 50,
+                stock: 40,
+                spec: "Brand: T-Wolf, Model: V1, Connectivity: Wired USB 2.0/3.0, Sensor: High-Precision Optical Sensor, Resolution: 1200 DPI, Ergonomic Comfortable Contour Grip, Anti-Skid 3D Scroll Wheel, 1.35m Durable Cable, Plug & Play (No Software Required)",
+                icon: '🖱️',
+                images: [
+                    'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-ACC-M02',
+                name: "Compoint CP-M161W 2.4GHz Wireless Optical Mouse",
+                category: 'Accessories',
+                price: 80,
+                stock: 35,
+                spec: "Brand: Compoint, Model: CP-M161W, Connectivity: 2.4GHz Wireless via Nano USB Receiver (Non-Bluetooth), Operating Range: 10 Meters, Resolution: 1600 DPI High-Definition Optical Tracking, Ultra-Slim Symmetrical Ergonomic Design, Smart Auto-Sleep Energy Saving",
+                icon: '🖱️',
+                images: [
+                    'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-ACC-M03',
+                name: "Dual-Mode Bluetooth 5.2 & 2.4GHz Wireless Mouse",
+                category: 'Accessories',
+                price: 100,
+                stock: 30,
+                spec: "Connectivity: Dual-Mode (Bluetooth 5.2 + 2.4GHz USB Dongle), Multi-Device Quick Switching, Built-in Rechargeable Battery (Type-C / Micro-USB Charging), Whisper-Quiet Silent Clicks, 3-Level Adjustable DPI (800 / 1200 / 1600 DPI), Slim Portable Profile",
+                icon: '🖱️',
+                images: [
+                    'https://images.unsplash.com/photo-1605773527852-c546a8584ea3?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-NET-001',
+                name: "Mini USB Wireless WiFi Network Adapter Dongle",
+                category: 'Networking',
+                price: 60,
+                stock: 45,
+                spec: "Interface: USB 2.0 High Speed, Wireless Standard: IEEE 802.11 b/g/n (2.4GHz), Speed: Up to 150Mbps / 300Mbps, Ultra-Compact Nano Design (Leave plugged in without blocking adjacent ports), Supports Windows 11/10/8/7, WPA2 Wireless Security Encryption",
+                icon: '📶',
+                images: [
+                    'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-NET-002',
+                name: "2-in-1 Dual Band USB WiFi + Bluetooth 5.0 Wireless Dongle",
+                category: 'Networking',
+                price: 100,
+                stock: 30,
+                spec: "Dual Function: High-Speed WiFi (600Mbps Dual Band 2.4GHz & 5GHz) + Bluetooth 5.0 Receiver & Transmitter, Connect to High-Speed WiFi and Pair Bluetooth Earphones, Speakers, Keyboards or Gamepads Simultaneously, Plug & Play for Windows 10/11",
+                icon: '📶',
+                images: [
+                    'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-ACC-G01',
+                name: "Wired USB Controller for Xbox 360 & Windows PC",
+                category: 'Accessories',
+                price: 100,
+                stock: 25,
+                spec: "Compatibility: Xbox 360, Windows PC (11/10/8/7), Steam Gaming, Connection: 2.2m Wired USB with Breakaway Cable, Features: Dual Vibration Force Feedback Motors, Precision 8-Directional D-Pad, 2 Pressure-Point Analog Triggers, Ergonomic Comfort Design",
+                icon: '🎮',
+                images: [
+                    'https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-ACC-G02',
+                name: "Dual Double-Motor Vibration Wireless Game Controller (PS4 / PC)",
+                category: 'Accessories',
+                price: 150,
+                stock: 20,
+                spec: "Compatibility: PlayStation 4 (PS4, PS4 Slim, PS4 Pro) & PC / Laptop / Mobile, Features: Dual High-Torque Rumble Vibration Motors, Highly Responsive Multi-Touch Clickable Touchpad, 6-Axis Motion Gyroscope, Built-in Speaker & 3.5mm Stereo Audio Jack, Rechargeable",
+                icon: '🎮',
+                images: [
+                    'https://images.unsplash.com/photo-1592840496694-26d035b52b48?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-ACC-KB01',
+                name: "T-Wolf TF100 2.4GHz Wireless Keyboard & Mouse Combo",
                 category: 'Accessories',
                 price: 200,
-                stock: 30,
-                spec: "Brand: Kingston, Model: DataTraveler Exodia, Capacity: 128GB, Interface: USB 3.2 Gen 1, Read Speed: up to 80MB/s, Write Speed: up to 30MB/s, Cap Design with Keyring Loop, High Capacity Portable Storage",
-                icon: '💾',
+                stock: 20,
+                spec: "Brand: T-Wolf, Model: TF100, Connectivity: 2.4GHz Wireless (Single USB Dongle for Both), Keyboard: Full Size 104-Key Layout with Low-Profile Quiet Keys, Spill-Resistant Architecture, Mouse: Ergonomic 1600 DPI Optical Sensor, Long Battery Life with Smart Sleep Mode",
+                icon: '⌨️',
                 images: [
-                    'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=600&q=80'
+                    'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-ACC-KB02',
+                name: "T-Wolf TF200 Rainbow Backlit Wired Gaming Keyboard & Mouse Set",
+                category: 'Accessories',
+                price: 200,
+                stock: 20,
+                spec: "Brand: T-Wolf, Model: TF200, Connectivity: High-Speed Wired USB, Keyboard: Mechanical-Feel Suspended Keycaps, Vibrant Rainbow RGB LED Backlighting, 19-Key Anti-Ghosting, Mouse: 4-Button Ergonomic RGB Gaming Optical Mouse with Dedicated DPI Adjustment (800-2400 DPI)",
+                icon: '⌨️',
+                images: [
+                    'https://images.unsplash.com/photo-1541140532154-b024d705b909?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-ACC-KB03',
+                name: "VONN VON 15 Wired Desktop Keyboard & Optical Mouse Set",
+                category: 'Accessories',
+                price: 150,
+                stock: 25,
+                spec: "Brand: VONN, Model: VON 15, Connectivity: Dual USB Wired Interface, Keyboard: Full-size Standard Office Layout with Dedicated Numeric Pad, UV Coated Wear-Resistant Lettering, Spill-Drain Channels, Mouse: Smooth High Precision 1200 DPI Optical Engine",
+                icon: '⌨️',
+                images: [
+                    'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CHG-001',
+                name: "HP 90W Blue Pin Smart AC Laptop Charger Adapter (19.5V 4.62A)",
+                category: 'Accessories',
+                price: 150,
+                stock: 30,
+                spec: "Brand: HP Compatible OEM, Output: 19.5V 4.62A (90W - fully backwards compatible with 65W & 45W), Connector Tip: 4.5mm x 3.0mm Blue Tip Center Pin, Built-in Over-Current, Over-Voltage & Short Circuit Protection, Fits HP Pavilion, Envy, ProBook, EliteBook",
+                icon: '🔌',
+                images: [
+                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CHG-002',
+                name: "Universal 65W / 90W Type-C USB-C PD Fast Laptop Charger Adapter",
+                category: 'Accessories',
+                price: 350,
+                stock: 20,
+                spec: "Technology: USB-C Power Delivery (PD 3.0 Fast Charge), Smart Output: Auto-Switching 5V/9V/12V/15V/20V (up to 65W/90W), Compatible with HP Type-C, Dell XPS/Latitude Type-C, Lenovo ThinkPad/Yoga, MacBook Pro/Air, Asus, Acer, Surface & Type-C Tablets/Phones",
+                icon: '🔌',
+                images: [
+                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CHG-003',
+                name: "Toshiba Satellite 19V AC Power Adapter Laptop Charger (5.5mm x 2.5mm)",
+                category: 'Accessories',
+                price: 100,
+                stock: 20,
+                spec: "Brand: Toshiba OEM Replacement, Output: 19V 3.42A / 3.95A (65W / 75W), Connector Tip: 5.5mm x 2.5mm Barrel, Compatible with Toshiba Satellite, Dynabook, Asus, Lenovo & Universal 19V Laptop Models",
+                icon: '🔌',
+                images: [
+                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CHG-004',
+                name: "Lenovo 65W / 90W Yellow Rectangular Square USB-Pin Laptop Charger",
+                category: 'Accessories',
+                price: 150,
+                stock: 25,
+                spec: "Brand: Lenovo OEM Replacement, Output: 20V 3.25A / 4.5A (65W/90W), Connector: Yellow Square USB-Style Tip with Center Pin, Compatible with Lenovo ThinkPad T440, T450, T460, T470, X240, X250, X260, IdeaPad, Yoga",
+                icon: '🔌',
+                images: [
+                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CHG-005',
+                name: "Acer Aspire 19V Laptop AC Power Adapter Charger (5.5mm x 1.7mm)",
+                category: 'Accessories',
+                price: 100,
+                stock: 20,
+                spec: "Brand: Acer OEM Replacement, Output: 19V 3.42A (65W) / 19V 2.37A (45W), Connector Tip: 5.5mm x 1.7mm (Purple/Blue tip), Compatible with Acer Aspire 3, Aspire 5, TravelMate, Swift & Extensa series",
+                icon: '🔌',
+                images: [
+                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CHG-006',
+                name: "Dell 65W / 90W Small Pin AC Laptop Charger (4.5mm x 3.0mm Tip)",
+                category: 'Accessories',
+                price: 150,
+                stock: 30,
+                spec: "Brand: Dell OEM Replacement, Output: 19.5V 3.34A / 4.62A (65W/90W), Connector: 4.5mm x 3.0mm Small Barrel with Center Smart Pin, Compatible with Dell Inspiron, XPS 13, Latitude 3000/5000/7000 series, Vostro",
+                icon: '🔌',
+                images: [
+                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CHG-007',
+                name: "Dell 90W Big Pin AC Laptop Charger Adapter (7.4mm x 5.0mm Tip)",
+                category: 'Accessories',
+                price: 150,
+                stock: 25,
+                spec: "Brand: Dell OEM Replacement, Output: 19.5V 4.62A (90W), Connector: 7.4mm x 5.0mm Large Barrel with Center Smart Pin, Compatible with Dell Latitude E6420, E6430, E6440, E5440, E5540, Inspiron, Precision Workstations",
+                icon: '🔌',
+                images: [
+                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CHG-008',
+                name: "Lenovo 90W Big Round Pin AC Laptop Charger Adapter (7.9mm x 5.5mm Tip)",
+                category: 'Accessories',
+                price: 100,
+                stock: 20,
+                spec: "Brand: Lenovo OEM Replacement, Output: 20V 4.5A (90W) / 3.25A (65W), Connector: 7.9mm x 5.5mm Round Tip with Center Pin, Compatible with Classic Lenovo ThinkPad T60, T61, T400, T410, T420, T430, X220, X230, W500",
+                icon: '🔌',
+                images: [
+                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CHG-MAC01',
+                name: "Apple MacBook MagSafe 1 Power Adapter Charger (45W / 60W / 85W)",
+                category: 'Accessories',
+                price: 200,
+                stock: 20,
+                spec: "Connector: MagSafe 1 (Magnetic L-Tip / T-Tip), Wattage Options: 45W (MacBook Air 11\"/13\" 2008-2011 - GH₵200), 60W (MacBook Pro 13\" 2009-2012 - GH₵250), 85W (MacBook Pro 15\"/17\" 2006-2012 - GH₵350), LED Charging Indicator, Magnetic Safety Breakaway",
+                icon: '🍏',
+                images: [
+                    'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CHG-MAC02',
+                name: "Apple MacBook MagSafe 2 Power Adapter Charger (45W / 60W / 85W)",
+                category: 'Accessories',
+                price: 250,
+                stock: 20,
+                spec: "Connector: MagSafe 2 (Slim Magnetic T-Tip), Wattage Options: 45W (MacBook Air 11\"/13\" 2012-2017 - GH₵250), 60W (MacBook Pro Retina 13\" 2012-2015 - GH₵300), 85W (MacBook Pro Retina 15\" 2012-2015 - GH₵400), High Grade Protected Output",
+                icon: '🍏',
+                images: [
+                    'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CAB-001',
+                name: "Heavy Duty 3-Pin UK Plug PC & Monitor Power Cable (1.5m)",
+                category: 'Accessories',
+                price: 30,
+                stock: 50,
+                spec: "Plug Type: UK Standard 3-Pin Fused Plug (13A Fused), Connector: IEC C13 Standard Kettle Lead / Cloverleaf C5 option, Length: 1.5m, Heavy Duty Pure Copper Wiring, Compatible with Desktop PCs, Monitors, Laptop Power Bricks, Printers, Projectors",
+                icon: '🔌',
+                images: [
+                    'https://images.unsplash.com/photo-1595225476474-87563907a212?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CAB-002',
+                name: "High-Speed USB 2.0 Type-A to Type-B Printer Cable (1.5m)",
+                category: 'Accessories',
+                price: 30,
+                stock: 40,
+                spec: "Interface: USB 2.0 Type-A Male to Type-B Male, Transfer Speed: Up to 480Mbps, Foil & Braid Shielding for Error-Free Data Transmission, Compatible with HP, Canon, Epson, Brother, Samsung Printers & Scanners",
+                icon: '🖨️',
+                images: [
+                    'https://images.unsplash.com/photo-1595225476474-87563907a212?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CAB-003',
+                name: "Gold-Plated 15-Pin Male-to-Male Full HD VGA Cable (1.5m)",
+                category: 'Accessories',
+                price: 35,
+                stock: 40,
+                spec: "Connector: 15-Pin SVGA/VGA Male to Male with Dual Ferrite Anti-Interference Cores, Resolution: Supports 1080p Full HD Display, Gold-Plated Connectors, Heavy Duty PVC Jacket, Compatible with PC, Laptops, Monitors, Projectors & Splitters",
+                icon: '🖥️',
+                images: [
+                    'https://images.unsplash.com/photo-1595225476474-87563907a212?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CAB-004',
+                name: "Cat6 RJ45 Gigabit High-Speed Ethernet Network Patch Cable",
+                category: 'Networking',
+                price: 35,
+                stock: 60,
+                spec: "Standard: Category 6 UTP Patch Cable, Speed: 1000Mbps (Gigabit Ethernet) / 250MHz Bandwidth, Gold-Plated 8P8C RJ45 Snagless Connectors, Compatible with Routers, Modems, Laptops, Desktops, CCTV, Starlink & Network Switches",
+                icon: '🌐',
+                images: [
+                    'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CAB-005',
+                name: "High-Speed 4K Ultra HD HDMI Cable (1m / 2m / 5m)",
+                category: 'Accessories',
+                price: 40,
+                stock: 50,
+                spec: "Standard: HDMI 2.0 High Speed with Ethernet, Resolution: Supports 4K Ultra HD @ 60Hz, 3D, Audio Return Channel (ARC), 24K Gold-Plated Connectors with Multi-Layer Shielding. Available Lengths: 1 Meter (GH₵40), 2 Meters (GH₵60), 5 Meters (GH₵100)",
+                icon: '📺',
+                images: [
+                    'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-HDD-001',
+                name: "500GB 2.5\" SATA Internal Laptop Hard Disk Drive (HDD)",
+                category: 'Storage',
+                price: 200,
+                stock: 25,
+                spec: "Capacity: 500GB, Form Factor: 2.5 inch SATA III (6Gb/s), Speed: 5400/7200 RPM, 100% Health Tested with 0 Bad Sectors, Ideal for Laptop Storage Expansion, Secondary Drive or External Enclosure Use",
+                icon: '💽',
+                images: [
+                    'https://images.unsplash.com/photo-1531492746076-161ca9bcad58?w=600&auto=format&fit=crop&q=80'
                 ]
             },
             {
                 id: 'PROD-SSD-001',
-                name: "256GB SATA SSD Upgrade (Laptop/Desktop)",
-                category: 'Accessories',
-                price: 400,
-                stock: 20,
-                spec: "Form Factor: 2.5 inch SATA III, Capacity: 256GB, Read Speed: up to 550MB/s, Write Speed: up to 500MB/s, Compatible with Most Laptops & Desktops, Low Power Consumption, Shock Resistant, Professional Installation Available",
+                name: "256GB High-Speed SSD Solid State Drive Upgrade (SATA / NVMe)",
+                category: 'Storage',
+                price: 350,
+                stock: 30,
+                spec: "Form Factor: 2.5\" SATA III / M.2 NVMe PCIe, Capacity: 256GB, Read Speed: up to 550MB/s (SATA) / 2400MB/s (NVMe), Instant Boot & 10x Faster Than Traditional Hard Drives, Low Power Consumption, Shock Resistant, Professional Installation & Data Migration Available",
                 icon: '💿',
                 images: [
-                    'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&q=80'
+                    'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&auto=format&fit=crop&q=80'
                 ]
             },
             {
                 id: 'PROD-SSD-002',
-                name: "512GB SATA SSD Upgrade (Laptop/Desktop)",
-                category: 'Accessories',
+                name: "512GB High-Speed SSD Solid State Drive Upgrade (SATA / NVMe)",
+                category: 'Storage',
                 price: 700,
-                stock: 15,
-                spec: "Form Factor: 2.5 inch SATA III, Capacity: 512GB, Read Speed: up to 560MB/s, Write Speed: up to 520MB/s, Compatible with Most Laptops & Desktops, Low Power Consumption, Shock Resistant, Professional Installation Available",
+                stock: 25,
+                spec: "Form Factor: 2.5\" SATA III / M.2 NVMe PCIe Gen 3, Capacity: 512GB, Read Speed: up to 560MB/s (SATA) / 3200MB/s (NVMe), Write Speed: up to 520MB/s, Blazing Fast Multitasking & Large Capacity for Software, Games and Projects, Professional Installation Available",
                 icon: '💿',
                 images: [
-                    'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&q=80'
+                    'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&auto=format&fit=crop&q=80'
                 ]
             },
             {
                 id: 'PROD-SSD-003',
-                name: "256GB NVMe M.2 SSD Upgrade",
-                category: 'Accessories',
-                price: 500,
-                stock: 15,
-                spec: "Form Factor: M.2 2280 NVMe PCIe Gen 3, Capacity: 256GB, Read Speed: up to 2400MB/s, Write Speed: up to 1600MB/s, Compatible with NVMe-enabled Laptops & Desktops, Ultra Fast Boot Times, Professional Installation Available",
+                name: "1TB Ultra-Fast High Capacity SSD Solid State Drive Upgrade (SATA / NVMe)",
+                category: 'Storage',
+                price: 1400,
+                stock: 20,
+                spec: "Form Factor: 2.5\" SATA III / M.2 NVMe PCIe Gen 3x4, Capacity: 1TB (1000GB), Read Speed: up to 3500MB/s, Write Speed: up to 3000MB/s, Maximum Performance & Massive Storage Capacity for Video Creators, Developers & Gamers, Professional Installation Available",
                 icon: '💿',
                 images: [
-                    'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&q=80'
+                    'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&auto=format&fit=crop&q=80'
                 ]
             },
             {
-                id: 'PROD-SSD-004',
-                name: "512GB NVMe M.2 SSD Upgrade",
+                id: 'PROD-ACC-CASE01',
+                name: "M.2 SATA (NGFF) SSD External Aluminum Enclosure Case (USB 3.1)",
                 category: 'Accessories',
-                price: 900,
-                stock: 12,
-                spec: "Form Factor: M.2 2280 NVMe PCIe Gen 3x4, Capacity: 512GB, Read Speed: up to 3200MB/s, Write Speed: up to 2800MB/s, Compatible with NVMe-enabled Laptops & Desktops, Dramatically Faster Performance, Professional Installation Available",
-                icon: '💿',
+                price: 200,
+                stock: 25,
+                spec: "Compatibility: M.2 SATA (B-Key & B+M Key) SSDs (Sizes 2230/2242/2260/2280), Interface: High-Speed USB 3.1 Gen 1 (up to 5Gbps), Premium Aluminum Alloy Shell for Rapid Heat Dissipation, Tool-Free Installation, Transform your Internal M.2 SSD into a Pocket Portable Drive",
+                icon: '🗄️',
                 images: [
-                    'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&q=80'
+                    'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=600&auto=format&fit=crop&q=80'
                 ]
             },
             {
-                id: 'PROD-SSD-005',
-                name: "1TB NVMe M.2 SSD Upgrade",
+                id: 'PROD-ACC-CASE02',
+                name: "Dual-Protocol M.2 NVMe & SATA SSD External Aluminum Enclosure Case (10Gbps USB-C)",
                 category: 'Accessories',
-                price: 1500,
-                stock: 10,
-                spec: "Form Factor: M.2 2280 NVMe PCIe Gen 3x4, Capacity: 1TB, Read Speed: up to 3500MB/s, Write Speed: up to 3000MB/s, Compatible with NVMe-enabled Laptops & Desktops, Maximum Storage & Speed Upgrade, Professional Installation Available",
-                icon: '💿',
+                price: 250,
+                stock: 25,
+                spec: "Dual Protocol Support: Compatible with Both M.2 NVMe (PCIe M-Key / B+M Key) & M.2 SATA (NGFF) SSDs, High Speed: USB 3.2 Gen 2 Type-C (up to 10Gbps / 1000MB/s real-world transfer speed), Aluminum Body with Thermal Silicone Pad, Includes USB-C & USB-A Cables",
+                icon: '🗄️',
                 images: [
-                    'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&q=80'
+                    'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-PART-BAT01',
+                name: "Replacement Inbuilt Laptop Battery (HP, Dell, Lenovo, Acer, Asus)",
+                category: 'Parts',
+                price: 300,
+                stock: 25,
+                spec: "Type: High Grade Li-ion / Li-Polymer Internal Inbuilt Laptop Battery, Grade-A Japanese/Korean Battery Cells, Multi-Protection Circuit (Overcharge, Over-discharge, Overheating & Short Circuit), Price ranges GH₵300 - GH₵400 depending on exact laptop model",
+                icon: '🔋',
+                images: [
+                    'https://images.unsplash.com/photo-1619725002198-6a689b72f41d?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-PART-BAT02',
+                name: "Replacement External Clip-On Laptop Battery",
+                category: 'Parts',
+                price: 200,
+                stock: 25,
+                spec: "Type: External Removable Clip-on Laptop Battery for Dell Latitude, HP ProBook / EliteBook, Lenovo ThinkPad & Toshiba laptops, High Capacity 6-Cell / 9-Cell options, Long-lasting backup time. Price ranges GH₵200 - GH₵350 depending on laptop model",
+                icon: '🔋',
+                images: [
+                    'https://images.unsplash.com/photo-1619725002198-6a689b72f41d?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-PART-KB01',
+                name: "Replacement Laptop OEM Internal Keyboard",
+                category: 'Parts',
+                price: 100,
+                stock: 30,
+                spec: "Type: OEM Internal Replacement Keyboard for HP, Dell, Lenovo, Toshiba, Acer, Asus laptops. Available in Backlit and Non-Backlit variants with standard US Layout. Professional installation available. Price ranges GH₵100 - GH₵350 depending on model",
+                icon: '⌨️',
+                images: [
+                    'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-PART-SCR01',
+                name: "Laptop LED / LCD Screen Replacement Panel (HD / FHD / Touch)",
+                category: 'Parts',
+                price: 350,
+                stock: 25,
+                spec: "Type: Grade-A+ Brand New Replacement Laptop Screen Display (11.6\", 13.3\", 14.0\", 15.6\", 17.3\"), Slim 30-Pin / 40-Pin eDP Interface, HD / Full HD IPS / Touchscreen Options Available, 0 Dead Pixels, Professional Same-Day Installation Available. Price ranges GH₵350 - GH₵1,900",
+                icon: '🖥️',
+                images: [
+                    'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600&auto=format&fit=crop&q=80'
                 ]
             }
         ];
@@ -1228,31 +1564,24 @@ class KmapStoreApp {
                     parsed = parsed.filter(p => p.images && p.images.length > 0);
                     if (parsed.length !== validLen) modified = true;
 
-                    // Update prices if still on old discounted prices
-                    if (parsed.some(p => p.id === 'PROD-001' && p.price === 7000)) {
-                        defaultProducts.forEach(defProd => {
-                            const existing = parsed.find(p => p.id === defProd.id);
-                            if (existing) {
-                                existing.price = defProd.price;
-                                modified = true;
-                            }
-                        });
-                    }
-
+                    // Sync & update all default catalog items into parsed storage
                     defaultProducts.forEach(defProd => {
                         const existing = parsed.find(p => p.id === defProd.id);
                         if (!existing) {
                             parsed.push(defProd);
                             modified = true;
-                        } else if ((!existing.images || existing.images.length === 0) && defProd.images && defProd.images.length > 0) {
-                            existing.images = defProd.images;
-                            modified = true;
-                        }
-                    });
-                    parsed.forEach(p => {
-                        if (p.id === 'PROD-ACC-001' && p.category !== 'Accessories') {
-                            p.category = 'Accessories';
-                            modified = true;
+                        } else {
+                            // Keep specs, price, name, category, and images up to date
+                            if (existing.price !== defProd.price || existing.name !== defProd.name || existing.category !== defProd.category || existing.spec !== defProd.spec) {
+                                existing.price = defProd.price;
+                                existing.name = defProd.name;
+                                existing.category = defProd.category;
+                                existing.spec = defProd.spec;
+                                if (defProd.images && defProd.images.length > 0) {
+                                    existing.images = defProd.images;
+                                }
+                                modified = true;
+                            }
                         }
                     });
                     if (modified) {
