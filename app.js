@@ -385,10 +385,10 @@ class KmapStoreApp {
                 priceHtml = `<div class="product-price">GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>`;
             }
 
-            const promoBadge = hasPromo ? `<div class="promo-badge">PROMO</div>` : '';
-
+            const isLocalOrLaptop = p.category === 'Laptops' || (p.images && p.images[0] && p.images[0].startsWith('images/products/'));
+            const fitStyle = isLocalOrLaptop ? 'object-fit:cover;' : 'object-fit:contain; background:#ffffff; padding:6px;';
             const mainImg = (p.images && p.images.length > 0 && p.images[0])
-                ? `<img src="${p.images[0]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;">`
+                ? `<img src="${p.images[0]}" alt="${p.name}" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:100%; ${fitStyle} object-position:center; display:block;">`
                 : `<span style="font-size: 56px; color: var(--primary); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${p.icon || '💻'}</span>`;
 
             const specsArray = p.spec ? p.spec.split(/,|\n/).map(s => s.trim()).filter(s => s.length > 0) : [];
@@ -1114,16 +1114,16 @@ class KmapStoreApp {
                 spec: "Brand: Kingston, Model: DataTraveler Exodia, Capacity: 64GB, Interface: USB 3.2 Gen 1 High Speed, Read Speed: up to 70MB/s, Quick File Transfers for Documents, Music, Videos & Photos, Protective Cap Design with Loop, High Durability",
                 icon: '💾',
                 images: [
-                    'https://mymemory.co.uk/cdn/shop/files/Kingston-128GB-DataTraveler-Exodia-USB-3.2-Flash-Drive-5.jpg?v=1773083195'
+                    'https://c1.neweggimages.com/productimage/nb640/A12KS20102019HDK.jpg'
                 ]
             },
             {
                 id: 'PROD-ACC-M01',
-                name: "T-Wolf V1 Wired Optical Mouse",
+                name: "T-Wolf V1 RGB LED Wired Optical Gaming Mouse",
                 category: 'Accessories',
                 price: 50,
                 stock: 40,
-                spec: "Brand: T-Wolf, Model: V1, Connectivity: Wired USB 2.0/3.0, Sensor: High-Precision Optical Sensor, Resolution: 1200 DPI, Ergonomic Comfortable Contour Grip, Anti-Skid 3D Scroll Wheel, 1.35m Durable Cable, Plug & Play (No Software Required)",
+                spec: "Brand: T-Wolf, Model: V1, Lighting: 7-Color Breathing RGB LED Backlight, Sensor: High-Precision Optical Sensor, Resolution: 1200 DPI, Ergonomic 3D Contour Comfort Grip, Anti-Skid Illuminated Scroll Wheel, 1.35m Durable Cable, Plug & Play (No Drivers Required), Compatible with Windows & Mac OS",
                 icon: '🖱️',
                 images: [
                     'https://m.media-amazon.com/images/I/61UO3-aDj3L._AC_SL1500_.jpg'
@@ -2501,8 +2501,10 @@ class KmapStoreApp {
             const promoBadge = hasPromo ? `<div class="promo-badge">PROMO</div>` : '';
 
             // Image handling (support up to 6 images, fallback to default laptop/desktop emoji icons)
+            const isLocalOrLaptop = p.category === 'Laptops' || (p.images && p.images[0] && p.images[0].startsWith('images/products/'));
+            const fitStyle = isLocalOrLaptop ? 'object-fit:cover;' : 'object-fit:contain; background:#ffffff; padding:6px;';
             const mainImg = (p.images && p.images.length > 0 && p.images[0])
-                ? `<img src="${p.images[0]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;">`
+                ? `<img src="${p.images[0]}" alt="${p.name}" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:100%; ${fitStyle} object-position:center; display:block;">`
                 : `<span style="font-size: 56px; color: var(--primary); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${p.icon || '💻'}</span>`;
 
             // Split specs by commas or newlines and show only the first two
