@@ -1102,7 +1102,7 @@ class KmapStoreApp {
                 spec: "Brand: Kingston, Model: DataTraveler Exodia, Capacity: 32GB, Interface: USB 3.2 Gen 1 (Backwards compatible with USB 2.0), Read Speed: up to 65MB/s, Protective Cap with Large Keyring Loop, Compact & Durable, Compatible with Windows, Mac OS & Linux",
                 icon: '💾',
                 images: [
-                    'https://images.unsplash.com/photo-1624696941338-934bf86c28b4?w=600&auto=format&fit=crop&q=80'
+                    'https://c1.neweggimages.com/productimage/nb640/A12KS20102019HDK.jpg'
                 ]
             },
             {
@@ -1114,7 +1114,7 @@ class KmapStoreApp {
                 spec: "Brand: Kingston, Model: DataTraveler Exodia, Capacity: 64GB, Interface: USB 3.2 Gen 1 High Speed, Read Speed: up to 70MB/s, Quick File Transfers for Documents, Music, Videos & Photos, Protective Cap Design with Loop, High Durability",
                 icon: '💾',
                 images: [
-                    'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=600&auto=format&fit=crop&q=80'
+                    'https://mymemory.co.uk/cdn/shop/files/Kingston-128GB-DataTraveler-Exodia-USB-3.2-Flash-Drive-5.jpg?v=1773083195'
                 ]
             },
             {
@@ -1126,7 +1126,7 @@ class KmapStoreApp {
                 spec: "Brand: T-Wolf, Model: V1, Connectivity: Wired USB 2.0/3.0, Sensor: High-Precision Optical Sensor, Resolution: 1200 DPI, Ergonomic Comfortable Contour Grip, Anti-Skid 3D Scroll Wheel, 1.35m Durable Cable, Plug & Play (No Software Required)",
                 icon: '🖱️',
                 images: [
-                    'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61UO3-aDj3L._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1138,7 +1138,7 @@ class KmapStoreApp {
                 spec: "Brand: Compoint, Model: CP-M161W, Connectivity: 2.4GHz Wireless via Nano USB Receiver (Non-Bluetooth), Operating Range: 10 Meters, Resolution: 1600 DPI High-Definition Optical Tracking, Ultra-Slim Symmetrical Ergonomic Design, Smart Auto-Sleep Energy Saving",
                 icon: '🖱️',
                 images: [
-                    'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=600&auto=format&fit=crop&q=80'
+                    'https://www.pcbelfast.co.uk/wp-content/uploads/2020/03/MICOM-CPM161WW.jpg'
                 ]
             },
             {
@@ -1162,7 +1162,7 @@ class KmapStoreApp {
                 spec: "Interface: USB 2.0 High Speed, Wireless Standard: IEEE 802.11 b/g/n (2.4GHz), Speed: Up to 150Mbps / 300Mbps, Ultra-Compact Nano Design (Leave plugged in without blocking adjacent ports), Supports Windows 11/10/8/7, WPA2 Wireless Security Encryption",
                 icon: '📶',
                 images: [
-                    'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61Y-tL7-dBL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1174,7 +1174,7 @@ class KmapStoreApp {
                 spec: "Dual Function: High-Speed WiFi (600Mbps Dual Band 2.4GHz & 5GHz) + Bluetooth 5.0 Receiver & Transmitter, Connect to High-Speed WiFi and Pair Bluetooth Earphones, Speakers, Keyboards or Gamepads Simultaneously, Plug & Play for Windows 10/11",
                 icon: '📶',
                 images: [
-                    'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61yB3b6s5kL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1210,7 +1210,7 @@ class KmapStoreApp {
                 spec: "Brand: T-Wolf, Model: TF100, Connectivity: 2.4GHz Wireless (Single USB Dongle for Both), Keyboard: Full Size 104-Key Layout with Low-Profile Quiet Keys, Spill-Resistant Architecture, Mouse: Ergonomic 1600 DPI Optical Sensor, Long Battery Life with Smart Sleep Mode",
                 icon: '⌨️',
                 images: [
-                    'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80'
+                    'https://manuals.plus/asin/B0922ZYXJ9.jpg'
                 ]
             },
             {
@@ -1234,7 +1234,7 @@ class KmapStoreApp {
                 spec: "Brand: VONN, Model: VON 15, Connectivity: Dual USB Wired Interface, Keyboard: Full-size Standard Office Layout with Dedicated Numeric Pad, UV Coated Wear-Resistant Lettering, Spill-Drain Channels, Mouse: Smooth High Precision 1200 DPI Optical Engine",
                 icon: '⌨️',
                 images: [
-                    'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/71X8k-24iSL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1246,7 +1246,7 @@ class KmapStoreApp {
                 spec: "Brand: HP Compatible OEM, Output: 19.5V 4.62A (90W - fully backwards compatible with 65W & 45W), Connector Tip: 4.5mm x 3.0mm Blue Tip Center Pin, Built-in Over-Current, Over-Voltage & Short Circuit Protection, Fits HP Pavilion, Envy, ProBook, EliteBook",
                 icon: '🔌',
                 images: [
-                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61o6U3-qD2L._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1270,7 +1270,7 @@ class KmapStoreApp {
                 spec: "Brand: Toshiba OEM Replacement, Output: 19V 3.42A / 3.95A (65W / 75W), Connector Tip: 5.5mm x 2.5mm Barrel, Compatible with Toshiba Satellite, Dynabook, Asus, Lenovo & Universal 19V Laptop Models",
                 icon: '🔌',
                 images: [
-                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61H4bX2mBTL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1282,7 +1282,7 @@ class KmapStoreApp {
                 spec: "Brand: Lenovo OEM Replacement, Output: 20V 3.25A / 4.5A (65W/90W), Connector: Yellow Square USB-Style Tip with Center Pin, Compatible with Lenovo ThinkPad T440, T450, T460, T470, X240, X250, X260, IdeaPad, Yoga",
                 icon: '🔌',
                 images: [
-                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61Xq0sX0zAL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1294,7 +1294,7 @@ class KmapStoreApp {
                 spec: "Brand: Acer OEM Replacement, Output: 19V 3.42A (65W) / 19V 2.37A (45W), Connector Tip: 5.5mm x 1.7mm (Purple/Blue tip), Compatible with Acer Aspire 3, Aspire 5, TravelMate, Swift & Extensa series",
                 icon: '🔌',
                 images: [
-                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61s8B4X4OML._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1306,7 +1306,7 @@ class KmapStoreApp {
                 spec: "Brand: Dell OEM Replacement, Output: 19.5V 3.34A / 4.62A (65W/90W), Connector: 4.5mm x 3.0mm Small Barrel with Center Smart Pin, Compatible with Dell Inspiron, XPS 13, Latitude 3000/5000/7000 series, Vostro",
                 icon: '🔌',
                 images: [
-                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61r5hGq1sEL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1318,7 +1318,7 @@ class KmapStoreApp {
                 spec: "Brand: Dell OEM Replacement, Output: 19.5V 4.62A (90W), Connector: 7.4mm x 5.0mm Large Barrel with Center Smart Pin, Compatible with Dell Latitude E6420, E6430, E6440, E5440, E5540, Inspiron, Precision Workstations",
                 icon: '🔌',
                 images: [
-                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61hX0V1N8-L._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1330,7 +1330,7 @@ class KmapStoreApp {
                 spec: "Brand: Lenovo OEM Replacement, Output: 20V 4.5A (90W) / 3.25A (65W), Connector: 7.9mm x 5.5mm Round Tip with Center Pin, Compatible with Classic Lenovo ThinkPad T60, T61, T400, T410, T420, T430, X220, X230, W500",
                 icon: '🔌',
                 images: [
-                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61bW6m0NlCL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1343,7 +1343,7 @@ class KmapStoreApp {
                 spec: "Connector: MagSafe 1 (Magnetic L-Tip / T-Tip), Wattage Options: 45W (MacBook Air 11\"/13\" 2008-2011 - GH₵200), 60W (MacBook Pro 13\" 2009-2012 - GH₵250), 85W (MacBook Pro 15\"/17\" 2006-2012 - GH₵350), LED Charging Indicator, Magnetic Safety Breakaway",
                 icon: '🍏',
                 images: [
-                    'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/51V1A0p3MCL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1368,7 +1368,7 @@ class KmapStoreApp {
                 spec: "Plug Type: UK Standard 3-Pin Fused Plug (13A Fused), Connector: IEC C13 Standard Kettle Lead / Cloverleaf C5 option, Length: 1.5m, Heavy Duty Pure Copper Wiring, Compatible with Desktop PCs, Monitors, Laptop Power Bricks, Printers, Projectors",
                 icon: '🔌',
                 images: [
-                    'https://images.unsplash.com/photo-1595225476474-87563907a212?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61K-31k2xFL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1380,7 +1380,7 @@ class KmapStoreApp {
                 spec: "Interface: USB 2.0 Type-A Male to Type-B Male, Transfer Speed: Up to 480Mbps, Foil & Braid Shielding for Error-Free Data Transmission, Compatible with HP, Canon, Epson, Brother, Samsung Printers & Scanners",
                 icon: '🖨️',
                 images: [
-                    'https://images.unsplash.com/photo-1595225476474-87563907a212?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61m1hQyJVAL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1392,7 +1392,7 @@ class KmapStoreApp {
                 spec: "Connector: 15-Pin SVGA/VGA Male to Male with Dual Ferrite Anti-Interference Cores, Resolution: Supports 1080p Full HD Display, Gold-Plated Connectors, Heavy Duty PVC Jacket, Compatible with PC, Laptops, Monitors, Projectors & Splitters",
                 icon: '🖥️',
                 images: [
-                    'https://images.unsplash.com/photo-1595225476474-87563907a212?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61Q6qQyJVAL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1417,7 +1417,7 @@ class KmapStoreApp {
                 spec: "Standard: HDMI 2.0 High Speed with Ethernet, Resolution: Supports 4K Ultra HD @ 60Hz, 3D, Audio Return Channel (ARC), 24K Gold-Plated Connectors with Multi-Layer Shielding. Available Lengths: 1 Meter (GH₵40), 2 Meters (GH₵60), 5 Meters (GH₵100)",
                 icon: '📺',
                 images: [
-                    'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61c8sFqL3TL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1477,7 +1477,7 @@ class KmapStoreApp {
                 spec: "Compatibility: M.2 SATA (B-Key & B+M Key) SSDs (Sizes 2230/2242/2260/2280), Interface: High-Speed USB 3.1 Gen 1 (up to 5Gbps), Premium Aluminum Alloy Shell for Rapid Heat Dissipation, Tool-Free Installation, Transform your Internal M.2 SSD into a Pocket Portable Drive",
                 icon: '🗄️',
                 images: [
-                    'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61y8B3q9YKL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1489,7 +1489,7 @@ class KmapStoreApp {
                 spec: "Dual Protocol Support: Compatible with Both M.2 NVMe (PCIe M-Key / B+M Key) & M.2 SATA (NGFF) SSDs, High Speed: USB 3.2 Gen 2 Type-C (up to 10Gbps / 1000MB/s real-world transfer speed), Aluminum Body with Thermal Silicone Pad, Includes USB-C & USB-A Cables",
                 icon: '🗄️',
                 images: [
-                    'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61u9Z3r3XTL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1502,7 +1502,7 @@ class KmapStoreApp {
                 spec: "Type: High Grade Li-ion / Li-Polymer Internal Inbuilt Laptop Battery, Grade-A Japanese/Korean Battery Cells, Multi-Protection Circuit (Overcharge, Over-discharge, Overheating & Short Circuit), Price ranges GH₵300 - GH₵400 depending on exact laptop model",
                 icon: '🔋',
                 images: [
-                    'https://images.unsplash.com/photo-1619725002198-6a689b72f41d?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61lX2q4HkML._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1515,7 +1515,7 @@ class KmapStoreApp {
                 spec: "Type: External Removable Clip-on Laptop Battery for Dell Latitude, HP ProBook / EliteBook, Lenovo ThinkPad & Toshiba laptops, High Capacity 6-Cell / 9-Cell options, Long-lasting backup time. Price ranges GH₵200 - GH₵350 depending on laptop model",
                 icon: '🔋',
                 images: [
-                    'https://images.unsplash.com/photo-1619725002198-6a689b72f41d?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/61h3P4q1vAL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1528,7 +1528,7 @@ class KmapStoreApp {
                 spec: "Type: OEM Internal Replacement Keyboard for HP, Dell, Lenovo, Toshiba, Acer, Asus laptops. Available in Backlit and Non-Backlit variants with standard US Layout. Professional installation available. Price ranges GH₵100 - GH₵350 depending on model",
                 icon: '⌨️',
                 images: [
-                    'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/71Y8K9l4OLL._AC_SL1500_.jpg'
                 ]
             },
             {
@@ -1541,7 +1541,7 @@ class KmapStoreApp {
                 spec: "Type: Grade-A+ Brand New Replacement Laptop Screen Display (11.6\", 13.3\", 14.0\", 15.6\", 17.3\"), Slim 30-Pin / 40-Pin eDP Interface, HD / Full HD IPS / Touchscreen Options Available, 0 Dead Pixels, Professional Same-Day Installation Available. Price ranges GH₵350 - GH₵1,900",
                 icon: '🖥️',
                 images: [
-                    'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600&auto=format&fit=crop&q=80'
+                    'https://m.media-amazon.com/images/I/71w1B5q8kPL._AC_SL1500_.jpg'
                 ]
             }
         ];
@@ -1584,7 +1584,8 @@ class KmapStoreApp {
                             modified = true;
                         } else {
                             // Keep specs, price, priceDisplay, name, category, and images up to date
-                            if (existing.price !== defProd.price || existing.name !== defProd.name || existing.category !== defProd.category || existing.spec !== defProd.spec || existing.priceDisplay !== defProd.priceDisplay) {
+                            const imagesChanged = JSON.stringify(existing.images || []) !== JSON.stringify(defProd.images || []);
+                            if (existing.price !== defProd.price || existing.name !== defProd.name || existing.category !== defProd.category || existing.spec !== defProd.spec || existing.priceDisplay !== defProd.priceDisplay || imagesChanged) {
                                 existing.price = defProd.price;
                                 existing.priceDisplay = defProd.priceDisplay;
                                 existing.name = defProd.name;
