@@ -1087,6 +1087,114 @@ class KmapStoreApp {
                 images: [
                     'images/landing/typec-adapter-7in1.jpg'
                 ]
+            },
+            {
+                id: 'PROD-USB-001',
+                name: "Kingston DataTraveler 16GB USB Flash Drive",
+                category: 'Accessories',
+                price: 55,
+                stock: 50,
+                spec: "Brand: Kingston, Model: DataTraveler Exodia, Capacity: 16GB, Interface: USB 3.2 Gen 1, Read Speed: up to 65MB/s, Cap Design with Keyring Loop, Compact & Durable, Compatible with Windows, Mac & Linux",
+                icon: '💾',
+                images: [
+                    'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=600&q=80'
+                ]
+            },
+            {
+                id: 'PROD-USB-002',
+                name: "Kingston DataTraveler 32GB USB Flash Drive",
+                category: 'Accessories',
+                price: 80,
+                stock: 50,
+                spec: "Brand: Kingston, Model: DataTraveler Exodia, Capacity: 32GB, Interface: USB 3.2 Gen 1, Read Speed: up to 65MB/s, Write Speed: up to 20MB/s, Cap Design with Keyring Loop, Compact & Durable",
+                icon: '💾',
+                images: [
+                    'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=600&q=80'
+                ]
+            },
+            {
+                id: 'PROD-USB-003',
+                name: "Kingston DataTraveler 64GB USB Flash Drive",
+                category: 'Accessories',
+                price: 120,
+                stock: 40,
+                spec: "Brand: Kingston, Model: DataTraveler Exodia, Capacity: 64GB, Interface: USB 3.2 Gen 1, Read Speed: up to 70MB/s, Write Speed: up to 22MB/s, Cap Design with Keyring Loop, High Speed Portable Storage",
+                icon: '💾',
+                images: [
+                    'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=600&q=80'
+                ]
+            },
+            {
+                id: 'PROD-USB-004',
+                name: "Kingston DataTraveler 128GB USB Flash Drive",
+                category: 'Accessories',
+                price: 200,
+                stock: 30,
+                spec: "Brand: Kingston, Model: DataTraveler Exodia, Capacity: 128GB, Interface: USB 3.2 Gen 1, Read Speed: up to 80MB/s, Write Speed: up to 30MB/s, Cap Design with Keyring Loop, High Capacity Portable Storage",
+                icon: '💾',
+                images: [
+                    'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=600&q=80'
+                ]
+            },
+            {
+                id: 'PROD-SSD-001',
+                name: "256GB SATA SSD Upgrade (Laptop/Desktop)",
+                category: 'Accessories',
+                price: 400,
+                stock: 20,
+                spec: "Form Factor: 2.5 inch SATA III, Capacity: 256GB, Read Speed: up to 550MB/s, Write Speed: up to 500MB/s, Compatible with Most Laptops & Desktops, Low Power Consumption, Shock Resistant, Professional Installation Available",
+                icon: '💿',
+                images: [
+                    'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&q=80'
+                ]
+            },
+            {
+                id: 'PROD-SSD-002',
+                name: "512GB SATA SSD Upgrade (Laptop/Desktop)",
+                category: 'Accessories',
+                price: 700,
+                stock: 15,
+                spec: "Form Factor: 2.5 inch SATA III, Capacity: 512GB, Read Speed: up to 560MB/s, Write Speed: up to 520MB/s, Compatible with Most Laptops & Desktops, Low Power Consumption, Shock Resistant, Professional Installation Available",
+                icon: '💿',
+                images: [
+                    'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&q=80'
+                ]
+            },
+            {
+                id: 'PROD-SSD-003',
+                name: "256GB NVMe M.2 SSD Upgrade",
+                category: 'Accessories',
+                price: 500,
+                stock: 15,
+                spec: "Form Factor: M.2 2280 NVMe PCIe Gen 3, Capacity: 256GB, Read Speed: up to 2400MB/s, Write Speed: up to 1600MB/s, Compatible with NVMe-enabled Laptops & Desktops, Ultra Fast Boot Times, Professional Installation Available",
+                icon: '💿',
+                images: [
+                    'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&q=80'
+                ]
+            },
+            {
+                id: 'PROD-SSD-004',
+                name: "512GB NVMe M.2 SSD Upgrade",
+                category: 'Accessories',
+                price: 900,
+                stock: 12,
+                spec: "Form Factor: M.2 2280 NVMe PCIe Gen 3x4, Capacity: 512GB, Read Speed: up to 3200MB/s, Write Speed: up to 2800MB/s, Compatible with NVMe-enabled Laptops & Desktops, Dramatically Faster Performance, Professional Installation Available",
+                icon: '💿',
+                images: [
+                    'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&q=80'
+                ]
+            },
+            {
+                id: 'PROD-SSD-005',
+                name: "1TB NVMe M.2 SSD Upgrade",
+                category: 'Accessories',
+                price: 1500,
+                stock: 10,
+                spec: "Form Factor: M.2 2280 NVMe PCIe Gen 3x4, Capacity: 1TB, Read Speed: up to 3500MB/s, Write Speed: up to 3000MB/s, Compatible with NVMe-enabled Laptops & Desktops, Maximum Storage & Speed Upgrade, Professional Installation Available",
+                icon: '💿',
+                images: [
+                    'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&q=80'
+                ]
             }
         ];
 
