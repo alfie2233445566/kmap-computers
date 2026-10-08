@@ -2980,7 +2980,7 @@ html { scroll-behavior: smooth; }
     #store-filter-card > div:first-child { min-width: 100% !important; width: 100% !important; }
 }
 @media (max-width: 480px) {
-    #store-filter-card { position: sticky; top: var(--header-h, 58px); z-index: 90; flex-direction: column; }
+    #store-filter-card { flex-direction: column; }
     #store-filter-card > div { min-width: 100% !important; width: 100%; justify-content: space-between; }
     #client-category-select { flex: 1; min-width: 0; }
 }
@@ -3126,35 +3126,39 @@ html { scroll-behavior: smooth; }
 /* Focus ring (uses existing brand color variable, no new color) */
 :focus-visible { outline: 2px solid var(--secondary); outline-offset: 2px; }
 
-/* Sticky Admin Inventory Header & Scroll Containment ("Swallow the scrolls") */
+/* Admin Inventory: Fixed header + Scroll Containment ("Swallow the scrolls") */
 .admin-inventory-card {
-    position: relative;
-    padding-top: 14px;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 120px);
+    max-height: calc(100vh - 120px);
+    min-height: 520px;
+    padding: 0;
+    overflow: hidden;
+    border-radius: var(--radius);
 }
 
 .admin-inventory-sticky-header {
-    position: sticky;
-    top: var(--header-h, 58px);
-    z-index: 45;
+    flex-shrink: 0;
     background: var(--white);
-    padding: 6px 0 14px 0;
+    padding: 16px 20px 14px 20px;
     border-bottom: 1px solid var(--border);
-    box-shadow: 0 4px 14px -6px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .admin-inventory-scroll-container {
-    max-height: calc(100vh - 275px);
-    min-height: 400px;
+    flex: 1;
     overflow-y: auto;
     overflow-x: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    margin-top: 12px;
+    margin: 0;
+    border: none;
+    border-radius: 0;
 }
 
 .admin-inventory-scroll-container table {
+    width: 100%;
     border-collapse: separate;
     border-spacing: 0;
 }
@@ -3162,15 +3166,23 @@ html { scroll-behavior: smooth; }
 .admin-inventory-scroll-container thead th {
     position: sticky;
     top: 0;
-    z-index: 25;
+    z-index: 20;
     background: var(--bg-light);
     border-bottom: 2px solid var(--border);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
+.admin-inventory-scroll-container tbody tr:first-child td {
+    padding-top: 14px;
+}
+
 @media (max-width: 768px) {
-    .admin-inventory-scroll-container {
-        max-height: calc(100vh - 310px);
-        min-height: 320px;
+    .admin-inventory-card {
+        height: calc(100vh - 140px);
+        max-height: calc(100vh - 140px);
+        min-height: 440px;
+    }
+    .admin-inventory-sticky-header {
+        padding: 12px 14px;
     }
 }
