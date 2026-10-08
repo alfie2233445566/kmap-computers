@@ -1339,12 +1339,35 @@ class KmapStoreApp {
             },
             {
                 id: 'PROD-CHG-MAC01',
-                name: "Apple MacBook MagSafe 1 Power Adapter Charger (45W / 60W / 85W)",
+                name: "Apple MacBook MagSafe 1 Power Adapter Charger (45W)",
                 category: 'Accessories',
                 price: 200,
-                priceDisplay: "GH₵ 200 – 350",
                 stock: 20,
-                spec: "Connector: MagSafe 1 (Magnetic L-Tip / T-Tip), Wattage Options: 45W (MacBook Air 11\"/13\" 2008-2011 - GH₵200), 60W (MacBook Pro 13\" 2009-2012 - GH₵250), 85W (MacBook Pro 15\"/17\" 2006-2012 - GH₵350), LED Charging Indicator, Magnetic Safety Breakaway",
+                spec: "Connector: MagSafe 1 (Magnetic L-Tip / T-Tip), Wattage: 45W (Compatible with MacBook Air 11\"/13\" 2008-2011 models), LED Charging Indicator, Magnetic Safety Breakaway",
+                icon: '🍏',
+                images: [
+                    'https://m.media-amazon.com/images/I/51V1A0p3MCL._AC_SL1500_.jpg'
+                ]
+            },
+            {
+                id: 'PROD-CHG-MAC03',
+                name: "Apple MacBook MagSafe 1 Power Adapter Charger (60W)",
+                category: 'Accessories',
+                price: 250,
+                stock: 20,
+                spec: "Connector: MagSafe 1 (Magnetic L-Tip / T-Tip), Wattage: 60W (Compatible with MacBook Pro 13\" 2009-2012 models & MacBook 13\" Unibody), LED Charging Indicator, Magnetic Safety Breakaway",
+                icon: '🍏',
+                images: [
+                    'https://m.media-amazon.com/images/I/51V1A0p3MCL._AC_SL1500_.jpg'
+                ]
+            },
+            {
+                id: 'PROD-CHG-MAC04',
+                name: "Apple MacBook MagSafe 1 Power Adapter Charger (85W)",
+                category: 'Accessories',
+                price: 350,
+                stock: 20,
+                spec: "Connector: MagSafe 1 (Magnetic L-Tip / T-Tip), Wattage: 85W (Compatible with MacBook Pro 15\" and 17\" 2006-2012 models), High Power Fast Charge, Magnetic Safety Breakaway",
                 icon: '🍏',
                 images: [
                     'https://m.media-amazon.com/images/I/51V1A0p3MCL._AC_SL1500_.jpg'
@@ -1352,12 +1375,35 @@ class KmapStoreApp {
             },
             {
                 id: 'PROD-CHG-MAC02',
-                name: "Apple MacBook MagSafe 2 Power Adapter Charger (45W / 60W / 85W)",
+                name: "Apple MacBook MagSafe 2 Power Adapter Charger (45W)",
                 category: 'Accessories',
                 price: 250,
-                priceDisplay: "GH₵ 250 – 400",
                 stock: 20,
-                spec: "Connector: MagSafe 2 (Slim Magnetic T-Tip), Wattage Options: 45W (MacBook Air 11\"/13\" 2012-2017 - GH₵250), 60W (MacBook Pro Retina 13\" 2012-2015 - GH₵300), 85W (MacBook Pro Retina 15\" 2012-2015 - GH₵400), High Grade Protected Output",
+                spec: "Connector: MagSafe 2 (Slim Magnetic T-Tip), Wattage: 45W (Compatible with MacBook Air 11\"/13\" 2012-2017 models), High Grade Protected Output",
+                icon: '🍏',
+                images: [
+                    'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CHG-MAC05',
+                name: "Apple MacBook MagSafe 2 Power Adapter Charger (60W)",
+                category: 'Accessories',
+                price: 300,
+                stock: 20,
+                spec: "Connector: MagSafe 2 (Slim Magnetic T-Tip), Wattage: 60W (Compatible with MacBook Pro Retina 13\" Late 2012 - Early 2015 models), LED Status Indicator, High Grade Protected Output",
+                icon: '🍏',
+                images: [
+                    'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            {
+                id: 'PROD-CHG-MAC06',
+                name: "Apple MacBook MagSafe 2 Power Adapter Charger (85W)",
+                category: 'Accessories',
+                price: 400,
+                stock: 20,
+                spec: "Connector: MagSafe 2 (Slim Magnetic T-Tip), Wattage: 85W (Compatible with MacBook Pro Retina 15\" Mid 2012 - Mid 2015 models), Heavy Duty Output, Multi-Protection Circuit",
                 icon: '🍏',
                 images: [
                     'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=600&auto=format&fit=crop&q=80'
@@ -1633,6 +1679,18 @@ class KmapStoreApp {
                     parsed = parsed.filter(p => p.images && p.images.length > 0);
                     if (parsed.length !== validLen) modified = true;
 
+                    // Ensure all replacement items are under Parts and MacBook chargers have no range display
+                    parsed.forEach(p => {
+                        if (p.name && p.name.toLowerCase().includes('replacement') && p.category !== 'Parts') {
+                            p.category = 'Parts';
+                            modified = true;
+                        }
+                        if (p.id && p.id.startsWith('PROD-CHG-MAC') && p.priceDisplay) {
+                            delete p.priceDisplay;
+                            modified = true;
+                        }
+                    });
+
                     // Sync & update all default catalog items into parsed storage
                     defaultProducts.forEach(defProd => {
                         const existing = parsed.find(p => p.id === defProd.id);
@@ -1642,9 +1700,14 @@ class KmapStoreApp {
                         } else {
                             // Keep specs, price, priceDisplay, name, category, and images up to date
                             const imagesChanged = JSON.stringify(existing.images || []) !== JSON.stringify(defProd.images || []);
-                            if (existing.price !== defProd.price || existing.name !== defProd.name || existing.category !== defProd.category || existing.spec !== defProd.spec || existing.priceDisplay !== defProd.priceDisplay || imagesChanged) {
+                            const priceDisplayChanged = existing.priceDisplay !== defProd.priceDisplay;
+                            if (existing.price !== defProd.price || existing.name !== defProd.name || existing.category !== defProd.category || existing.spec !== defProd.spec || priceDisplayChanged || imagesChanged) {
                                 existing.price = defProd.price;
-                                existing.priceDisplay = defProd.priceDisplay;
+                                if (defProd.priceDisplay !== undefined) {
+                                    existing.priceDisplay = defProd.priceDisplay;
+                                } else {
+                                    delete existing.priceDisplay;
+                                }
                                 existing.name = defProd.name;
                                 existing.category = defProd.category;
                                 existing.spec = defProd.spec;
