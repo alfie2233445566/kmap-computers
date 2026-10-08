@@ -19,10 +19,12 @@ const safeLocalStorage = {
         // Push to cloud if it's a watched key and sync is not skipped
         const watchedKeys = ['kmap_products', 'kmap_users', 'kmap_orders', 'kmap_logs', 'kmap_promos', 'kmap_hire_purchase', 'kmap_featured_laptops', 'kmap_catalog_version'];
         if (!skipSync && watchedKeys.includes(key)) {
+            window.lastLocalSaveTimestamp = window.lastLocalSaveTimestamp || {};
+            window.lastLocalSaveTimestamp[key] = Date.now();
             try {
                 window.kvSyncQueue[key] = JSON.parse(val);
                 if (window.kvSyncTimeout) clearTimeout(window.kvSyncTimeout);
-                window.kvSyncTimeout = setTimeout(triggerKVSync, 400); // Fast debounce uploads
+                window.kvSyncTimeout = setTimeout(triggerKVSync, 300); // Fast debounce uploads
             } catch (e) { }
         }
     },
@@ -190,6 +192,11 @@ class KmapStoreApp {
                         let cloudVal = typeof data[key] === 'string' ? data[key] : JSON.stringify(data[key]);
                         const localVal = safeLocalStorage.getItem(key);
                         if (cloudVal !== localVal) {
+                            // If local user recently saved changes to this key (within last 12s), do not overwrite with stale cloud data
+                            const lastLocalSave = window.lastLocalSaveTimestamp && window.lastLocalSaveTimestamp[key];
+                            if (lastLocalSave && (Date.now() - lastLocalSave < 12000)) {
+                                continue;
+                            }
                             // Update silently to prevent triggering loop
                             safeLocalStorage.setItem(key, cloudVal, true);
                             updated = true;
@@ -2282,18 +2289,16 @@ class KmapStoreApp {
                     statusEl.style.color = 'var(--secondary)';
                 }
 
-                // If some slots are already empty, fill from first empty slot, otherwise start from slot 0
-                let emptyIdx = urlInputs.findIndex(input => !input.value.trim());
-                if (emptyIdx === -1) emptyIdx = 0;
+                // Uploaded photos take over starting from slot 0 so the first photo is always the Main Display Photo
+                urlInputs.forEach(input => input.value = '');
 
                 try {
                     const compressedList = await Promise.all(files.map(f => this.compressImageFile(f)));
 
                     compressedList.forEach((base64, i) => {
                         if (!base64) return;
-                        const targetIdx = (emptyIdx + i) % urlInputs.length;
-                        if (urlInputs[targetIdx]) {
-                            urlInputs[targetIdx].value = base64;
+                        if (urlInputs[i]) {
+                            urlInputs[i].value = base64;
                         }
                     });
 
@@ -2795,7 +2800,7 @@ class KmapStoreApp {
             const fitStyle = isLocalOrLaptop ? 'object-fit:cover;' : 'object-fit:contain; background:#ffffff; padding:6px;';
             const fallbackIcon = `<span style="font-size: 56px; color: var(--primary); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${p.icon || '💻'}</span>`;
             const mainImg = (p.images && p.images.length > 0 && p.images[0])
-                ? `<img src="${p.images[0]}" alt="${p.name}" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:100%; ${fitStyle} object-position:center; display:block;" onerror="this.onerror=null; this.parentElement.innerHTML='${fallbackIcon.replace(/'/g, "\\'")}';">`
+                ? `<img src="${p.images[0]}" alt="${p.name}" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:100%; ${fitStyle} object-position:center; display:block;" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"><span style="display:none; font-size: 56px; color: var(--primary); align-items: center; justify-content: center; width: 100%; height: 100%;">${p.icon || '💻'}</span>`
                 : fallbackIcon;
 
             // Split specs by commas or newlines and show only the first two
