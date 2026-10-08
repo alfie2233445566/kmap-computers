@@ -156,15 +156,6 @@ class KmapStoreApp {
                             data[key] = data[key].filter(u => u.username !== '0241234567' && u.name !== 'Kwame Mensah');
                         }
                         if (key === 'kmap_products' && Array.isArray(data[key])) {
-                            const p1 = data[key].find(p => p.id === 'PROD-001');
-                            if (p1 && p1.images && p1.images.length > 0 && p1.images[0].startsWith('data:')) {
-                                p1.images = [
-                                    'images/products/PROD-001/1.jpg',
-                                    'images/products/PROD-001/2.jpg',
-                                    'images/products/PROD-001/3.jpg',
-                                    'images/products/PROD-001/4.jpg'
-                                ];
-                            }
                             const pCase = data[key].find(p => p.id === 'PROD-ACC-001');
                             if (pCase && pCase.category !== 'Accessories') {
                                 pCase.category = 'Accessories';
@@ -264,7 +255,7 @@ class KmapStoreApp {
                         kmap_promos: this.db.getPromos(),
                         kmap_hire_purchase: this.db.getHP(),
                         kmap_featured_laptops: this.db.getFeaturedLaptops(),
-                        kmap_catalog_version: 'v4.5_20261008'
+                        kmap_catalog_version: 'v4.6_20261008'
                     }
                 })
             });
@@ -1753,7 +1744,7 @@ class KmapStoreApp {
         ];
 
         // Check if database reset or cross-device sync migration is needed
-        const CURRENT_CATALOG_VERSION = 'v4.5_20261008';
+        const CURRENT_CATALOG_VERSION = 'v4.6_20261008';
         const localVersion = safeLocalStorage.getItem('kmap_catalog_version');
         const existingProducts = safeLocalStorage.getItem('kmap_products');
         let needsReset = false;
@@ -1762,16 +1753,15 @@ class KmapStoreApp {
         if (existingProducts) {
             try {
                 let parsed = JSON.parse(existingProducts);
-                if (parsed.length === 0 ||
-                    parsed.some(p => p.id === 'PROD-001' && p.name !== 'Hp Zbook 15u G6') ||
-                    parsed.some(p => !p.images || p.images.length === 0) ||
-                    parsed.some(p => p.id === 'PROD-001' && (!p.images || !p.images.length || p.images[0].startsWith('data:')))) {
+                if (!Array.isArray(parsed) || parsed.length === 0) {
                     needsReset = true;
                 } else {
                     let modified = versionMismatch;
-                    const validLen = parsed.length;
-                    parsed = parsed.filter(p => p.images && p.images.length > 0);
-                    if (parsed.length !== validLen) modified = true;
+
+                    // Ensure all products have images array
+                    parsed.forEach(p => {
+                        if (!Array.isArray(p.images)) p.images = [];
+                    });
 
                     // Ensure all replacement items are under Parts and MacBook chargers have no range display
                     parsed.forEach(p => {
@@ -1785,17 +1775,15 @@ class KmapStoreApp {
                         }
                     });
 
-                    // Sync & update default catalog items without overwriting user-configured categories
+                    // Sync & update default catalog items without overwriting user-configured categories or user-uploaded photos
                     defaultProducts.forEach(defProd => {
                         const existing = parsed.find(p => p.id === defProd.id);
                         if (!existing) {
                             parsed.push(defProd);
                             modified = true;
                         } else {
-                            // Keep specs, price, priceDisplay, name, and images up to date, while PRESERVING user-selected category
-                            const imagesChanged = JSON.stringify(existing.images || []) !== JSON.stringify(defProd.images || []);
                             const priceDisplayChanged = existing.priceDisplay !== defProd.priceDisplay;
-                            if (existing.price !== defProd.price || existing.name !== defProd.name || existing.spec !== defProd.spec || priceDisplayChanged || imagesChanged) {
+                            if (existing.price !== defProd.price || existing.name !== defProd.name || existing.spec !== defProd.spec || priceDisplayChanged) {
                                 existing.price = defProd.price;
                                 if (defProd.priceDisplay !== undefined) {
                                     existing.priceDisplay = defProd.priceDisplay;
@@ -1807,9 +1795,11 @@ class KmapStoreApp {
                                 if (!existing.category) {
                                     existing.category = defProd.category;
                                 }
-                                if (defProd.images && defProd.images.length > 0) {
-                                    existing.images = defProd.images;
-                                }
+                                modified = true;
+                            }
+                            // Only set default images if item has no images whatsoever
+                            if (!existing.images || existing.images.length === 0) {
+                                existing.images = defProd.images || [];
                                 modified = true;
                             }
                         }
@@ -2229,9 +2219,18 @@ class KmapStoreApp {
             const stock = parseInt(document.getElementById('form-product-stock').value) || 0;
             const spec = document.getElementById('form-product-spec').value.trim();
 
+            if (this.isProcessingImages) {
+                this.showToast('Please wait a moment while photos are optimizing...', 'warning');
+                return;
+            }
+
             const images = [];
             document.querySelectorAll('.product-img-url').forEach(input => {
-                if (input.value.trim()) images.push(input.value.trim());
+                const val = input.value.trim();
+                // Never save temporary blob: URLs into products as they are invalid across page reloads/devices!
+                if (val && !val.startsWith('blob:')) {
+                    images.push(val);
+                }
             });
 
             const products = this.db.getProducts();
@@ -2262,60 +2261,62 @@ class KmapStoreApp {
             this.forceCloudSyncAll(false);
         });
 
-        // Instant zero-latency image preview & hardware-accelerated compression handler
+        // Robust, high-speed photo upload and compression handler
         const fileInput = document.getElementById('form-product-file-upload');
         if (fileInput) {
             fileInput.addEventListener('change', async (e) => {
-                const files = Array.from(e.target.files).slice(0, 4);
+                const files = Array.from(e.target.files).slice(0, 6);
                 if (files.length === 0) return;
 
                 const statusEl = document.getElementById('img-upload-status');
+                const submitBtn = document.querySelector('#product-details-form button[type="submit"]');
                 const urlInputs = Array.from(document.querySelectorAll('.product-img-url'));
 
+                this.isProcessingImages = true;
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing Photos...';
+                }
+                if (statusEl) {
+                    statusEl.innerText = `⚡ Optimizing ${files.length} photo(s)...`;
+                    statusEl.style.color = 'var(--secondary)';
+                }
+
+                // If some slots are already empty, fill from first empty slot, otherwise start from slot 0
                 let emptyIdx = urlInputs.findIndex(input => !input.value.trim());
                 if (emptyIdx === -1) emptyIdx = 0;
 
-                // 1. Instant zero-latency preview (0ms)
-                // Immediately assign object URLs so thumbnails appear on screen instantaneously!
-                const tempUrls = files.map(f => URL.createObjectURL(f));
-                files.forEach((f, i) => {
-                    const targetIdx = (emptyIdx + i) % urlInputs.length;
-                    if (urlInputs[targetIdx]) {
-                        urlInputs[targetIdx].value = tempUrls[i];
-                    }
-                });
-                this.refreshModalImagePreviews();
-
-                if (statusEl) statusEl.innerText = `⚡ Optimizing ${files.length} photo(s)...`;
-
-                // 2. Ultra-fast hardware-accelerated parallel compression
                 try {
                     const compressedList = await Promise.all(files.map(f => this.compressImageFile(f)));
 
-                    // Swap temporary object URLs with compressed base64 strings
                     compressedList.forEach((base64, i) => {
+                        if (!base64) return;
                         const targetIdx = (emptyIdx + i) % urlInputs.length;
                         if (urlInputs[targetIdx]) {
                             urlInputs[targetIdx].value = base64;
                         }
                     });
 
-                    // Free memory
-                    tempUrls.forEach(u => {
-                        try { URL.revokeObjectURL(u); } catch (e) { }
-                    });
-
                     if (statusEl) {
-                        statusEl.innerText = `✓ ${compressedList.length} photo(s) ready!`;
-                        setTimeout(() => { if (statusEl) statusEl.innerText = ''; }, 2500);
+                        statusEl.innerText = `✓ ${compressedList.filter(Boolean).length} photo(s) ready!`;
+                        statusEl.style.color = 'var(--success)';
+                        setTimeout(() => { if (statusEl) statusEl.innerText = ''; }, 3000);
                     }
                 } catch (err) {
                     console.error('Image compression failed:', err);
-                    if (statusEl) statusEl.innerText = 'Upload failed: ' + err.message;
+                    if (statusEl) {
+                        statusEl.innerText = 'Upload failed: ' + err.message;
+                        statusEl.style.color = 'var(--error)';
+                    }
+                } finally {
+                    this.isProcessingImages = false;
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = 'Save Product';
+                    }
+                    this.refreshModalImagePreviews();
+                    fileInput.value = '';
                 }
-
-                this.refreshModalImagePreviews();
-                fileInput.value = '';
             });
         }
 
@@ -2791,10 +2792,10 @@ class KmapStoreApp {
 
             // Image handling (support up to 6 images, fallback to default laptop/desktop emoji icons)
             const isLocalOrLaptop = p.category === 'Laptops' || (p.images && p.images[0] && p.images[0].startsWith('images/products/'));
-            const fitStyle = isLocalOrLaptop ? 'object-fit:cover;' : 'object-fit:contain; background:#ffffff; padding:6px;';
+            const fallbackIcon = `<span style="font-size: 56px; color: var(--primary); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${p.icon || '💻'}</span>`;
             const mainImg = (p.images && p.images.length > 0 && p.images[0])
-                ? `<img src="${p.images[0]}" alt="${p.name}" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:100%; ${fitStyle} object-position:center; display:block;">`
-                : `<span style="font-size: 56px; color: var(--primary); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${p.icon || '💻'}</span>`;
+                ? `<img src="${p.images[0]}" alt="${p.name}" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:100%; ${fitStyle} object-position:center; display:block;" onerror="this.onerror=null; this.parentElement.innerHTML='${fallbackIcon.replace(/'/g, "\\'")}';">`
+                : fallbackIcon;
 
             // Split specs by commas or newlines and show only the first two
             const specsArray = p.spec ? p.spec.split(/,|\n/).map(s => s.trim()).filter(s => s.length > 0) : [];
@@ -3352,11 +3353,14 @@ class KmapStoreApp {
             mainImgDisplay.src = this.inspectImages[0];
             mainImgDisplay.style.opacity = '1';
             mainImgDisplay.onclick = () => { this.openLightbox(mainImgDisplay.src, productId); };
+            mainImgDisplay.onerror = () => {
+                mainImgDisplay.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>';
+            };
 
             this.inspectImages.forEach((imgSrc, idx) => {
                 const thumb = document.createElement('div');
                 thumb.className = `inspect-thumb ${idx === 0 ? 'active' : ''}`;
-                thumb.innerHTML = `<img src="${imgSrc}">`;
+                thumb.innerHTML = `<img src="${imgSrc}" onerror="this.style.opacity='0.3';">`;
                 thumb.onclick = () => {
                     this.setInspectImage(idx);
                 };
@@ -4027,7 +4031,7 @@ class KmapStoreApp {
         products.forEach(p => {
             const hasImg = p.images && p.images.length > 0 && p.images[0];
             const iconOrImg = hasImg
-                ? `<img src="${p.images[0]}" alt="${p.name}" style="width:36px; height:36px; object-fit:cover; object-position:center; border-radius:4px; border:1px solid var(--border); background:#fff;">`
+                ? `<img src="${p.images[0]}" alt="${p.name}" style="width:36px; height:36px; object-fit:cover; object-position:center; border-radius:4px; border:1px solid var(--border); background:#fff;" onerror="this.onerror=null; this.style.display='none'; if (this.nextElementSibling) this.nextElementSibling.style.display='inline';"><span style="display:none; font-size: 20px;">${p.icon || '💻'}</span>`
                 : `<span style="font-size: 20px;">${p.icon || '💻'}</span>`;
 
             let stockBadge = '';
@@ -4092,13 +4096,13 @@ class KmapStoreApp {
         }
     }
 
-    // Helper: instantaneous, hardware-accelerated image compression (<25ms per photo)
+    // Helper: instantaneous, hardware-accelerated image compression (<25ms per photo) with fail-safe fallback
     async compressImageFile(file) {
         // Fast path 1: native hardware-accelerated browser bitmap decoding
         if (typeof window !== 'undefined' && 'createImageBitmap' in window) {
             try {
                 const bmp = await createImageBitmap(file);
-                const MAX_SIZE = 800;
+                const MAX_SIZE = 720;
                 let targetWidth = bmp.width;
                 let targetHeight = bmp.height;
 
@@ -4123,23 +4127,28 @@ class KmapStoreApp {
                 ctx.drawImage(bmp, 0, 0, targetWidth, targetHeight);
                 bmp.close();
 
-                return canvas.toDataURL('image/jpeg', 0.80);
+                const base64 = canvas.toDataURL('image/jpeg', 0.78);
+                if (base64 && base64.length > 100) return base64;
             } catch (err) {
                 // Fallback to Image element if format not handled by createImageBitmap
             }
         }
 
         // Fast path 2: direct Image object with object URL
-        return new Promise((resolve, reject) => {
-            const img = new Image();
+        return new Promise((resolve) => {
             const objectUrl = URL.createObjectURL(file);
+            const img = new Image();
             img.onerror = () => {
                 URL.revokeObjectURL(objectUrl);
-                reject(new Error("Unable to parse image. Please use JPG, PNG, or WebP."));
+                // Fast path 3 fallback: raw FileReader (supports all browser image types)
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = () => resolve('');
+                reader.readAsDataURL(file);
             };
             img.onload = () => {
                 URL.revokeObjectURL(objectUrl);
-                const MAX_SIZE = 800;
+                const MAX_SIZE = 720;
                 let targetWidth = img.width;
                 let targetHeight = img.height;
 
@@ -4163,7 +4172,7 @@ class KmapStoreApp {
                 ctx.fillRect(0, 0, targetWidth, targetHeight);
                 ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
-                const base64 = canvas.toDataURL('image/jpeg', 0.80);
+                const base64 = canvas.toDataURL('image/jpeg', 0.78);
                 resolve(base64);
             };
             img.src = objectUrl;

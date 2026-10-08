@@ -117,7 +117,7 @@
     }
     </script>
 
-    <link rel="stylesheet" href="style.css?v=4.5">
+    <link rel="stylesheet" href="style.css?v=4.6">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <!-- Chart.js for Sales Analytics -->
@@ -2060,12 +2060,18 @@
 
                     <div
                         style="background: var(--bg); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
-                        <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Upload Photos from Device (JPEG, PNG, WEBP)
-                        </label>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label style="font-size: 12px; font-weight: 600; margin: 0;">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Upload Photos from Device (JPEG, PNG, WEBP)
+                            </label>
+                            <button type="button" class="btn btn-outline" onclick="app.clearAllModalImages()" style="padding: 2px 8px; font-size: 11px; color: var(--error); border-color: var(--error);" title="Clear all photos">
+                                <i class="fa-solid fa-trash"></i> Clear All Photos
+                            </button>
+                        </div>
                         <input type="file" id="form-product-file-upload" class="form-control"
                             style="font-size: 12px; padding: 6px;" multiple
                             accept="image/jpeg,image/png,image/webp,image/gif,image/*">
+                        <span id="img-upload-status" style="display: block; font-size: 11px; margin-top: 4px; font-weight: 600; color: var(--secondary);"></span>
                     </div>
 
                     <!-- Hidden or expandable URL inputs for power users -->
@@ -2398,7 +2404,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=4.5"></script>
+    <script src="app.js?v=4.6"></script>
 </body>
 
 </html>
