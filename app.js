@@ -92,7 +92,7 @@ class KmapStoreApp {
     constructor() {
         this.db = null;
         this.currentUser = null;
-        this.activeView = 'client-store';
+        this.activeView = 'landing-page';
         this.activeCategory = 'All';
         this.cart = [];
         this.favorites = [];
@@ -569,9 +569,10 @@ class KmapStoreApp {
         this.loadCart();
         this.loadFavorites();
 
-        // Initialize starting view with browser navigation support
+        // Strictly ensure the homepage landing-page is the initial entry point
         const hashView = window.location.hash ? window.location.hash.replace('#', '') : null;
-        const initialView = hashView && document.getElementById(`view-${hashView}`) ? hashView : 'landing-page';
+        const isAdminHash = hashView && hashView.startsWith('admin-') && this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role);
+        const initialView = isAdminHash && document.getElementById(`view-${hashView}`) ? hashView : 'landing-page';
         this.switchView(initialView, false);
         if (window.history && window.history.replaceState) {
             window.history.replaceState({ view: initialView }, '', '#' + initialView);
@@ -2011,7 +2012,7 @@ class KmapStoreApp {
                 this.renderSidebar();
 
                 if (foundUser.role === 'client') {
-                    this.switchView('client-store');
+                    this.switchView('landing-page');
                 } else {
                     this.switchView('admin-dashboard');
                 }
@@ -2070,7 +2071,7 @@ class KmapStoreApp {
             this.updateProfileHeader(newUser);
 
             this.renderSidebar();
-            this.switchView('client-store');
+            this.switchView('landing-page');
             this.showToast(`Welcome, ${name}! Your account has been registered.`);
             document.getElementById('signup-form').reset();
         });
@@ -2103,7 +2104,7 @@ class KmapStoreApp {
 
         // Browser navigation integration ("the web ones" - native back/forward buttons)
         window.addEventListener('popstate', (e) => {
-            const targetView = (e.state && e.state.view) || (window.location.hash ? window.location.hash.replace('#', '') : 'client-store');
+            const targetView = (e.state && e.state.view) || (window.location.hash ? window.location.hash.replace('#', '') : 'landing-page');
             if (targetView && document.getElementById(`view-${targetView}`)) {
                 this.switchView(targetView, false);
             }
@@ -5885,7 +5886,7 @@ class KmapStoreApp {
                 card.innerHTML = `
                     <div class="feat-card-badge ${badgeClass}">${item.brand || 'LAPTOP'}</div>
                     <div class="feat-card-thumb" onclick="app.openInspectModal('${prodId}')">
-                        <img src="${imgUrl}" alt="${title}">
+                        <img src="${imgUrl}" alt="${title}" onerror="this.onerror=null; this.src='images/default-laptop.jpg';">
                     </div>
                     <h3 class="feat-card-title" onclick="app.openInspectModal('${prodId}')">${title}</h3>
                     <p class="feat-card-specs">${specs.replace(/\n/g, '<br>')}</p>
@@ -5932,7 +5933,7 @@ class KmapStoreApp {
                         <span class="slide-badge-title">${title}</span>
                         <span class="slide-badge-price">${priceHtml}</span>
                     </div>
-                    <img src="${imgUrl}" alt="${title}" class="hero-laptop-img">
+                    <img src="${imgUrl}" alt="${title}" class="hero-laptop-img" onerror="this.onerror=null; this.src='images/default-laptop.jpg';">
                 `;
                 showcase.appendChild(slide);
             });
