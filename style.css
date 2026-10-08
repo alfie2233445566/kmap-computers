@@ -578,18 +578,22 @@ body.modal-open {
 }
 
 .toast {
-    background: var(--sidebar-bg);
-    color: var(--white);
-    padding: 16px 24px;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
     gap: 12px;
-    transform: translateY(100px);
+    font-size: 13px;
+    font-weight: 500;
+    transform: translateY(20px);
     opacity: 0;
-    animation: slideIn 0.3s forwards;
-    border-left: 4px solid var(--accent);
+    animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 4px solid #10b981;
+    max-width: 380px;
 }
 
 @keyframes slideIn {

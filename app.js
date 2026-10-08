@@ -250,7 +250,6 @@ class KmapStoreApp {
         const products = this.db.getProducts();
         const syncUrl = getSyncApiUrl();
         const isAdmin = this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role);
-        if (!silent) this.showToast('☁️ Syncing products to cloud database...');
         try {
             const res = await fetch(syncUrl, {
                 method: 'POST',
@@ -267,7 +266,6 @@ class KmapStoreApp {
                 })
             });
             if (res.ok) {
-                if (!silent) this.showToast('✓ Cloud database updated! All devices synced.', 'success');
                 const indicator = document.getElementById('sync-status-indicator');
                 if (indicator) {
                     indicator.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #059669;"></span> Cloud Sync Live`;
@@ -397,11 +395,9 @@ class KmapStoreApp {
         if (index > -1) {
             this.favorites.splice(index, 1);
             this.saveFavorites();
-            this.showToast(`Removed ${name} from Favorites.`);
         } else {
             this.favorites.push(productId);
             this.saveFavorites();
-            this.showToast(`Saved ${name} to Favorites! You can buy it later. ❤️`);
         }
 
         // Update card buttons across any active grids
@@ -2869,7 +2865,6 @@ class KmapStoreApp {
             this.cart.push({ id: prod.id, name: prod.name, price: activePrice, qty: 1, icon: prod.icon });
         }
 
-        this.showToast(`${prod.name} added to cart`);
         this.renderCart();
     }
 
@@ -2972,7 +2967,6 @@ class KmapStoreApp {
     removeFromCart(id) {
         this.cart = this.cart.filter(item => item.id !== id);
         this.renderCart();
-        this.showToast("Item removed from cart");
     }
 
     handleMobileClaimChange(val) {
@@ -4099,7 +4093,6 @@ class KmapStoreApp {
         if (p) {
             p.stock = Math.max(0, parseInt(newStock) || 0);
             this.db.saveProducts(products);
-            this.showToast(`Stock updated for ${p.name}`);
             this.forceCloudSyncAll(true);
             this.updateFeaturedPrices();
         }
@@ -4227,7 +4220,6 @@ class KmapStoreApp {
                 input.value = currentImages[idx] || '';
             });
             this.refreshModalImagePreviews();
-            this.showToast('Updated main display photo');
         }
     }
 
@@ -4237,7 +4229,6 @@ class KmapStoreApp {
         const fileInput = document.getElementById('form-product-file-upload');
         if (fileInput) fileInput.value = '';
         this.refreshModalImagePreviews();
-        this.showToast('All photos cleared. Select new photos from device.');
     }
 
     removeModalImage(index) {
@@ -4250,7 +4241,6 @@ class KmapStoreApp {
         const fileInput = document.getElementById('form-product-file-upload');
         if (fileInput) fileInput.value = '';
         this.refreshModalImagePreviews();
-        this.showToast('Photo removed');
     }
 
     openProductModal(productId = null) {
@@ -4884,23 +4874,47 @@ class KmapStoreApp {
         this.forceCloudSyncAll(false);
     }
 
-    // Real-time toast alerts
+    // Real-time toast alerts (clean, non-intrusive, yellow-free)
     showToast(msg, type = 'success') {
         const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        // Dismiss older toasts if 2 or more are already active
+        while (container.children.length >= 2) {
+            container.removeChild(container.firstChild);
+        }
+
         const toast = document.createElement('div');
         toast.className = 'toast';
-        if (type === 'error') toast.style.borderLeftColor = 'var(--error)';
 
+        let borderCol = '#10b981'; // Emerald
+        let iconCol = '#10b981';
+        let iconClass = 'fa-circle-check';
+
+        if (type === 'error') {
+            borderCol = '#ef4444'; // Crimson
+            iconCol = '#ef4444';
+            iconClass = 'fa-triangle-exclamation';
+        } else if (type === 'warning' || type === 'info') {
+            borderCol = '#3b82f6'; // Blue
+            iconCol = '#3b82f6';
+            iconClass = 'fa-circle-info';
+        }
+
+        toast.style.borderLeftColor = borderCol;
         toast.innerHTML = `
-            <i class="fa-solid ${type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-check'}" 
-               style="color: ${type === 'error' ? 'var(--error)' : 'var(--accent)'};"></i>
-            <span>${msg}</span>
+            <i class="fa-solid ${iconClass}" style="color: ${iconCol}; font-size: 15px; flex-shrink: 0;"></i>
+            <span style="line-height: 1.4;">${msg}</span>
         `;
         container.appendChild(toast);
 
+        const duration = type === 'error' ? 4500 : 2500;
         setTimeout(() => {
-            toast.remove();
-        }, 4000);
+            toast.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(10px)';
+            setTimeout(() => toast.remove(), 200);
+        }, duration);
     }
 
     // ==========================================
@@ -5693,7 +5707,6 @@ class KmapStoreApp {
         this.renderSidebar();
         this.loadCart();
         this.switchView('client-store');
-        this.showToast("Logged out. Browsing Kmap Computers as Guest.");
     }
 
     closeActiveModal(overlay) {
@@ -6208,7 +6221,6 @@ class KmapStoreApp {
             this.renderAdminFeatured();
             this.renderHomepageFeaturedLaptops();
             this.updateFeaturedPrices();
-            this.showToast('Reset back to default 4 featured laptops');
             this.forceCloudSyncAll(true);
         }
     }
@@ -6236,8 +6248,6 @@ class KmapStoreApp {
         if (specsInput) specsInput.value = (item.specs || '').replace(/<br>/g, '\n');
         if (imgInput) imgInput.value = item.image || '';
         if (previewImg) previewImg.src = item.image || 'images/default-laptop.jpg';
-
-        this.showToast(`Reverted Slot ${slot}`);
     }
 
     // UI action aliases
