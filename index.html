@@ -705,7 +705,7 @@
                                 </a>
                             </div>
 
-                            <div class="featured-cards-grid">
+                            <div class="featured-cards-grid" id="homepage-featured-grid">
                                 <!-- Laptop 1: Hp Zbook 15u G6 -->
                                 <div class="featured-laptop-card" data-product-id="PROD-001">
                                     <div class="feat-card-badge brand-hp-pill">hp</div>
@@ -1917,6 +1917,46 @@
                     </div>
                 </div>
             </section>
+
+            <!-- VIEW G: Admin Featured Laptops Management (Strict 4 Slots Limit) -->
+            <section id="view-admin-featured" class="app-view" style="display: none;">
+                <div class="card" style="margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <h3 class="card-title" style="margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-star" style="color: #f59e0b;"></i> Homepage Featured Laptops
+                                <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706; font-size: 11px; padding: 4px 8px; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.3);">4 SLOTS LIMIT</span>
+                            </h3>
+                            <p style="font-size: 13px; color: var(--text-light); margin: 0;">
+                                Manage the <strong>4 showcase laptops</strong> featured on the storefront homepage and top Hero floater. Strictly capped at 4 items for optimal design and performance.
+                            </p>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <span class="badge badge-info" style="font-size: 13px; padding: 7px 12px; font-weight: 700;">
+                                <i class="fa-solid fa-lock"></i> 4 of 4 Slots Allowed
+                            </span>
+                            <button class="btn btn-outline" onclick="app.resetAdminFeaturedToDefaults()" title="Reset back to standard laptops">
+                                <i class="fa-solid fa-rotate-left"></i> Reset Defaults
+                            </button>
+                            <button class="btn btn-primary" onclick="app.saveAllAdminFeatured()" title="Save all 4 featured slots and publish to homepage">
+                                <i class="fa-solid fa-floppy-disk"></i> Save & Publish All
+                            </button>
+                            <button class="btn btn-secondary" onclick="app.switchView('landing-page')" title="Preview on homepage">
+                                <i class="fa-solid fa-eye"></i> View on Homepage
+                            </button>
+                        </div>
+                    </div>
+                    <div style="background: rgba(245, 158, 11, 0.08); border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 13px; color: var(--text-color);">
+                        <i class="fa-solid fa-circle-info" style="color: #f59e0b; margin-right: 6px;"></i>
+                        <strong>Easy Pick or Custom Upload:</strong> For any slot below, choose a laptop from your inventory dropdown to auto-fill its price, specs, and image, or manually type details and upload a new photo.
+                    </div>
+                </div>
+
+                <!-- 4 Slots Container Grid -->
+                <div id="admin-featured-slots-container" class="grid grid-2" style="gap: 20px;">
+                    <!-- Rendered dynamically by app.renderAdminFeatured() -->
+                </div>
+            </section>
         </main>
     </div>
 
@@ -2355,7 +2395,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=3.7"></script>
+    <script src="app.js?v=3.8"></script>
 </body>
 
 </html>

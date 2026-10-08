@@ -17,7 +17,7 @@ const safeLocalStorage = {
         }
 
         // Push to cloud if it's a watched key and sync is not skipped
-        const watchedKeys = ['kmap_products', 'kmap_users', 'kmap_orders', 'kmap_logs', 'kmap_promos', 'kmap_hire_purchase'];
+        const watchedKeys = ['kmap_products', 'kmap_users', 'kmap_orders', 'kmap_logs', 'kmap_promos', 'kmap_hire_purchase', 'kmap_featured_laptops'];
         if (!skipSync && watchedKeys.includes(key)) {
             try {
                 window.kvSyncQueue[key] = JSON.parse(val);
@@ -244,7 +244,8 @@ class KmapStoreApp {
                         kmap_products: products,
                         kmap_users: this.db.getUsers(),
                         kmap_promos: this.db.getPromos(),
-                        kmap_hire_purchase: this.db.getHP()
+                        kmap_hire_purchase: this.db.getHP(),
+                        kmap_featured_laptops: this.db.getFeaturedLaptops()
                     }
                 })
             });
@@ -494,6 +495,7 @@ class KmapStoreApp {
         if (window.history && window.history.replaceState) {
             window.history.replaceState({ view: initialView }, '', '#' + initialView);
         }
+        this.renderHomepageFeaturedLaptops();
         this.updateFeaturedPrices();
     }
 
@@ -1571,6 +1573,49 @@ class KmapStoreApp {
             }
         ];
 
+        const defaultFeaturedLaptops = [
+            {
+                slot: 1,
+                productId: 'PROD-001',
+                brand: 'HP',
+                title: 'Hp Zbook 15u G6',
+                specs: 'Core i7 | 32GB RAM\n1TB SSD | 15.6" FHD',
+                heroLabel: 'HP WORKSTATION',
+                price: 8750,
+                image: 'images/products/PROD-001/1.jpg'
+            },
+            {
+                slot: 2,
+                productId: 'PROD-018',
+                brand: 'HP',
+                title: 'Hp Elitebook 840 G8',
+                specs: 'Core i7 | 32GB RAM\n512GB SSD | 14.0" FHD',
+                heroLabel: 'HP FLAGSHIP',
+                price: 7875,
+                image: 'images/products/PROD-018/1.jpg'
+            },
+            {
+                slot: 3,
+                productId: 'PROD-022',
+                brand: 'DELL',
+                title: 'Dell Latitude 7420',
+                specs: 'Core i5 | 16GB RAM\n512GB SSD | 13.3" FHD',
+                heroLabel: 'DELL BUSINESS',
+                price: 5625,
+                image: 'images/products/PROD-022/1.jpg'
+            },
+            {
+                slot: 4,
+                productId: 'PROD-023',
+                brand: 'Lenovo',
+                title: 'Lenovo Thinkpad T480s',
+                specs: 'Core i5 | 16GB RAM\n256GB SSD | 14.0" FHD',
+                heroLabel: 'LENOVO THINKPAD',
+                price: 3600,
+                image: 'images/products/PROD-023/1.jpg'
+            }
+        ];
+
         // Check if database reset or sync is needed
         const existingProducts = safeLocalStorage.getItem('kmap_products');
         let needsReset = false;
@@ -1628,6 +1673,11 @@ class KmapStoreApp {
             safeLocalStorage.setItem('kmap_logs', JSON.stringify([]), true);
             safeLocalStorage.setItem('kmap_promos', JSON.stringify(defaultPromos), true);
             safeLocalStorage.setItem('kmap_hire_purchase', JSON.stringify(defaultHP), true);
+            safeLocalStorage.setItem('kmap_featured_laptops', JSON.stringify(defaultFeaturedLaptops), true);
+        }
+
+        if (!safeLocalStorage.getItem('kmap_featured_laptops')) {
+            safeLocalStorage.setItem('kmap_featured_laptops', JSON.stringify(defaultFeaturedLaptops), true);
         }
 
         // Clean out any legacy seeded test orders, hire purchases, and test client accounts from local storage & cloud
@@ -1739,7 +1789,20 @@ class KmapStoreApp {
             },
             savePromos: (data) => safeLocalStorage.setItem('kmap_promos', JSON.stringify(data)),
             getHP: () => JSON.parse(safeLocalStorage.getItem('kmap_hire_purchase')) || [],
-            saveHP: (data) => safeLocalStorage.setItem('kmap_hire_purchase', JSON.stringify(data))
+            saveHP: (data) => safeLocalStorage.setItem('kmap_hire_purchase', JSON.stringify(data)),
+            getFeaturedLaptops: () => {
+                try {
+                    const f = JSON.parse(safeLocalStorage.getItem('kmap_featured_laptops'));
+                    return (Array.isArray(f) && f.length > 0) ? f.slice(0, 4) : defaultFeaturedLaptops;
+                } catch (e) {
+                    return defaultFeaturedLaptops;
+                }
+            },
+            saveFeaturedLaptops: (data) => {
+                const capped = (data || []).slice(0, 4);
+                safeLocalStorage.setItem('kmap_featured_laptops', JSON.stringify(capped));
+                return capped;
+            }
         };
     }
 
@@ -1928,12 +1991,13 @@ class KmapStoreApp {
                     console.error('Error parsing order updates', err);
                 }
             }
-            if (e.key === 'kmap_promos' || e.key === 'kmap_products') {
+            if (e.key === 'kmap_promos' || e.key === 'kmap_products' || e.key === 'kmap_featured_laptops') {
                 this.renderClientCatalog();
                 this.renderPromotions();
                 this.renderCart();
                 this.renderAdminInventory();
                 this.renderAdminOverview();
+                this.renderHomepageFeaturedLaptops();
                 this.updateFeaturedPrices();
             }
         });
@@ -2229,6 +2293,7 @@ class KmapStoreApp {
                 const totalQty = this.cart ? this.cart.reduce((sum, item) => sum + item.qty, 0) : 0;
                 document.querySelectorAll('.cart-count').forEach(el => el.innerText = totalQty);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                this.renderHomepageFeaturedLaptops();
                 this.updateFeaturedPrices();
                 this.startHeroSlider();
                 break;
@@ -2279,6 +2344,12 @@ class KmapStoreApp {
                 pageTitle.innerText = "Stock Inventory";
                 pageSubtitle.innerText = "Maintain items and stock alert settings";
                 this.renderAdminInventory();
+                break;
+            case 'admin-featured':
+                document.getElementById('view-admin-featured').style.display = 'block';
+                pageTitle.innerText = "Featured Laptops Manager";
+                pageSubtitle.innerText = "Manage the 4 homepage showcase laptops (Strict 4-Slot Limit)";
+                this.renderAdminFeatured();
                 break;
             case 'admin-reports':
                 document.getElementById('view-admin-reports').style.display = 'block';
@@ -2424,6 +2495,9 @@ class KmapStoreApp {
                 </button>
                 <button class="nav-item" id="nav-btn-admin-inventory" onclick="app.switchView('admin-inventory')">
                     <i class="fa-solid fa-boxes-stacked"></i> Inventory & Stock
+                </button>
+                <button class="nav-item" id="nav-btn-admin-featured" onclick="app.switchView('admin-featured')">
+                    <i class="fa-solid fa-star" style="color: #f59e0b;"></i> Featured Laptops (4)
                 </button>
                 <button class="nav-item" id="nav-btn-admin-orders" onclick="app.switchView('admin-orders')">
                     <i class="fa-solid fa-truck-fast"></i> Order Hub
@@ -5539,6 +5613,410 @@ class KmapStoreApp {
                 }
             }
         });
+    }
+
+    // Render Homepage Featured Laptops (Grid and Hero Floater)
+    renderHomepageFeaturedLaptops() {
+        const grid = document.getElementById('homepage-featured-grid');
+        const showcase = document.getElementById('hero-laptop-showcase');
+        const featuredItems = (this.db.getFeaturedLaptops() || []).slice(0, 4);
+        const products = this.db.getProducts();
+
+        const brandPills = {
+            'hp': 'brand-hp-pill',
+            'dell': 'brand-dell-pill',
+            'lenovo': 'brand-lenovo-pill',
+            'apple': 'brand-apple-pill',
+            'acer': 'brand-acer-pill',
+            'asus': 'brand-asus-pill',
+            'toshiba': 'brand-toshiba-pill'
+        };
+
+        // 1. Render Homepage Grid Cards (Strict 4 items)
+        if (grid && featuredItems.length > 0) {
+            grid.innerHTML = '';
+            featuredItems.forEach((item, idx) => {
+                const p = item.productId ? products.find(prod => prod.id === item.productId) : null;
+                const price = p ? p.price : (Number(item.price) || 0);
+                const discPrice = p ? this.getDiscountedPrice(p) : this.getDiscountedPrice({ price, category: 'Laptops' });
+                const hasPromo = discPrice < price;
+                const brandKey = (item.brand || (p ? p.brand : '') || 'hp').toLowerCase();
+                const badgeClass = brandPills[brandKey] || 'brand-hp-pill';
+                const imgUrl = item.image || (p && p.images && p.images[0] ? p.images[0] : 'images/default-laptop.jpg');
+                const title = item.title || (p ? p.name : `Featured Laptop ${idx + 1}`);
+                const specs = item.specs || (p ? (p.spec || p.desc || '') : '');
+                const stock = p ? p.stock : 10;
+                const prodId = p ? p.id : (item.productId || `FEAT-${idx + 1}`);
+
+                let stockHtml = `<span class="stock-dot"></span> In Stock`;
+                if (stock === 0) {
+                    stockHtml = `<span class="stock-dot" style="background:#dc2626;"></span> <span style="color:#dc2626; font-weight:700;">Out of Stock</span>`;
+                } else if (stock <= 3) {
+                    stockHtml = `<span class="stock-dot" style="background:#eab308;"></span> <span style="color:#d97706; font-weight:700;">Low Stock (${stock} left)</span>`;
+                }
+
+                const percentOff = Math.round(((price - discPrice) / price) * 100);
+                const promoTagHtml = hasPromo
+                    ? `<span class="feat-tag feat-promo-tag" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-weight: 700;">${percentOff > 0 ? `${percentOff}% OFF PROMO` : 'PROMO DEAL'}</span>`
+                    : '';
+
+                const priceHtml = hasPromo
+                    ? `<span class="original-price" style="text-decoration: line-through; color: #94a3b8; font-size: 13px; font-weight: 600; margin-right: 6px;">GH₵ ${price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</span><span class="promo-price" style="color: #dc2626; font-weight: 900;">GH₵ ${discPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</span>`
+                    : `GH₵ ${price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+
+                const card = document.createElement('div');
+                card.className = 'featured-laptop-card';
+                card.setAttribute('data-product-id', prodId);
+                card.innerHTML = `
+                    <div class="feat-card-badge ${badgeClass}">${item.brand || 'LAPTOP'}</div>
+                    <div class="feat-card-thumb" onclick="app.openInspectModal('${prodId}')">
+                        <img src="${imgUrl}" alt="${title}">
+                    </div>
+                    <h3 class="feat-card-title" onclick="app.openInspectModal('${prodId}')">${title}</h3>
+                    <p class="feat-card-specs">${specs.replace(/\n/g, '<br>')}</p>
+                    <div class="feat-card-price">${priceHtml}</div>
+                    <div class="feat-card-stock">${stockHtml}</div>
+                    <div class="feat-card-tags">
+                        ${promoTagHtml}
+                        <span class="feat-tag">Quality Laptop</span>
+                        <span class="feat-tag">3 Months Warranty</span>
+                    </div>
+                    <button type="button" class="feat-add-cart-btn" onclick="app.addToCart('${prodId}')">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // 2. Render Hero Slider Slides (Matching the 4 featured laptops)
+        if (showcase && featuredItems.length > 0) {
+            showcase.innerHTML = '';
+            featuredItems.forEach((item, idx) => {
+                const p = item.productId ? products.find(prod => prod.id === item.productId) : null;
+                const price = p ? p.price : (Number(item.price) || 0);
+                const discPrice = p ? this.getDiscountedPrice(p) : this.getDiscountedPrice({ price, category: 'Laptops' });
+                const hasPromo = discPrice < price;
+                const imgUrl = item.image || (p && p.images && p.images[0] ? p.images[0] : 'images/default-laptop.jpg');
+                const title = item.title || (p ? p.name : `Featured Laptop ${idx + 1}`);
+                const prodId = p ? p.id : (item.productId || `FEAT-${idx + 1}`);
+                const heroLabel = item.heroLabel || (p ? `${(p.brand || 'KMAP').toUpperCase()} FLAGSHIP` : 'KMAP SHOWCASE');
+
+                const priceHtml = hasPromo
+                    ? `<span style="text-decoration: line-through; opacity: 0.7; font-size: 11px; margin-right: 5px;">GH₵ ${price.toLocaleString()}</span><span style="color: #fef08a; font-weight: 900;">GH₵ ${discPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</span>`
+                    : `GH₵ ${price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+
+                const slide = document.createElement('div');
+                slide.className = `hero-floater-slide ${idx === (this.currentHeroSlide || 0) ? 'active' : ''}`;
+                slide.setAttribute('data-slide', idx);
+                slide.setAttribute('data-product-id', prodId);
+                slide.onclick = () => this.openInspectModal(prodId);
+                slide.innerHTML = `
+                    <div class="hero-slide-badge">
+                        <span class="slide-badge-brand">${heroLabel}</span>
+                        <span class="slide-badge-title">${title}</span>
+                        <span class="slide-badge-price">${priceHtml}</span>
+                    </div>
+                    <img src="${imgUrl}" alt="${title}" class="hero-laptop-img">
+                `;
+                showcase.appendChild(slide);
+            });
+
+            // Update dots
+            const dotsContainer = document.getElementById('hero-slider-dots');
+            if (dotsContainer) {
+                dotsContainer.innerHTML = '';
+                featuredItems.forEach((item, idx) => {
+                    const dot = document.createElement('span');
+                    dot.className = `hero-dot ${idx === (this.currentHeroSlide || 0) ? 'active' : ''}`;
+                    dot.title = item.title || `Slide ${idx + 1}`;
+                    dot.onclick = () => this.setHeroSlide(idx);
+                    dotsContainer.appendChild(dot);
+                });
+            }
+        }
+    }
+
+    // Render Admin Featured Laptops Manager (Strict 4 Slots)
+    renderAdminFeatured() {
+        const container = document.getElementById('admin-featured-slots-container');
+        if (!container) return;
+
+        let featuredItems = (this.db.getFeaturedLaptops() || []).slice(0, 4);
+        while (featuredItems.length < 4) {
+            featuredItems.push({
+                slot: featuredItems.length + 1,
+                productId: '',
+                brand: 'HP',
+                title: `Featured Laptop ${featuredItems.length + 1}`,
+                specs: 'Core i7 | 16GB RAM\n512GB SSD | FHD',
+                heroLabel: 'KMAP SHOWCASE',
+                price: 5000,
+                image: 'images/default-laptop.jpg'
+            });
+        }
+
+        const products = this.db.getProducts();
+        const laptopProducts = products.filter(p => !p.category || p.category.toLowerCase().includes('laptop') || p.category === 'Laptops');
+        const candidateList = laptopProducts.length > 0 ? laptopProducts : products;
+
+        const optionsHtml = candidateList.map(p => {
+            return `<option value="${p.id}">[${p.id}] ${p.name} - GH₵ ${p.price.toLocaleString()}</option>`;
+        }).join('');
+
+        container.innerHTML = '';
+
+        featuredItems.forEach((item, idx) => {
+            const slot = idx + 1;
+            const brand = (item.brand || 'HP').toUpperCase();
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.cssText = 'border: 2px solid var(--border-color); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.03);';
+
+            card.innerHTML = `
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="badge" style="background: var(--primary); color: #fff; font-size: 13px; font-weight: 800; padding: 4px 10px; border-radius: 6px;">
+                                SLOT ${slot}
+                            </span>
+                            <strong style="font-size: 15px; color: var(--text-color);">${slot === 1 ? 'Hero Lead Laptop' : `Featured Laptop #${slot}`}</strong>
+                        </div>
+                        <span style="font-size: 11px; background: rgba(245, 158, 11, 0.1); color: #d97706; font-weight: 700; padding: 3px 8px; border-radius: 12px;">Slot ${slot} of 4</span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px; background: rgba(0,0,0,0.02); padding: 10px; border-radius: var(--radius-sm); border: 1px dashed var(--border-color);">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--secondary); margin-bottom: 4px; display: block;">
+                            <i class="fa-solid fa-bolt"></i> Quick Pick from Stock Inventory:
+                        </label>
+                        <select id="feat-slot-${slot}-prod-id" class="form-control" style="font-size: 13px;" onchange="app.selectFeaturedFromInventory(${slot}, this.value)">
+                            <option value="">-- Choose In-Stock Laptop to Auto-Fill --</option>
+                            ${optionsHtml}
+                        </select>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 12px; font-weight: 600;">Laptop Model Title *</label>
+                            <input type="text" id="feat-slot-${slot}-title" class="form-control" value="${item.title || ''}" placeholder="e.g. Hp Zbook 15u G6">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 12px; font-weight: 600;">Brand Pill</label>
+                            <select id="feat-slot-${slot}-brand" class="form-control">
+                                <option value="HP" ${brand === 'HP' ? 'selected' : ''}>HP</option>
+                                <option value="DELL" ${brand === 'DELL' ? 'selected' : ''}>DELL</option>
+                                <option value="Lenovo" ${brand === 'LENOVO' ? 'selected' : ''}>Lenovo</option>
+                                <option value="Apple" ${brand === 'APPLE' ? 'selected' : ''}>Apple</option>
+                                <option value="Asus" ${brand === 'ASUS' ? 'selected' : ''}>Asus</option>
+                                <option value="Acer" ${brand === 'ACER' ? 'selected' : ''}>Acer</option>
+                                <option value="Toshiba" ${brand === 'TOSHIBA' ? 'selected' : ''}>Toshiba</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 12px; font-weight: 600;">Regular Price (GH₵) *</label>
+                            <input type="number" id="feat-slot-${slot}-price" class="form-control" value="${item.price || 0}" min="0">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 12px; font-weight: 600;">Hero Label Badge</label>
+                            <input type="text" id="feat-slot-${slot}-hero" class="form-control" value="${item.heroLabel || ''}" placeholder="e.g. HP WORKSTATION">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label style="font-size: 12px; font-weight: 600;">Specifications (Use | or new lines)</label>
+                        <textarea id="feat-slot-${slot}-specs" class="form-control" rows="2" style="font-size: 12px; resize: vertical;" placeholder="Core i7 | 32GB RAM&#10;1TB SSD | 15.6 FHD">${(item.specs || '').replace(/<br>/g, '\n')}</textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Laptop Photo (Upload file or paste URL)</label>
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <div style="width: 70px; height: 70px; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; background: #f8fafc; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <img id="feat-slot-${slot}-preview" src="${item.image || 'images/default-laptop.jpg'}" alt="Preview" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                            </div>
+                            <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                                <input type="file" id="feat-slot-${slot}-file" accept="image/*" class="form-control" style="font-size: 12px; padding: 4px;" onchange="app.handleFeaturedSlotFileUpload(${slot}, this)">
+                                <input type="text" id="feat-slot-${slot}-image" class="form-control" style="font-size: 11px;" value="${item.image || ''}" placeholder="Or image path / URL" oninput="document.getElementById('feat-slot-${slot}-preview').src = this.value">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--border-color); margin-top: 6px;">
+                    <button class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;" onclick="app.clearFeaturedSlot(${slot})">
+                        <i class="fa-solid fa-rotate-left"></i> Revert
+                    </button>
+                    <button class="btn btn-secondary" style="font-size: 13px; padding: 6px 14px; font-weight: 700;" onclick="app.saveSingleFeaturedSlot(${slot})">
+                        <i class="fa-solid fa-check"></i> Save Slot ${slot}
+                    </button>
+                </div>
+            `;
+
+            container.appendChild(card);
+
+            if (item.productId) {
+                const select = document.getElementById(`feat-slot-${slot}-prod-id`);
+                if (select) select.value = item.productId;
+            }
+        });
+    }
+
+    // Auto-fill slot from inventory selection
+    selectFeaturedFromInventory(slot, prodId) {
+        if (!prodId) return;
+        const products = this.db.getProducts();
+        const p = products.find(prod => prod.id === prodId);
+        if (!p) return;
+
+        const titleInput = document.getElementById(`feat-slot-${slot}-title`);
+        const priceInput = document.getElementById(`feat-slot-${slot}-price`);
+        const specsInput = document.getElementById(`feat-slot-${slot}-specs`);
+        const brandSelect = document.getElementById(`feat-slot-${slot}-brand`);
+        const heroInput = document.getElementById(`feat-slot-${slot}-hero`);
+        const imgInput = document.getElementById(`feat-slot-${slot}-image`);
+        const previewImg = document.getElementById(`feat-slot-${slot}-preview`);
+
+        if (titleInput) titleInput.value = p.name;
+        if (priceInput) priceInput.value = p.price;
+        if (specsInput) specsInput.value = p.spec || p.desc || '';
+        if (brandSelect && p.brand) {
+            const bUpper = p.brand.toUpperCase();
+            Array.from(brandSelect.options).forEach(opt => {
+                if (opt.value.toUpperCase() === bUpper) brandSelect.value = opt.value;
+            });
+        }
+        if (heroInput) heroInput.value = `${(p.brand || 'KMAP').toUpperCase()} FLAGSHIP`;
+        if (p.images && p.images[0]) {
+            if (imgInput) imgInput.value = p.images[0];
+            if (previewImg) previewImg.src = p.images[0];
+        }
+    }
+
+    // Handle image file upload with compression to keep storage light and fast
+    handleFeaturedSlotFileUpload(slot, input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                const maxDim = 800;
+                if (width > maxDim || height > maxDim) {
+                    if (width > height) {
+                        height = Math.round((height * maxDim) / width);
+                        width = maxDim;
+                    } else {
+                        width = Math.round((width * maxDim) / height);
+                        height = maxDim;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+                const imgInput = document.getElementById(`feat-slot-${slot}-image`);
+                const previewImg = document.getElementById(`feat-slot-${slot}-preview`);
+                if (imgInput) imgInput.value = dataUrl;
+                if (previewImg) previewImg.src = dataUrl;
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Collect data object for a single slot from form
+    collectFeaturedSlotData(slot) {
+        const prodSelect = document.getElementById(`feat-slot-${slot}-prod-id`);
+        const titleInput = document.getElementById(`feat-slot-${slot}-title`);
+        const brandSelect = document.getElementById(`feat-slot-${slot}-brand`);
+        const priceInput = document.getElementById(`feat-slot-${slot}-price`);
+        const heroInput = document.getElementById(`feat-slot-${slot}-hero`);
+        const specsInput = document.getElementById(`feat-slot-${slot}-specs`);
+        const imgInput = document.getElementById(`feat-slot-${slot}-image`);
+
+        return {
+            slot: slot,
+            productId: prodSelect ? prodSelect.value : '',
+            title: titleInput ? titleInput.value.trim() : `Featured Laptop ${slot}`,
+            brand: brandSelect ? brandSelect.value : 'HP',
+            price: priceInput ? Number(priceInput.value) || 0 : 0,
+            heroLabel: heroInput ? heroInput.value.trim() : 'KMAP SHOWCASE',
+            specs: specsInput ? specsInput.value.trim() : '',
+            image: imgInput ? imgInput.value.trim() : 'images/default-laptop.jpg'
+        };
+    }
+
+    // Save a single slot and publish to homepage
+    saveSingleFeaturedSlot(slot) {
+        let items = this.db.getFeaturedLaptops();
+        while (items.length < 4) {
+            items.push({ slot: items.length + 1, title: '', price: 0 });
+        }
+        items[slot - 1] = this.collectFeaturedSlotData(slot);
+        this.db.saveFeaturedLaptops(items);
+        this.renderHomepageFeaturedLaptops();
+        this.updateFeaturedPrices();
+        this.showToast(`✓ Featured Slot ${slot} saved and published to Homepage!`, 'success');
+        this.forceCloudSyncAll(true);
+    }
+
+    // Save all 4 slots and publish to homepage
+    saveAllAdminFeatured() {
+        const items = [];
+        for (let slot = 1; slot <= 4; slot++) {
+            items.push(this.collectFeaturedSlotData(slot));
+        }
+        this.db.saveFeaturedLaptops(items);
+        this.renderHomepageFeaturedLaptops();
+        this.updateFeaturedPrices();
+        this.showToast('✓ All 4 Featured Laptops saved and published to Homepage!', 'success');
+        this.forceCloudSyncAll(true);
+    }
+
+    // Reset featured laptops back to defaults
+    resetAdminFeaturedToDefaults() {
+        if (confirm('Reset the homepage showcase back to the default 4 featured laptops?')) {
+            safeLocalStorage.removeItem('kmap_featured_laptops');
+            this.renderAdminFeatured();
+            this.renderHomepageFeaturedLaptops();
+            this.updateFeaturedPrices();
+            this.showToast('Reset back to default 4 featured laptops');
+            this.forceCloudSyncAll(true);
+        }
+    }
+
+    // Clear / revert changes in a single slot
+    clearFeaturedSlot(slot) {
+        const items = this.db.getFeaturedLaptops();
+        const item = items[slot - 1];
+        if (!item) return;
+
+        const prodSelect = document.getElementById(`feat-slot-${slot}-prod-id`);
+        const titleInput = document.getElementById(`feat-slot-${slot}-title`);
+        const brandSelect = document.getElementById(`feat-slot-${slot}-brand`);
+        const priceInput = document.getElementById(`feat-slot-${slot}-price`);
+        const heroInput = document.getElementById(`feat-slot-${slot}-hero`);
+        const specsInput = document.getElementById(`feat-slot-${slot}-specs`);
+        const imgInput = document.getElementById(`feat-slot-${slot}-image`);
+        const previewImg = document.getElementById(`feat-slot-${slot}-preview`);
+
+        if (prodSelect) prodSelect.value = item.productId || '';
+        if (titleInput) titleInput.value = item.title || '';
+        if (brandSelect) brandSelect.value = item.brand || 'HP';
+        if (priceInput) priceInput.value = item.price || 0;
+        if (heroInput) heroInput.value = item.heroLabel || '';
+        if (specsInput) specsInput.value = (item.specs || '').replace(/<br>/g, '\n');
+        if (imgInput) imgInput.value = item.image || '';
+        if (previewImg) previewImg.src = item.image || 'images/default-laptop.jpg';
+
+        this.showToast(`Reverted Slot ${slot}`);
     }
 
     // UI action aliases
