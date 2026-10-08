@@ -2792,6 +2792,7 @@ class KmapStoreApp {
 
             // Image handling (support up to 6 images, fallback to default laptop/desktop emoji icons)
             const isLocalOrLaptop = p.category === 'Laptops' || (p.images && p.images[0] && p.images[0].startsWith('images/products/'));
+            const fitStyle = isLocalOrLaptop ? 'object-fit:cover;' : 'object-fit:contain; background:#ffffff; padding:6px;';
             const fallbackIcon = `<span style="font-size: 56px; color: var(--primary); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${p.icon || '💻'}</span>`;
             const mainImg = (p.images && p.images.length > 0 && p.images[0])
                 ? `<img src="${p.images[0]}" alt="${p.name}" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:100%; ${fitStyle} object-position:center; display:block;" onerror="this.onerror=null; this.parentElement.innerHTML='${fallbackIcon.replace(/'/g, "\\'")}';">`
