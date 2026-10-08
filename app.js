@@ -4851,8 +4851,7 @@ class KmapStoreApp {
         toast.className = 'toast';
         toast.style.background = '#111827';
         toast.style.color = '#ffffff';
-        toast.style.border = '1px solid rgba(255, 255, 255, 0.18)';
-        toast.style.borderLeft = '3px solid #ffffff';
+        toast.style.border = '1px solid rgba(255, 255, 255, 0.15)';
 
         toast.innerHTML = `
             <i class="fa-solid fa-circle-info" style="color: #ffffff; font-size: 14px; flex-shrink: 0; opacity: 0.9;"></i>
