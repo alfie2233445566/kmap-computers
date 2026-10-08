@@ -1494,52 +1494,55 @@
 
             <!-- VIEW E: Admin Product/Inventory Management -->
             <section id="view-admin-inventory" class="app-view" style="display: none;">
-                <div class="card">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
-                        <h3 class="card-title" style="margin-bottom: 0;">Product Inventory</h3>
-                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                            <button class="btn btn-outline" onclick="app.forceCloudSyncAll()"
-                                title="Push all inventory and photos to cloud database">
-                                <i class="fa-solid fa-cloud-arrow-up"></i> Sync to Cloud
-                            </button>
-                            <button class="btn btn-secondary" onclick="app.openProductModal()"><i
-                                    class="fa-solid fa-plus"></i> Add New Product</button>
+                <div class="card admin-inventory-card">
+                    <!-- Sticky Inventory Actions & Filter Header -->
+                    <div class="admin-inventory-sticky-header">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 16px;">
+                            <h3 class="card-title" style="margin-bottom: 0;">Product Inventory</h3>
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <button class="btn btn-outline" onclick="app.forceCloudSyncAll()"
+                                    title="Push all inventory and photos to cloud database">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i> Sync to Cloud
+                                </button>
+                                <button class="btn btn-secondary" onclick="app.openProductModal()"><i
+                                        class="fa-solid fa-plus"></i> Add New Product</button>
+                            </div>
+                        </div>
+
+                        <!-- Inventory Search & Filter Controls -->
+                        <div
+                            style="display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 0; padding: 12px 16px; background-color: var(--bg-light); border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                            <div style="position: relative; flex: 1; min-width: 240px;">
+                                <i class="fa-solid fa-magnifying-glass"
+                                    style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-light); pointer-events: none; font-size: 14px;"></i>
+                                <input type="text" id="admin-inventory-search" class="form-control"
+                                    placeholder="Search inventory by name, ID, category, specs..."
+                                    oninput="app.searchAdminInventory()"
+                                    style="padding-left: 38px; width: 100%;">
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                <select id="admin-inventory-category-filter" class="form-control" style="width: 160px;"
+                                    onchange="app.searchAdminInventory()">
+                                    <option value="all">All Categories</option>
+                                </select>
+                                <select id="admin-inventory-stock-filter" class="form-control" style="width: 160px;"
+                                    onchange="app.searchAdminInventory()">
+                                    <option value="all">All Stock Status</option>
+                                    <option value="in_stock">In Stock (&gt; 0)</option>
+                                    <option value="low_stock">Low Stock (≤ 3)</option>
+                                    <option value="out_of_stock">Out of Stock (0)</option>
+                                </select>
+                                <button class="btn btn-outline" onclick="app.resetAdminInventoryFilters()" title="Reset Filters"
+                                    style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 13px;">
+                                    <i class="fa-solid fa-rotate-left"></i> Reset
+                                </button>
+                                <span id="admin-inventory-count" style="font-size: 13px; color: var(--text-light); font-weight: 600; white-space: nowrap; margin-left: 4px;"></span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Inventory Search & Filter Controls -->
-                    <div
-                        style="display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 20px; padding: 12px 16px; background-color: var(--bg-light); border: 1px solid var(--border); border-radius: var(--radius-sm);">
-                        <div style="position: relative; flex: 1; min-width: 240px;">
-                            <i class="fa-solid fa-magnifying-glass"
-                                style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-light); pointer-events: none; font-size: 14px;"></i>
-                            <input type="text" id="admin-inventory-search" class="form-control"
-                                placeholder="Search inventory by name, ID, category, specs..."
-                                oninput="app.searchAdminInventory()"
-                                style="padding-left: 38px; width: 100%;">
-                        </div>
-                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                            <select id="admin-inventory-category-filter" class="form-control" style="width: 160px;"
-                                onchange="app.searchAdminInventory()">
-                                <option value="all">All Categories</option>
-                            </select>
-                            <select id="admin-inventory-stock-filter" class="form-control" style="width: 160px;"
-                                onchange="app.searchAdminInventory()">
-                                <option value="all">All Stock Status</option>
-                                <option value="in_stock">In Stock (&gt; 0)</option>
-                                <option value="low_stock">Low Stock (≤ 3)</option>
-                                <option value="out_of_stock">Out of Stock (0)</option>
-                            </select>
-                            <button class="btn btn-outline" onclick="app.resetAdminInventoryFilters()" title="Reset Filters"
-                                style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 13px;">
-                                <i class="fa-solid fa-rotate-left"></i> Reset
-                            </button>
-                            <span id="admin-inventory-count" style="font-size: 13px; color: var(--text-light); font-weight: 600; white-space: nowrap; margin-left: 4px;"></span>
-                        </div>
-                    </div>
-
-                    <div class="table-responsive">
+                    <div class="table-responsive admin-inventory-scroll-container">
                         <table>
                             <thead>
                                 <tr>
