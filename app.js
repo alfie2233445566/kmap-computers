@@ -171,10 +171,16 @@ class KmapStoreApp {
                             }
                             if (this.defaultProductsList && Array.isArray(this.defaultProductsList)) {
                                 this.defaultProductsList.forEach(defProd => {
-                                    if (!data[key].some(p => p.id === defProd.id)) {
+                                    const ex = data[key].find(p => p.id === defProd.id);
+                                    if (!ex) {
                                         data[key].push(defProd);
+                                    } else {
+                                        if (defProd.id.startsWith('PROD-CHG-MAC')) {
+                                            delete ex.priceDisplay;
+                                        }
                                     }
                                 });
+                                data[key] = this.sortProductList(data[key]);
                             }
                         }
 
@@ -267,6 +273,70 @@ class KmapStoreApp {
             console.error('Cloud Sync Error:', e);
             if (!silent) this.showToast(`⚠️ Network error: ${e.message || 'Cannot reach cloud endpoint'}`, 'error');
         }
+    }
+
+    sortProductList(products) {
+        if (!Array.isArray(products) || products.length === 0) return products;
+
+        const macOrderMap = {
+            'PROD-CHG-MAC01': 1, // MagSafe 1 (45W)
+            'PROD-CHG-MAC03': 2, // MagSafe 1 (60W)
+            'PROD-CHG-MAC04': 3, // MagSafe 1 (85W)
+            'PROD-CHG-MAC02': 4, // MagSafe 2 (45W)
+            'PROD-CHG-MAC05': 5, // MagSafe 2 (60W)
+            'PROD-CHG-MAC06': 6  // MagSafe 2 (85W)
+        };
+
+        const isMacBookCharger = (p) => {
+            if (!p) return false;
+            if (p.id && (p.id in macOrderMap || p.id.startsWith('PROD-CHG-MAC'))) return true;
+            const name = (p.name || '').toLowerCase();
+            return name.includes('macbook') && (name.includes('charger') || name.includes('magsafe') || name.includes('adapter'));
+        };
+
+        const getMacWeight = (p) => {
+            if (p.id && macOrderMap[p.id]) return macOrderMap[p.id];
+            const name = (p.name || '').toLowerCase();
+            const spec = (p.spec || '').toLowerCase();
+            const text = name + ' ' + spec;
+            let safe = (text.includes('safe 2') || text.includes('safe2')) ? 2 : 1;
+            let watt = 45;
+            if (text.includes('85w')) watt = 85;
+            else if (text.includes('60w')) watt = 60;
+            else if (text.includes('45w')) watt = 45;
+            return (safe * 10) + (watt === 85 ? 3 : watt === 60 ? 2 : 1);
+        };
+
+        const defOrder = new Map((this.defaultProductsList || []).map((p, idx) => [p.id, idx]));
+
+        return [...products].sort((a, b) => {
+            const isMacA = isMacBookCharger(a);
+            const isMacB = isMacBookCharger(b);
+
+            // If both are MacBook chargers, sort strictly so they follow each other in order
+            if (isMacA && isMacB) {
+                return getMacWeight(a) - getMacWeight(b);
+            }
+
+            // If one is MacBook and the other is in defaultProducts, anchor by MagSafe 1 45W position
+            if (isMacA && !isMacB && defOrder.has(b.id)) {
+                const macAnchor = defOrder.has('PROD-CHG-MAC01') ? defOrder.get('PROD-CHG-MAC01') : 40;
+                return macAnchor - defOrder.get(b.id);
+            }
+            if (!isMacA && isMacB && defOrder.has(a.id)) {
+                const macAnchor = defOrder.has('PROD-CHG-MAC01') ? defOrder.get('PROD-CHG-MAC01') : 40;
+                return defOrder.get(a.id) - macAnchor;
+            }
+
+            // Both in default list
+            if (defOrder.has(a.id) && defOrder.has(b.id)) {
+                return defOrder.get(a.id) - defOrder.get(b.id);
+            }
+
+            const orderA = defOrder.has(a.id) ? defOrder.get(a.id) : 9999;
+            const orderB = defOrder.has(b.id) ? defOrder.get(b.id) : 9999;
+            return orderA - orderB;
+        });
     }
 
     loadCart() {
@@ -1729,12 +1799,7 @@ class KmapStoreApp {
                     });
 
                     // Re-order parsed products so all like chargers and items appear in clean succession
-                    const defOrder = new Map(defaultProducts.map((p, idx) => [p.id, idx]));
-                    parsed.sort((a, b) => {
-                        const orderA = defOrder.has(a.id) ? defOrder.get(a.id) : 9999;
-                        const orderB = defOrder.has(b.id) ? defOrder.get(b.id) : 9999;
-                        return orderA - orderB;
-                    });
+                    parsed = this.sortProductList(parsed);
                     modified = true;
 
                     if (modified) {
@@ -1831,12 +1896,16 @@ class KmapStoreApp {
             getProducts: () => {
                 try {
                     const p = JSON.parse(safeLocalStorage.getItem('kmap_products'));
-                    return (Array.isArray(p) && p.length > 0) ? p : defaultProducts;
+                    const list = (Array.isArray(p) && p.length > 0) ? p : defaultProducts;
+                    return this.sortProductList(list);
                 } catch (e) {
-                    return defaultProducts;
+                    return this.sortProductList(defaultProducts);
                 }
             },
-            saveProducts: (data) => safeLocalStorage.setItem('kmap_products', JSON.stringify(data)),
+            saveProducts: (data) => {
+                const sorted = this.sortProductList(data);
+                safeLocalStorage.setItem('kmap_products', JSON.stringify(sorted));
+            },
             getUsers: () => {
                 try {
                     const u = JSON.parse(safeLocalStorage.getItem('kmap_users'));
