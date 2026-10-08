@@ -108,11 +108,11 @@ class KmapStoreApp {
         this.bindEvents();
         this.initSession();
 
-        // Track known order IDs to prevent false order notifications on startup or sync
-        this.knownOrderIds = new Set();
+        // Track known order IDs and statuses for reliable real-time notifications
+        this.knownOrdersMap = new Map();
         try {
             const initialOrders = JSON.parse(safeLocalStorage.getItem('kmap_orders') || '[]');
-            initialOrders.forEach(o => this.knownOrderIds.add(o.id));
+            initialOrders.forEach(o => this.knownOrdersMap.set(o.id, o.status));
         } catch (e) { }
 
         // Start polling for Vercel KV updates
@@ -204,11 +204,9 @@ class KmapStoreApp {
                     }
                 }
                 if (updated) {
-                    // Update known order IDs
-                    try {
-                        const currentOrders = JSON.parse(safeLocalStorage.getItem('kmap_orders') || '[]');
-                        currentOrders.forEach(o => this.knownOrderIds.add(o.id));
-                    } catch (e) { }
+                    if (data.kmap_orders && Array.isArray(data.kmap_orders)) {
+                        this.checkOrderNotifications(data.kmap_orders);
+                    }
 
                     // Update active views immediately
                     this.renderClientCatalog();
@@ -2111,42 +2109,8 @@ class KmapStoreApp {
         window.addEventListener('storage', (e) => {
             if (e.key === 'kmap_orders') {
                 try {
-                    const oldOrders = JSON.parse(e.oldValue || '[]');
                     const newOrders = JSON.parse(e.newValue || safeLocalStorage.getItem('kmap_orders') || '[]');
-
-                    // Show notification to Admin/Superadmin on genuinely new client order
-                    if (this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role)) {
-                        const genuinelyNewOrders = newOrders.filter(no => !this.knownOrderIds.has(no.id));
-                        genuinelyNewOrders.forEach(o => {
-                            this.knownOrderIds.add(o.id);
-                            this.showToast(`🔔 New Order Received: ${o.id} - GH₵ ${o.total.toLocaleString()} from ${o.clientName}!`);
-                        });
-                    }
-
-                    // Update known order IDs
-                    newOrders.forEach(o => this.knownOrderIds.add(o.id));
-
-                    // Show notification when an order is removed (cancelled/reverted)
-                    if (newOrders.length < oldOrders.length) {
-                        const removedOrders = oldOrders.filter(oo => !newOrders.some(no => no.id === oo.id));
-                        removedOrders.forEach(o => {
-                            if (this.currentUser && this.currentUser.role === 'client' && o.phone === (this.currentUser.phone || this.currentUser.username)) {
-                                this.showToast(`🚨 Your order ${o.id} has been cancelled and reverted.`);
-                            } else if (this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role)) {
-                                this.showToast(`🗑️ Order ${o.id} was cancelled/reverted.`);
-                            }
-                        });
-                    }
-
-                    // Show notification to Client when Admin updates order status
-                    if (this.currentUser && this.currentUser.role === 'client') {
-                        newOrders.forEach(no => {
-                            const oldO = oldOrders.find(oo => oo.id === no.id);
-                            if (oldO && oldO.status !== no.status && no.phone === (this.currentUser.phone || this.currentUser.username)) {
-                                this.showToast(`📦 Order ${no.id} status updated to: ${no.status.toUpperCase()}`);
-                            }
-                        });
-                    }
+                    this.checkOrderNotifications(newOrders);
 
                     // Refresh views on all tabs instantly
                     this.renderClientOrders();
@@ -3816,10 +3780,9 @@ class KmapStoreApp {
             order.status = newStatus;
             this.db.saveOrders(orders);
             this.db.addLog(`Updated order status ${orderId} to: ${newStatus}`);
-            this.showToast(`Order status updated to ${newStatus}`);
-
             if (this.activeView === 'admin-dashboard') this.renderAdminOverview();
             if (this.activeView === 'admin-orders') this.renderAdminOrders();
+            this.forceCloudSyncAll(false);
         }
     }
 
@@ -4874,8 +4837,8 @@ class KmapStoreApp {
         this.forceCloudSyncAll(false);
     }
 
-    // Real-time toast alerts (clean, non-intrusive, yellow-free)
-    showToast(msg, type = 'success') {
+    // Real-time toast alerts (monochromatic, clean, completely no-color)
+    showToast(msg, type = 'info') {
         const container = document.getElementById('toast-container');
         if (!container) return;
 
@@ -4886,25 +4849,14 @@ class KmapStoreApp {
 
         const toast = document.createElement('div');
         toast.className = 'toast';
+        toast.style.background = '#111827';
+        toast.style.color = '#ffffff';
+        toast.style.border = '1px solid rgba(255, 255, 255, 0.18)';
+        toast.style.borderLeft = '3px solid #ffffff';
 
-        let borderCol = '#10b981'; // Emerald
-        let iconCol = '#10b981';
-        let iconClass = 'fa-circle-check';
-
-        if (type === 'error') {
-            borderCol = '#ef4444'; // Crimson
-            iconCol = '#ef4444';
-            iconClass = 'fa-triangle-exclamation';
-        } else if (type === 'warning' || type === 'info') {
-            borderCol = '#3b82f6'; // Blue
-            iconCol = '#3b82f6';
-            iconClass = 'fa-circle-info';
-        }
-
-        toast.style.borderLeftColor = borderCol;
         toast.innerHTML = `
-            <i class="fa-solid ${iconClass}" style="color: ${iconCol}; font-size: 15px; flex-shrink: 0;"></i>
-            <span style="line-height: 1.4;">${msg}</span>
+            <i class="fa-solid fa-circle-info" style="color: #ffffff; font-size: 14px; flex-shrink: 0; opacity: 0.9;"></i>
+            <span style="line-height: 1.4; color: #ffffff;">${msg}</span>
         `;
         container.appendChild(toast);
 
@@ -4915,6 +4867,45 @@ class KmapStoreApp {
             toast.style.transform = 'translateY(10px)';
             setTimeout(() => toast.remove(), 200);
         }, duration);
+    }
+
+    // Real-time order notification engine
+    checkOrderNotifications(newOrders) {
+        if (!Array.isArray(newOrders)) return;
+
+        const isAdmin = this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role);
+        const isClient = this.currentUser && this.currentUser.role === 'client';
+        const clientIdentifier = isClient ? (this.currentUser.phone || this.currentUser.username || '') : '';
+
+        // 1. Detect new orders & status updates
+        newOrders.forEach(no => {
+            // Admin notification on newly placed customer order
+            if (isAdmin && !this.knownOrdersMap.has(no.id)) {
+                this.showToast(`New Order Received: ${no.id} - GH₵ ${Number(no.total || 0).toLocaleString()} from ${no.clientName || 'Customer'}`);
+            }
+
+            // Customer notification when admin updates their order status
+            if (isClient && no.phone === clientIdentifier && this.knownOrdersMap.has(no.id)) {
+                const prevStatus = this.knownOrdersMap.get(no.id);
+                if (prevStatus && prevStatus !== no.status) {
+                    const statusText = (no.status || '').replace(/_/g, ' ').toUpperCase();
+                    this.showToast(`Order ${no.id} status updated to: ${statusText}`);
+                }
+            }
+        });
+
+        // 2. Detect cancellations / deleted orders
+        this.knownOrdersMap.forEach((prevStatus, orderId) => {
+            if (!newOrders.some(no => no.id === orderId)) {
+                if (isAdmin) {
+                    this.showToast(`Order ${orderId} was cancelled or removed.`);
+                }
+            }
+        });
+
+        // Update known orders map
+        this.knownOrdersMap.clear();
+        newOrders.forEach(o => this.knownOrdersMap.set(o.id, o.status));
     }
 
     // ==========================================
