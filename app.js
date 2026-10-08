@@ -17,7 +17,7 @@ const safeLocalStorage = {
         }
 
         // Push to cloud if it's a watched key and sync is not skipped
-        const watchedKeys = ['kmap_products', 'kmap_users', 'kmap_orders', 'kmap_logs', 'kmap_promos', 'kmap_hire_purchase', 'kmap_featured_laptops'];
+        const watchedKeys = ['kmap_products', 'kmap_users', 'kmap_orders', 'kmap_logs', 'kmap_promos', 'kmap_hire_purchase', 'kmap_featured_laptops', 'kmap_catalog_version'];
         if (!skipSync && watchedKeys.includes(key)) {
             try {
                 window.kvSyncQueue[key] = JSON.parse(val);
@@ -175,9 +175,21 @@ class KmapStoreApp {
                                     if (!ex) {
                                         data[key].push(defProd);
                                     } else {
-                                        if (defProd.id.startsWith('PROD-CHG-MAC')) {
+                                        if (defProd.priceDisplay === undefined && ex.priceDisplay) {
                                             delete ex.priceDisplay;
                                         }
+                                        if (defProd.id.startsWith('PROD-CHG-MAC')) {
+                                            delete ex.priceDisplay;
+                                            ex.price = defProd.price;
+                                        }
+                                        if (defProd.name && ex.name !== defProd.name) {
+                                            ex.name = defProd.name;
+                                        }
+                                    }
+                                });
+                                data[key].forEach(p => {
+                                    if (p.name && p.name.toLowerCase().includes('replacement') && p.category !== 'Parts') {
+                                        p.category = 'Parts';
                                     }
                                 });
                                 data[key] = this.sortProductList(data[key]);
@@ -251,7 +263,8 @@ class KmapStoreApp {
                         kmap_users: this.db.getUsers(),
                         kmap_promos: this.db.getPromos(),
                         kmap_hire_purchase: this.db.getHP(),
-                        kmap_featured_laptops: this.db.getFeaturedLaptops()
+                        kmap_featured_laptops: this.db.getFeaturedLaptops(),
+                        kmap_catalog_version: 'v4.5_20261008'
                     }
                 })
             });
@@ -1739,9 +1752,13 @@ class KmapStoreApp {
             }
         ];
 
-        // Check if database reset or sync is needed
+        // Check if database reset or cross-device sync migration is needed
+        const CURRENT_CATALOG_VERSION = 'v4.5_20261008';
+        const localVersion = safeLocalStorage.getItem('kmap_catalog_version');
         const existingProducts = safeLocalStorage.getItem('kmap_products');
         let needsReset = false;
+        const versionMismatch = localVersion !== CURRENT_CATALOG_VERSION;
+
         if (existingProducts) {
             try {
                 let parsed = JSON.parse(existingProducts);
@@ -1751,7 +1768,7 @@ class KmapStoreApp {
                     parsed.some(p => p.id === 'PROD-001' && (!p.images || !p.images.length || p.images[0].startsWith('data:')))) {
                     needsReset = true;
                 } else {
-                    let modified = false;
+                    let modified = versionMismatch;
                     const validLen = parsed.length;
                     parsed = parsed.filter(p => p.images && p.images.length > 0);
                     if (parsed.length !== validLen) modified = true;
@@ -1802,8 +1819,10 @@ class KmapStoreApp {
                     parsed = this.sortProductList(parsed);
                     modified = true;
 
-                    if (modified) {
+                    if (modified || versionMismatch) {
                         safeLocalStorage.setItem('kmap_products', JSON.stringify(parsed));
+                        safeLocalStorage.setItem('kmap_catalog_version', CURRENT_CATALOG_VERSION);
+                        setTimeout(() => this.forceCloudSyncAll(true), 600);
                     }
                 }
             } catch (e) {

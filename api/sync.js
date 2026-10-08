@@ -1,7 +1,7 @@
 import { createClient } from '@vercel/kv';
 
 export default async function handler(request, response) {
-  const allowedKeys = ['kmap_products', 'kmap_users', 'kmap_orders', 'kmap_logs', 'kmap_promos', 'kmap_hire_purchase'];
+  const allowedKeys = ['kmap_products', 'kmap_users', 'kmap_orders', 'kmap_logs', 'kmap_promos', 'kmap_hire_purchase', 'kmap_featured_laptops', 'kmap_catalog_version'];
 
   // Dynamically resolve URL and write TOKEN (ignoring READ_ONLY tokens)
   const url = process.env.KV_REST_API_URL 
