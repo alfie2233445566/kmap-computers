@@ -1241,102 +1241,7 @@ class KmapStoreApp {
                     'https://m.media-amazon.com/images/I/71X8k-24iSL._AC_SL1500_.jpg'
                 ]
             },
-            {
-                id: 'PROD-CHG-001',
-                name: "HP 90W Blue Pin Smart AC Laptop Charger Adapter (19.5V 4.62A)",
-                category: 'Accessories',
-                price: 150,
-                stock: 30,
-                spec: "Brand: HP Compatible OEM, Output: 19.5V 4.62A (90W - fully backwards compatible with 65W & 45W), Connector Tip: 4.5mm x 3.0mm Blue Tip Center Pin, Built-in Over-Current, Over-Voltage & Short Circuit Protection, Fits HP Pavilion, Envy, ProBook, EliteBook",
-                icon: '🔌',
-                images: [
-                    'https://m.media-amazon.com/images/I/61o6U3-qD2L._AC_SL1500_.jpg'
-                ]
-            },
-            {
-                id: 'PROD-CHG-002',
-                name: "Universal 65W / 90W Type-C USB-C PD Fast Laptop Charger Adapter",
-                category: 'Accessories',
-                price: 350,
-                stock: 20,
-                spec: "Technology: USB-C Power Delivery (PD 3.0 Fast Charge), Smart Output: Auto-Switching 5V/9V/12V/15V/20V (up to 65W/90W), Compatible with HP Type-C, Dell XPS/Latitude Type-C, Lenovo ThinkPad/Yoga, MacBook Pro/Air, Asus, Acer, Surface & Type-C Tablets/Phones",
-                icon: '🔌',
-                images: [
-                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
-                ]
-            },
-            {
-                id: 'PROD-CHG-003',
-                name: "Toshiba Satellite 19V AC Power Adapter Laptop Charger (5.5mm x 2.5mm)",
-                category: 'Accessories',
-                price: 100,
-                stock: 20,
-                spec: "Brand: Toshiba OEM Replacement, Output: 19V 3.42A / 3.95A (65W / 75W), Connector Tip: 5.5mm x 2.5mm Barrel, Compatible with Toshiba Satellite, Dynabook, Asus, Lenovo & Universal 19V Laptop Models",
-                icon: '🔌',
-                images: [
-                    'https://m.media-amazon.com/images/I/61H4bX2mBTL._AC_SL1500_.jpg'
-                ]
-            },
-            {
-                id: 'PROD-CHG-004',
-                name: "Lenovo 65W / 90W Yellow Rectangular Square USB-Pin Laptop Charger",
-                category: 'Accessories',
-                price: 150,
-                stock: 25,
-                spec: "Brand: Lenovo OEM Replacement, Output: 20V 3.25A / 4.5A (65W/90W), Connector: Yellow Square USB-Style Tip with Center Pin, Compatible with Lenovo ThinkPad T440, T450, T460, T470, X240, X250, X260, IdeaPad, Yoga",
-                icon: '🔌',
-                images: [
-                    'https://m.media-amazon.com/images/I/61Xq0sX0zAL._AC_SL1500_.jpg'
-                ]
-            },
-            {
-                id: 'PROD-CHG-005',
-                name: "Acer Aspire 19V Laptop AC Power Adapter Charger (5.5mm x 1.7mm)",
-                category: 'Accessories',
-                price: 100,
-                stock: 20,
-                spec: "Brand: Acer OEM Replacement, Output: 19V 3.42A (65W) / 19V 2.37A (45W), Connector Tip: 5.5mm x 1.7mm (Purple/Blue tip), Compatible with Acer Aspire 3, Aspire 5, TravelMate, Swift & Extensa series",
-                icon: '🔌',
-                images: [
-                    'https://m.media-amazon.com/images/I/61s8B4X4OML._AC_SL1500_.jpg'
-                ]
-            },
-            {
-                id: 'PROD-CHG-006',
-                name: "Dell 65W / 90W Small Pin AC Laptop Charger (4.5mm x 3.0mm Tip)",
-                category: 'Accessories',
-                price: 150,
-                stock: 30,
-                spec: "Brand: Dell OEM Replacement, Output: 19.5V 3.34A / 4.62A (65W/90W), Connector: 4.5mm x 3.0mm Small Barrel with Center Smart Pin, Compatible with Dell Inspiron, XPS 13, Latitude 3000/5000/7000 series, Vostro",
-                icon: '🔌',
-                images: [
-                    'https://m.media-amazon.com/images/I/61r5hGq1sEL._AC_SL1500_.jpg'
-                ]
-            },
-            {
-                id: 'PROD-CHG-007',
-                name: "Dell 90W Big Pin AC Laptop Charger Adapter (7.4mm x 5.0mm Tip)",
-                category: 'Accessories',
-                price: 150,
-                stock: 25,
-                spec: "Brand: Dell OEM Replacement, Output: 19.5V 4.62A (90W), Connector: 7.4mm x 5.0mm Large Barrel with Center Smart Pin, Compatible with Dell Latitude E6420, E6430, E6440, E5440, E5540, Inspiron, Precision Workstations",
-                icon: '🔌',
-                images: [
-                    'https://m.media-amazon.com/images/I/61hX0V1N8-L._AC_SL1500_.jpg'
-                ]
-            },
-            {
-                id: 'PROD-CHG-008',
-                name: "Lenovo 90W Big Round Pin AC Laptop Charger Adapter (7.9mm x 5.5mm Tip)",
-                category: 'Accessories',
-                price: 100,
-                stock: 20,
-                spec: "Brand: Lenovo OEM Replacement, Output: 20V 4.5A (90W) / 3.25A (65W), Connector: 7.9mm x 5.5mm Round Tip with Center Pin, Compatible with Classic Lenovo ThinkPad T60, T61, T400, T410, T420, T430, X220, X230, W500",
-                icon: '🔌',
-                images: [
-                    'https://m.media-amazon.com/images/I/61bW6m0NlCL._AC_SL1500_.jpg'
-                ]
-            },
+            // ── Apple MacBook Chargers ──
             {
                 id: 'PROD-CHG-MAC01',
                 name: "Apple MacBook MagSafe 1 Power Adapter Charger (45W)",
@@ -1407,6 +1312,108 @@ class KmapStoreApp {
                 icon: '🍏',
                 images: [
                     'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=600&auto=format&fit=crop&q=80'
+                ]
+            },
+            // ── HP Chargers ──
+            {
+                id: 'PROD-CHG-001',
+                name: "HP 90W Blue Pin Smart AC Laptop Charger Adapter (19.5V 4.62A)",
+                category: 'Accessories',
+                price: 150,
+                stock: 30,
+                spec: "Brand: HP Compatible OEM, Output: 19.5V 4.62A (90W - fully backwards compatible with 65W & 45W), Connector Tip: 4.5mm x 3.0mm Blue Tip Center Pin, Built-in Over-Current, Over-Voltage & Short Circuit Protection, Fits HP Pavilion, Envy, ProBook, EliteBook",
+                icon: '🔌',
+                images: [
+                    'https://m.media-amazon.com/images/I/61o6U3-qD2L._AC_SL1500_.jpg'
+                ]
+            },
+            // ── Dell Chargers ──
+            {
+                id: 'PROD-CHG-006',
+                name: "Dell 65W / 90W Small Pin AC Laptop Charger (4.5mm x 3.0mm Tip)",
+                category: 'Accessories',
+                price: 150,
+                stock: 30,
+                spec: "Brand: Dell OEM Replacement, Output: 19.5V 3.34A / 4.62A (65W/90W), Connector: 4.5mm x 3.0mm Small Barrel with Center Smart Pin, Compatible with Dell Inspiron, XPS 13, Latitude 3000/5000/7000 series, Vostro",
+                icon: '🔌',
+                images: [
+                    'https://m.media-amazon.com/images/I/61r5hGq1sEL._AC_SL1500_.jpg'
+                ]
+            },
+            {
+                id: 'PROD-CHG-007',
+                name: "Dell 90W Big Pin AC Laptop Charger Adapter (7.4mm x 5.0mm Tip)",
+                category: 'Accessories',
+                price: 150,
+                stock: 25,
+                spec: "Brand: Dell OEM Replacement, Output: 19.5V 4.62A (90W), Connector: 7.4mm x 5.0mm Large Barrel with Center Smart Pin, Compatible with Dell Latitude E6420, E6430, E6440, E5440, E5540, Inspiron, Precision Workstations",
+                icon: '🔌',
+                images: [
+                    'https://m.media-amazon.com/images/I/61hX0V1N8-L._AC_SL1500_.jpg'
+                ]
+            },
+            // ── Lenovo Chargers ──
+            {
+                id: 'PROD-CHG-004',
+                name: "Lenovo 65W / 90W Yellow Rectangular Square USB-Pin Laptop Charger",
+                category: 'Accessories',
+                price: 150,
+                stock: 25,
+                spec: "Brand: Lenovo OEM Replacement, Output: 20V 3.25A / 4.5A (65W/90W), Connector: Yellow Square USB-Style Tip with Center Pin, Compatible with Lenovo ThinkPad T440, T450, T460, T470, X240, X250, X260, IdeaPad, Yoga",
+                icon: '🔌',
+                images: [
+                    'https://m.media-amazon.com/images/I/61Xq0sX0zAL._AC_SL1500_.jpg'
+                ]
+            },
+            {
+                id: 'PROD-CHG-008',
+                name: "Lenovo 90W Big Round Pin AC Laptop Charger Adapter (7.9mm x 5.5mm Tip)",
+                category: 'Accessories',
+                price: 100,
+                stock: 20,
+                spec: "Brand: Lenovo OEM Replacement, Output: 20V 4.5A (90W) / 3.25A (65W), Connector: 7.9mm x 5.5mm Round Tip with Center Pin, Compatible with Classic Lenovo ThinkPad T60, T61, T400, T410, T420, T430, X220, X230, W500",
+                icon: '🔌',
+                images: [
+                    'https://m.media-amazon.com/images/I/61bW6m0NlCL._AC_SL1500_.jpg'
+                ]
+            },
+            // ── Acer Chargers ──
+            {
+                id: 'PROD-CHG-005',
+                name: "Acer Aspire 19V Laptop AC Power Adapter Charger (5.5mm x 1.7mm)",
+                category: 'Accessories',
+                price: 100,
+                stock: 20,
+                spec: "Brand: Acer OEM Replacement, Output: 19V 3.42A (65W) / 19V 2.37A (45W), Connector Tip: 5.5mm x 1.7mm (Purple/Blue tip), Compatible with Acer Aspire 3, Aspire 5, TravelMate, Swift & Extensa series",
+                icon: '🔌',
+                images: [
+                    'https://m.media-amazon.com/images/I/61s8B4X4OML._AC_SL1500_.jpg'
+                ]
+            },
+            // ── Toshiba Chargers ──
+            {
+                id: 'PROD-CHG-003',
+                name: "Toshiba Satellite 19V AC Power Adapter Laptop Charger (5.5mm x 2.5mm)",
+                category: 'Accessories',
+                price: 100,
+                stock: 20,
+                spec: "Brand: Toshiba OEM Replacement, Output: 19V 3.42A / 3.95A (65W / 75W), Connector Tip: 5.5mm x 2.5mm Barrel, Compatible with Toshiba Satellite, Dynabook, Asus, Lenovo & Universal 19V Laptop Models",
+                icon: '🔌',
+                images: [
+                    'https://m.media-amazon.com/images/I/61H4bX2mBTL._AC_SL1500_.jpg'
+                ]
+            },
+            // ── Universal Type-C Chargers ──
+            {
+                id: 'PROD-CHG-002',
+                name: "Universal 65W / 90W Type-C USB-C PD Fast Laptop Charger Adapter",
+                category: 'Accessories',
+                price: 350,
+                stock: 20,
+                spec: "Technology: USB-C Power Delivery (PD 3.0 Fast Charge), Smart Output: Auto-Switching 5V/9V/12V/15V/20V (up to 65W/90W), Compatible with HP Type-C, Dell XPS/Latitude Type-C, Lenovo ThinkPad/Yoga, MacBook Pro/Air, Asus, Acer, Surface & Type-C Tablets/Phones",
+                icon: '🔌',
+                images: [
+                    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80'
                 ]
             },
             {
@@ -1691,17 +1698,17 @@ class KmapStoreApp {
                         }
                     });
 
-                    // Sync & update all default catalog items into parsed storage
+                    // Sync & update default catalog items without overwriting user-configured categories
                     defaultProducts.forEach(defProd => {
                         const existing = parsed.find(p => p.id === defProd.id);
                         if (!existing) {
                             parsed.push(defProd);
                             modified = true;
                         } else {
-                            // Keep specs, price, priceDisplay, name, category, and images up to date
+                            // Keep specs, price, priceDisplay, name, and images up to date, while PRESERVING user-selected category
                             const imagesChanged = JSON.stringify(existing.images || []) !== JSON.stringify(defProd.images || []);
                             const priceDisplayChanged = existing.priceDisplay !== defProd.priceDisplay;
-                            if (existing.price !== defProd.price || existing.name !== defProd.name || existing.category !== defProd.category || existing.spec !== defProd.spec || priceDisplayChanged || imagesChanged) {
+                            if (existing.price !== defProd.price || existing.name !== defProd.name || existing.spec !== defProd.spec || priceDisplayChanged || imagesChanged) {
                                 existing.price = defProd.price;
                                 if (defProd.priceDisplay !== undefined) {
                                     existing.priceDisplay = defProd.priceDisplay;
@@ -1709,8 +1716,10 @@ class KmapStoreApp {
                                     delete existing.priceDisplay;
                                 }
                                 existing.name = defProd.name;
-                                existing.category = defProd.category;
                                 existing.spec = defProd.spec;
+                                if (!existing.category) {
+                                    existing.category = defProd.category;
+                                }
                                 if (defProd.images && defProd.images.length > 0) {
                                     existing.images = defProd.images;
                                 }
@@ -1718,6 +1727,16 @@ class KmapStoreApp {
                             }
                         }
                     });
+
+                    // Re-order parsed products so all like chargers and items appear in clean succession
+                    const defOrder = new Map(defaultProducts.map((p, idx) => [p.id, idx]));
+                    parsed.sort((a, b) => {
+                        const orderA = defOrder.has(a.id) ? defOrder.get(a.id) : 9999;
+                        const orderB = defOrder.has(b.id) ? defOrder.get(b.id) : 9999;
+                        return orderA - orderB;
+                    });
+                    modified = true;
+
                     if (modified) {
                         safeLocalStorage.setItem('kmap_products', JSON.stringify(parsed));
                     }
@@ -2452,6 +2471,8 @@ class KmapStoreApp {
     navigateToCategory(category) {
         this.switchView('client-store');
         this.activeCategory = category;
+        const searchInput = document.getElementById('client-search');
+        if (searchInput) searchInput.value = '';
         const catSelect = document.getElementById('client-category-select');
         if (catSelect) {
             catSelect.value = category;
@@ -2629,7 +2650,9 @@ class KmapStoreApp {
     // Render client catalog
     renderClientCatalog() {
         if (!this.categoryFiltersInitialized) {
-            this.activeCategory = 'All';
+            if (!this.activeCategory) {
+                this.activeCategory = 'All';
+            }
             this.categoryFiltersInitialized = true;
         }
         this.renderCategoryFilters();
@@ -2640,8 +2663,8 @@ class KmapStoreApp {
 
         const products = this.db.getProducts();
         const filtered = products.filter(p => {
-            const matchesQuery = p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query);
-            const matchesCategory = this.activeCategory === 'All' || p.category.toLowerCase() === this.activeCategory.toLowerCase();
+            const matchesQuery = p.name.toLowerCase().includes(query) || (p.category && p.category.toLowerCase().includes(query));
+            const matchesCategory = this.activeCategory === 'All' || (p.category && p.category.toLowerCase() === this.activeCategory.toLowerCase());
             return matchesQuery && matchesCategory;
         });
 
@@ -3850,7 +3873,7 @@ class KmapStoreApp {
 
         // Filter by category
         if (selectedCategory && selectedCategory !== 'all') {
-            products = products.filter(p => p.category === selectedCategory);
+            products = products.filter(p => p.category && p.category.toLowerCase() === selectedCategory.toLowerCase());
         }
 
         // Filter by stock level
