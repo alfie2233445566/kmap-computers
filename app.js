@@ -202,6 +202,7 @@ class KmapStoreApp {
                     this.renderAdminOverview();
                     this.renderClientOrders();
                     this.renderAdminOrders();
+                    this.updateFeaturedPrices();
 
                     // Trigger cross-tab sync to refresh other local tabs
                     window.dispatchEvent(new StorageEvent('storage', { key: 'kmap_orders' }));
@@ -493,6 +494,7 @@ class KmapStoreApp {
         if (window.history && window.history.replaceState) {
             window.history.replaceState({ view: initialView }, '', '#' + initialView);
         }
+        this.updateFeaturedPrices();
     }
 
     openLoginModal(tab = 'signin') {
@@ -1559,6 +1561,16 @@ class KmapStoreApp {
 
         const defaultHP = [];
 
+        const defaultPromos = [
+            {
+                id: 'PROMO-20OFF',
+                scope: 'category',
+                category: 'Laptops',
+                type: 'percent',
+                value: 20
+            }
+        ];
+
         // Check if database reset or sync is needed
         const existingProducts = safeLocalStorage.getItem('kmap_products');
         let needsReset = false;
@@ -1614,7 +1626,7 @@ class KmapStoreApp {
             safeLocalStorage.setItem('kmap_users', JSON.stringify(defaultUsers), true);
             safeLocalStorage.setItem('kmap_orders', JSON.stringify(defaultOrders), true);
             safeLocalStorage.setItem('kmap_logs', JSON.stringify([]), true);
-            safeLocalStorage.setItem('kmap_promos', JSON.stringify([]), true);
+            safeLocalStorage.setItem('kmap_promos', JSON.stringify(defaultPromos), true);
             safeLocalStorage.setItem('kmap_hire_purchase', JSON.stringify(defaultHP), true);
         }
 
@@ -1717,7 +1729,14 @@ class KmapStoreApp {
                 logs.unshift({ date: new Date().toISOString(), user: this.currentUser?.username || 'System', message: msg });
                 safeLocalStorage.setItem('kmap_logs', JSON.stringify(logs));
             },
-            getPromos: () => JSON.parse(safeLocalStorage.getItem('kmap_promos')) || [],
+            getPromos: () => {
+                try {
+                    const p = JSON.parse(safeLocalStorage.getItem('kmap_promos'));
+                    return (Array.isArray(p) && p.length > 0) ? p : defaultPromos;
+                } catch (e) {
+                    return defaultPromos;
+                }
+            },
             savePromos: (data) => safeLocalStorage.setItem('kmap_promos', JSON.stringify(data)),
             getHP: () => JSON.parse(safeLocalStorage.getItem('kmap_hire_purchase')) || [],
             saveHP: (data) => safeLocalStorage.setItem('kmap_hire_purchase', JSON.stringify(data))
@@ -1915,6 +1934,7 @@ class KmapStoreApp {
                 this.renderCart();
                 this.renderAdminInventory();
                 this.renderAdminOverview();
+                this.updateFeaturedPrices();
             }
         });
 
@@ -2209,6 +2229,7 @@ class KmapStoreApp {
                 const totalQty = this.cart ? this.cart.reduce((sum, item) => sum + item.qty, 0) : 0;
                 document.querySelectorAll('.cart-count').forEach(el => el.innerText = totalQty);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                this.updateFeaturedPrices();
                 this.startHeroSlider();
                 break;
             case 'client-store':
@@ -2444,7 +2465,8 @@ class KmapStoreApp {
         if (!select) return;
 
         const products = this.db.getProducts();
-        const categories = ['All', ...new Set(products.map(p => p.category))];
+        const standardCategories = ['Laptops', 'Accessories', 'Parts', 'Networking', 'Storage'];
+        const categories = ['All', ...Array.from(new Set([...standardCategories, ...products.map(p => p.category).filter(Boolean)]))];
 
         const currentOptions = Array.from(select.options).map(o => o.value);
         const needsUpdate = categories.length !== currentOptions.length || !categories.every((c, i) => c === currentOptions[i]);
@@ -2856,28 +2878,53 @@ class KmapStoreApp {
 
     // Promotions pricing utility
     getDiscountedPrice(p) {
+        if (!p || typeof p.price !== 'number') return p?.price || 0;
         const promos = this.db.getPromos();
         let bestPrice = p.price;
+        if (!Array.isArray(promos) || promos.length === 0) return bestPrice;
+
+        const prodCat = (p.category || '').toLowerCase().trim();
+        const prodCatNorm = prodCat.replace(/s$/, ''); // normalize "laptops" and "laptop"
+
         promos.forEach(promo => {
+            if (promo.active === false || promo.status === 'inactive') return;
+
             let matches = false;
-            if (promo.scope === 'category' && promo.category.toLowerCase() === p.category.toLowerCase()) {
+            const scope = (promo.scope || '').toLowerCase().trim();
+            const promoCat = (promo.category || '').toLowerCase().trim();
+            const promoCatNorm = promoCat.replace(/s$/, '');
+
+            if (!scope || scope === 'all' || scope === 'store' || scope === 'storewide' || scope === 'all_products') {
                 matches = true;
-            } else if (promo.scope === 'product' && promo.productId === p.id) {
+            } else if (scope === 'category') {
+                if (!promoCat || promoCat === 'all' || promoCat === prodCat || promoCatNorm === prodCatNorm) {
+                    matches = true;
+                }
+            } else if (scope === 'product') {
+                if (promo.productId === p.id) {
+                    matches = true;
+                }
+            } else if (scope === prodCat || scope === prodCatNorm) {
                 matches = true;
             }
+
             if (matches) {
+                const val = parseFloat(promo.value) || 0;
                 let discounted = p.price;
-                if (promo.type === 'percent') {
-                    discounted = p.price * (1 - parseFloat(promo.value) / 100);
-                } else if (promo.type === 'amount') {
-                    discounted = Math.max(0, p.price - parseFloat(promo.value));
+                const type = (promo.type || '').toLowerCase().trim();
+                if (type === 'percent' || type === 'percentage' || type === '%') {
+                    discounted = p.price * (1 - val / 100);
+                } else if (type === 'amount' || type === 'fixed') {
+                    discounted = Math.max(0, p.price - val);
+                } else if (val > 0 && val < 100) {
+                    discounted = p.price * (1 - val / 100);
                 }
                 if (discounted < bestPrice) {
                     bestPrice = discounted;
                 }
             }
         });
-        return bestPrice;
+        return Math.round(bestPrice * 100) / 100;
     }
 
     handlePromoScopeChange() {
@@ -2887,6 +2934,26 @@ class KmapStoreApp {
     }
 
     renderPromotions() {
+        const promoCatSelect = document.getElementById('promo-category');
+        if (promoCatSelect) {
+            const products = this.db.getProducts();
+            const standardCategories = ['Laptops', 'Accessories', 'Parts', 'Networking', 'Storage'];
+            const allCategories = Array.from(new Set([...standardCategories, ...products.map(p => p.category).filter(Boolean)]));
+            const currentOptions = Array.from(promoCatSelect.options).map(o => o.value);
+            const needsUpdate = allCategories.length !== currentOptions.length || !allCategories.every(c => currentOptions.includes(c));
+            if (needsUpdate || promoCatSelect.options.length === 0) {
+                const prevVal = promoCatSelect.value;
+                promoCatSelect.innerHTML = '';
+                allCategories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat;
+                    opt.innerText = cat;
+                    promoCatSelect.appendChild(opt);
+                });
+                if (prevVal) promoCatSelect.value = prevVal;
+            }
+        }
+
         const productsSelect = document.getElementById('promo-product');
         if (productsSelect) {
             productsSelect.innerHTML = '';
@@ -2948,6 +3015,7 @@ class KmapStoreApp {
         this.db.addLog(`Created promotion ${newPromo.id} - ${scope} discount`);
         this.showToast("Promotion created successfully!");
         this.renderPromotions();
+        this.updateFeaturedPrices();
     }
 
     deletePromotion(id) {
@@ -2956,6 +3024,7 @@ class KmapStoreApp {
         this.db.savePromos(promos);
         this.showToast("Promotion removed");
         this.renderPromotions();
+        this.updateFeaturedPrices();
     }
 
     viewProductFromCart(productId) {
@@ -3308,6 +3377,12 @@ class KmapStoreApp {
 
     showLowStockItems() {
         this.switchView('admin-inventory');
+        const searchInput = document.getElementById('admin-inventory-search');
+        if (searchInput) searchInput.value = '';
+        const catFilter = document.getElementById('admin-inventory-category-filter');
+        if (catFilter) catFilter.value = 'all';
+        const stockFilter = document.getElementById('admin-inventory-stock-filter');
+        if (stockFilter) stockFilter.value = 'low_stock';
         this.renderAdminInventory(true);
     }
 
@@ -3600,17 +3675,100 @@ class KmapStoreApp {
     // ADMIN: Stock & Inventory Page
     renderAdminInventory(filterLowStock = false) {
         const tbody = document.getElementById('admin-inventory-tbody');
+        if (!tbody) return;
         tbody.innerHTML = '';
 
         let products = this.db.getProducts();
-        if (filterLowStock) {
-            products = products.filter(p => p.stock <= 3);
+
+        // Dynamically populate Category Filter with consistent categories
+        const catFilter = document.getElementById('admin-inventory-category-filter');
+        if (catFilter) {
+            const currentSelected = catFilter.value || 'all';
+            const standardCategories = ['Laptops', 'Accessories', 'Parts', 'Networking', 'Storage'];
+            const allCategories = ['all', ...Array.from(new Set([...standardCategories, ...products.map(p => p.category).filter(Boolean)]))];
+            const currentOptions = Array.from(catFilter.options).map(o => o.value);
+            const needsUpdate = allCategories.length !== currentOptions.length || !allCategories.every((c, i) => c === currentOptions[i]);
+
+            if (needsUpdate || catFilter.options.length <= 1) {
+                catFilter.innerHTML = '<option value="all">All Categories</option>';
+                allCategories.filter(c => c !== 'all').forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat;
+                    opt.innerText = cat;
+                    catFilter.appendChild(opt);
+                });
+                catFilter.value = allCategories.includes(currentSelected) ? currentSelected : 'all';
+            }
         }
+
+        const stockFilter = document.getElementById('admin-inventory-stock-filter');
+        if (filterLowStock && stockFilter) {
+            stockFilter.value = 'low_stock';
+        }
+
+        const selectedCategory = catFilter ? catFilter.value : 'all';
+        const selectedStock = stockFilter ? stockFilter.value : (filterLowStock ? 'low_stock' : 'all');
+        const searchInput = document.getElementById('admin-inventory-search');
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+        // Filter by category
+        if (selectedCategory && selectedCategory !== 'all') {
+            products = products.filter(p => p.category === selectedCategory);
+        }
+
+        // Filter by stock level
+        if (selectedStock === 'low_stock') {
+            products = products.filter(p => p.stock <= 3);
+        } else if (selectedStock === 'in_stock') {
+            products = products.filter(p => p.stock > 0);
+        } else if (selectedStock === 'out_of_stock') {
+            products = products.filter(p => p.stock === 0);
+        }
+
+        // Filter by search query
+        if (query) {
+            products = products.filter(p => {
+                const name = (p.name || '').toLowerCase();
+                const id = (p.id || '').toLowerCase();
+                const category = (p.category || '').toLowerCase();
+                const specs = (p.spec || p.specs || '').toLowerCase();
+                const brand = (p.brand || '').toLowerCase();
+                return name.includes(query) || id.includes(query) || category.includes(query) || specs.includes(query) || brand.includes(query);
+            });
+        }
+
+        // Update count badge
+        const countBadge = document.getElementById('admin-inventory-count');
+        if (countBadge) {
+            const totalProducts = this.db.getProducts().length;
+            countBadge.innerText = `Showing ${products.length} of ${totalProducts} items`;
+        }
+
+        if (products.length === 0) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td colspan="6" style="text-align: center; padding: 36px 16px; color: var(--text-light);">
+                    <i class="fa-solid fa-boxes-stacked" style="font-size: 32px; margin-bottom: 10px; display: block; opacity: 0.35;"></i>
+                    <strong style="display: block; margin-bottom: 4px;">No products found</strong>
+                    <span style="font-size: 13px;">No items match your active search or filter criteria.</span>
+                </td>
+            `;
+            tbody.appendChild(tr);
+            return;
+        }
+
         products.forEach(p => {
             const hasImg = p.images && p.images.length > 0 && p.images[0];
             const iconOrImg = hasImg
                 ? `<img src="${p.images[0]}" alt="${p.name}" style="width:36px; height:36px; object-fit:cover; object-position:center; border-radius:4px; border:1px solid var(--border); background:#fff;">`
                 : `<span style="font-size: 20px;">${p.icon || '💻'}</span>`;
+
+            let stockBadge = '';
+            if (p.stock === 0) {
+                stockBadge = `<span class="badge" style="background: rgba(217, 48, 37, 0.12); color: #C5221F; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">Out of Stock</span>`;
+            } else if (p.stock <= 3) {
+                stockBadge = `<span class="badge" style="background: rgba(244, 180, 0, 0.15); color: #B07D00; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">Low Stock</span>`;
+            }
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -3618,21 +3776,41 @@ class KmapStoreApp {
                 <td>
                     <div style="display:flex; align-items:center; gap:8px;">
                         ${iconOrImg}
-                        <strong>${p.name}</strong>
+                        <div>
+                            <strong>${p.name}</strong>
+                            ${p.brand ? `<div style="font-size: 11px; color: var(--text-light);">${p.brand}</div>` : ''}
+                        </div>
                     </div>
                 </td>
-                <td>${p.category}</td>
-                <td><strong>GH₵ ${p.price.toLocaleString()}</strong></td>
+                <td><span style="display: inline-block; padding: 2px 8px; background: rgba(0,0,0,0.04); border-radius: 4px; font-size: 12px; font-weight: 500;">${p.category}</span></td>
+                <td><strong>GH₵ ${Number(p.price || 0).toLocaleString()}</strong></td>
                 <td>
-                    <input type="number" class="form-control" style="width: 80px; padding: 4px 8px;" value="${p.stock}" onchange="app.updateProductStock('${p.id}', this.value)">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="number" class="form-control" style="width: 75px; padding: 4px 8px; font-weight: 600;" value="${p.stock}" min="0" onchange="app.updateProductStock('${p.id}', this.value)">
+                        ${stockBadge}
+                    </div>
                 </td>
                 <td>
-                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="app.openProductModal('${p.id}')"><i class="fa-solid fa-pen"></i></button>
-                    <button class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="app.deleteProduct('${p.id}')"><i class="fa-solid fa-trash"></i></button>
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="app.openProductModal('${p.id}')" title="Edit Product"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="app.deleteProduct('${p.id}')" title="Delete Product"><i class="fa-solid fa-trash"></i></button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
+    }
+
+    searchAdminInventory() {
+        this.renderAdminInventory();
+    }
+
+    resetAdminInventoryFilters() {
+        const searchInput = document.getElementById('admin-inventory-search');
+        if (searchInput) searchInput.value = '';
+        const catFilter = document.getElementById('admin-inventory-category-filter');
+        if (catFilter) catFilter.value = 'all';
+        const stockFilter = document.getElementById('admin-inventory-stock-filter');
+        if (stockFilter) stockFilter.value = 'all';
+        this.renderAdminInventory();
     }
 
     updateProductStock(prodId, newStock) {
@@ -3643,6 +3821,7 @@ class KmapStoreApp {
             this.db.saveProducts(products);
             this.showToast(`Stock updated for ${p.name}`);
             this.forceCloudSyncAll(true);
+            this.updateFeaturedPrices();
         }
     }
 
@@ -3790,6 +3969,26 @@ class KmapStoreApp {
 
         const fileInput = document.getElementById('form-product-file-upload');
         if (fileInput) fileInput.value = '';
+
+        // Dynamically ensure all consistent categories are populated in the select dropdown
+        const catSelect = document.getElementById('form-product-category');
+        if (catSelect) {
+            const standardCategories = ['Laptops', 'Accessories', 'Parts', 'Networking', 'Storage'];
+            const allCategories = Array.from(new Set([...standardCategories, ...this.db.getProducts().map(p => p.category).filter(Boolean)]));
+            const currentOptions = Array.from(catSelect.options).map(o => o.value);
+            const needsUpdate = allCategories.length !== currentOptions.length || !allCategories.every(c => currentOptions.includes(c));
+            if (needsUpdate || catSelect.options.length === 0) {
+                const prevVal = catSelect.value;
+                catSelect.innerHTML = '';
+                allCategories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat;
+                    opt.innerText = cat;
+                    catSelect.appendChild(opt);
+                });
+                if (prevVal) catSelect.value = prevVal;
+            }
+        }
 
         if (productId) {
             title.innerText = "Edit Product Details";
@@ -5258,6 +5457,88 @@ class KmapStoreApp {
     restartHeroSlider() {
         this.stopHeroSlider();
         this.startHeroSlider();
+    }
+
+    // Update current prices on Featured Laptops & Hero showcase after every promo is applied
+    updateFeaturedPrices() {
+        const products = this.db.getProducts();
+
+        // 1. Update Featured Laptop Cards
+        document.querySelectorAll('.featured-laptop-card').forEach(card => {
+            let prodId = card.getAttribute('data-product-id');
+            if (!prodId) {
+                const match = card.innerHTML.match(/openInspectModal\(['"]([^'"]+)['"]\)/) || card.innerHTML.match(/addToCart\(['"]([^'"]+)['"]\)/);
+                if (match) prodId = match[1];
+            }
+            if (!prodId) return;
+            const p = products.find(item => item.id === prodId);
+            if (!p) return;
+
+            const discPrice = this.getDiscountedPrice(p);
+            const hasPromo = discPrice < p.price;
+            const priceEl = card.querySelector('.feat-card-price');
+            if (priceEl) {
+                if (hasPromo) {
+                    priceEl.innerHTML = `<span class="original-price" style="text-decoration: line-through; color: #94a3b8; font-size: 13px; font-weight: 600; margin-right: 6px;">GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</span><span class="promo-price" style="color: #dc2626; font-weight: 900;">GH₵ ${discPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</span>`;
+                } else {
+                    priceEl.innerHTML = `GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+                }
+            }
+
+            // Promo Badge Tag
+            const tagsContainer = card.querySelector('.feat-card-tags');
+            let promoBadge = card.querySelector('.feat-promo-tag');
+            if (hasPromo) {
+                const percentOff = Math.round(((p.price - discPrice) / p.price) * 100);
+                const discountText = percentOff > 0 ? `${percentOff}% OFF PROMO` : 'PROMO DEAL';
+                if (!promoBadge && tagsContainer) {
+                    promoBadge = document.createElement('span');
+                    promoBadge.className = 'feat-tag feat-promo-tag';
+                    promoBadge.style.cssText = 'background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-weight: 700;';
+                    tagsContainer.prepend(promoBadge);
+                }
+                if (promoBadge) {
+                    promoBadge.innerText = discountText;
+                }
+            } else if (promoBadge) {
+                promoBadge.remove();
+            }
+
+            // Stock status update
+            const stockEl = card.querySelector('.feat-card-stock');
+            if (stockEl) {
+                if (p.stock === 0) {
+                    stockEl.innerHTML = `<span class="stock-dot" style="background:#dc2626;"></span> <span style="color:#dc2626; font-weight:700;">Out of Stock</span>`;
+                } else if (p.stock <= 3) {
+                    stockEl.innerHTML = `<span class="stock-dot" style="background:#eab308;"></span> <span style="color:#d97706; font-weight:700;">Low Stock (${p.stock} left)</span>`;
+                } else {
+                    stockEl.innerHTML = `<span class="stock-dot"></span> In Stock`;
+                }
+            }
+        });
+
+        // 2. Update Hero Laptop Floater Slides
+        document.querySelectorAll('.hero-floater-slide').forEach(slide => {
+            let prodId = slide.getAttribute('data-product-id');
+            if (!prodId) {
+                const match = slide.innerHTML.match(/openInspectModal\(['"]([^'"]+)['"]\)/) || slide.innerHTML.match(/addToCart\(['"]([^'"]+)['"]\)/);
+                if (match) prodId = match[1];
+            }
+            if (!prodId) return;
+            const p = products.find(item => item.id === prodId);
+            if (!p) return;
+
+            const discPrice = this.getDiscountedPrice(p);
+            const hasPromo = discPrice < p.price;
+            const priceEl = slide.querySelector('.slide-badge-price');
+            if (priceEl) {
+                if (hasPromo) {
+                    priceEl.innerHTML = `<span style="text-decoration: line-through; opacity: 0.7; font-size: 11px; margin-right: 5px;">GH₵ ${p.price.toLocaleString()}</span><span style="color: #fef08a; font-weight: 900;">GH₵ ${discPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</span>`;
+                } else {
+                    priceEl.innerHTML = `GH₵ ${p.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+                }
+            }
+        });
     }
 
     // UI action aliases
