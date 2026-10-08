@@ -470,9 +470,10 @@ class KmapStoreApp {
 
             const isLocalOrLaptop = p.category === 'Laptops' || (p.images && p.images[0] && p.images[0].startsWith('images/products/'));
             const fitStyle = isLocalOrLaptop ? 'object-fit:cover;' : 'object-fit:contain; background:#ffffff; padding:6px;';
+            const noPhotoPlaceholder = `<div class="no-photo-placeholder" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f8fafc; color:#94a3b8; text-align:center; padding:16px; user-select:none;"><i class="fa-solid fa-camera" style="font-size:26px; margin-bottom:6px; opacity:0.6;"></i><span style="font-size:11px; font-weight:600; letter-spacing:0.3px; color:#64748b;">No Picture Available</span></div>`;
             const mainImg = (p.images && p.images.length > 0 && p.images[0])
-                ? `<img src="${p.images[0]}" alt="${p.name}" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:100%; ${fitStyle} object-position:center; display:block;">`
-                : `<span style="font-size: 56px; color: var(--primary); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${p.icon || '💻'}</span>`;
+                ? `<img src="${p.images[0]}" alt="${p.name}" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:100%; ${fitStyle} object-position:center; display:block;" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"><div class="no-photo-placeholder" style="display:none; width:100%; height:100%; flex-direction:column; align-items:center; justify-content:center; background:#f8fafc; color:#94a3b8; text-align:center; padding:16px; user-select:none;"><i class="fa-solid fa-camera" style="font-size:26px; margin-bottom:6px; opacity:0.6;"></i><span style="font-size:11px; font-weight:600; letter-spacing:0.3px; color:#64748b;">No Picture Available</span></div>`
+                : noPhotoPlaceholder;
 
             const specsArray = p.spec ? p.spec.split(/,|\n/).map(s => s.trim()).filter(s => s.length > 0) : [];
             const shortSpec = specsArray.length > 2
@@ -2796,13 +2797,13 @@ class KmapStoreApp {
 
             const promoBadge = hasPromo ? `<div class="promo-badge">PROMO</div>` : '';
 
-            // Image handling (support up to 6 images, fallback to default laptop/desktop emoji icons)
+            // Image handling (support up to 6 images, fallback to clean professional placeholder)
             const isLocalOrLaptop = p.category === 'Laptops' || (p.images && p.images[0] && p.images[0].startsWith('images/products/'));
             const fitStyle = isLocalOrLaptop ? 'object-fit:cover;' : 'object-fit:contain; background:#ffffff; padding:6px;';
-            const fallbackIcon = `<span style="font-size: 56px; color: var(--primary); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${p.icon || '💻'}</span>`;
+            const noPhotoPlaceholder = `<div class="no-photo-placeholder" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f8fafc; color:#94a3b8; text-align:center; padding:16px; user-select:none;"><i class="fa-solid fa-camera" style="font-size:28px; margin-bottom:8px; opacity:0.6;"></i><span style="font-size:12px; font-weight:600; letter-spacing:0.3px; color:#64748b;">No Picture Available</span></div>`;
             const mainImg = (p.images && p.images.length > 0 && p.images[0])
-                ? `<img src="${p.images[0]}" alt="${p.name}" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:100%; ${fitStyle} object-position:center; display:block;" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"><span style="display:none; font-size: 56px; color: var(--primary); align-items: center; justify-content: center; width: 100%; height: 100%;">${p.icon || '💻'}</span>`
-                : fallbackIcon;
+                ? `<img src="${p.images[0]}" alt="${p.name}" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:100%; ${fitStyle} object-position:center; display:block;" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"><div class="no-photo-placeholder" style="display:none; width:100%; height:100%; flex-direction:column; align-items:center; justify-content:center; background:#f8fafc; color:#94a3b8; text-align:center; padding:16px; user-select:none;"><i class="fa-solid fa-camera" style="font-size:28px; margin-bottom:8px; opacity:0.6;"></i><span style="font-size:12px; font-weight:600; letter-spacing:0.3px; color:#64748b;">No Picture Available</span></div>`
+                : noPhotoPlaceholder;
 
             // Split specs by commas or newlines and show only the first two
             const specsArray = p.spec ? p.spec.split(/,|\n/).map(s => s.trim()).filter(s => s.length > 0) : [];
@@ -4038,8 +4039,8 @@ class KmapStoreApp {
         products.forEach(p => {
             const hasImg = p.images && p.images.length > 0 && p.images[0];
             const iconOrImg = hasImg
-                ? `<img src="${p.images[0]}" alt="${p.name}" style="width:36px; height:36px; object-fit:cover; object-position:center; border-radius:4px; border:1px solid var(--border); background:#fff;" onerror="this.onerror=null; this.style.display='none'; if (this.nextElementSibling) this.nextElementSibling.style.display='inline';"><span style="display:none; font-size: 20px;">${p.icon || '💻'}</span>`
-                : `<span style="font-size: 20px;">${p.icon || '💻'}</span>`;
+                ? `<img src="${p.images[0]}" alt="${p.name}" style="width:36px; height:36px; object-fit:cover; object-position:center; border-radius:4px; border:1px solid var(--border); background:#fff;" onerror="this.onerror=null; this.style.display='none'; if (this.nextElementSibling) this.nextElementSibling.style.display='inline-flex';"><div style="display:none; width:36px; height:36px; border-radius:4px; border:1px solid var(--border); background:#f1f5f9; align-items:center; justify-content:center; color:#94a3b8; font-size:13px;" title="No picture available"><i class="fa-solid fa-camera" style="opacity:0.7;"></i></div>`
+                : `<div style="width:36px; height:36px; border-radius:4px; border:1px solid var(--border); background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#94a3b8; font-size:13px;" title="No picture available"><i class="fa-solid fa-camera" style="opacity:0.7;"></i></div>`;
 
             let stockBadge = '';
             if (p.stock === 0) {
