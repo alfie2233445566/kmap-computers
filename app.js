@@ -1806,8 +1806,8 @@ class KmapStoreApp {
                                 }
                                 modified = true;
                             }
-                            // Only set default images if item has no images whatsoever
-                            if (!existing.images || existing.images.length === 0) {
+                            // Only set default images if item has never been customized by user and has no images
+                            if (!existing.customImages && (!existing.images || existing.images.length === 0)) {
                                 existing.images = defProd.images || [];
                                 modified = true;
                             }
@@ -2253,6 +2253,7 @@ class KmapStoreApp {
                     p.stock = stock;
                     p.spec = spec;
                     p.images = images;
+                    p.customImages = true;
                 }
                 this.db.addLog(`Updated product details for ${name} (${id})`);
                 this.showToast(`Product ${name} updated.`);
@@ -2260,7 +2261,7 @@ class KmapStoreApp {
                 // Add
                 const nextNum = products.length + 1;
                 const newId = 'PROD-' + String(nextNum).padStart(3, '0');
-                products.push({ id: newId, name, category, price, stock, spec, images, icon: category === 'Laptops' ? '💻' : '🔌' });
+                products.push({ id: newId, name, category, price, stock, spec, images, customImages: true, icon: category === 'Laptops' ? '💻' : '🔌' });
                 this.db.addLog(`Created new product: ${name} (${newId})`);
                 this.showToast(`Product ${name} added.`);
             }
@@ -2291,21 +2292,21 @@ class KmapStoreApp {
                     statusEl.style.color = 'var(--secondary)';
                 }
 
-                // Uploaded photos take over starting from slot 0 so the first photo is always the Main Display Photo
-                urlInputs.forEach(input => input.value = '');
+                // Keep existing photos and append newly uploaded ones
+                const existingPhotos = urlInputs.map(input => input.value.trim()).filter(v => v.length > 0);
 
                 try {
                     const compressedList = await Promise.all(files.map(f => this.compressImageFile(f)));
+                    const validNew = compressedList.filter(Boolean);
 
-                    compressedList.forEach((base64, i) => {
-                        if (!base64) return;
-                        if (urlInputs[i]) {
-                            urlInputs[i].value = base64;
-                        }
+                    // Combine existing photos + newly uploaded photos (up to max slots)
+                    const combined = [...existingPhotos, ...validNew];
+                    urlInputs.forEach((input, i) => {
+                        input.value = combined[i] || '';
                     });
 
                     if (statusEl) {
-                        statusEl.innerText = `✓ ${compressedList.filter(Boolean).length} photo(s) ready!`;
+                        statusEl.innerText = `✓ ${validNew.length} photo(s) added! (Total: ${Math.min(combined.length, urlInputs.length)})`;
                         statusEl.style.color = 'var(--success)';
                         setTimeout(() => { if (statusEl) statusEl.innerText = ''; }, 3000);
                     }
@@ -4207,7 +4208,7 @@ class KmapStoreApp {
             thumb.innerHTML = `
                 <img src="${imgSrc}" style="width: 100%; height: 100%; object-fit: cover;">
                 ${idx === 0 ? '<span style="position: absolute; bottom: 2px; left: 2px; font-size: 8px; font-weight: 800; background: var(--secondary); color: #000; padding: 1px 4px; border-radius: 3px; letter-spacing: 0.5px;">MAIN</span>' : ''}
-                <button type="button" onclick="event.stopPropagation(); app.removeModalImage(${idx})" style="position: absolute; top: 2px; right: 2px; background: rgba(220,38,38,0.9); color: #fff; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Remove Photo">✕</button>
+                <button type="button" onclick="event.stopPropagation(); app.removeModalImage(${idx})" style="position: absolute; top: 2px; right: 2px; background: #dc2626; color: #fff; border: 1.5px solid #fff; border-radius: 50%; width: 22px; height: 22px; font-size: 11px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.3); z-index: 10;" title="Remove this photo">✕</button>
             `;
             if (idx > 0) {
                 thumb.onclick = () => app.setMainModalImage(idx);
@@ -4246,7 +4247,10 @@ class KmapStoreApp {
         urlInputs.forEach((input, idx) => {
             input.value = currentImages[idx] || '';
         });
+        const fileInput = document.getElementById('form-product-file-upload');
+        if (fileInput) fileInput.value = '';
         this.refreshModalImagePreviews();
+        this.showToast('Photo removed');
     }
 
     openProductModal(productId = null) {
