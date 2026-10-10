@@ -117,7 +117,7 @@
     }
     </script>
 
-    <link rel="stylesheet" href="style.css?v=5.7">
+    <link rel="stylesheet" href="style.css?v=5.8">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <!-- Chart.js for Sales Analytics -->
@@ -1442,32 +1442,35 @@
 
             <!-- VIEW D: Admin Orders Management -->
             <section id="view-admin-orders" class="app-view" style="display: none;">
-                <div class="card">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
-                        <h3 class="card-title" style="margin-bottom: 0;">Manage System Orders</h3>
-                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                            <select id="admin-order-status-filter" class="form-control" style="width: 160px;"
-                                onchange="app.searchOrders()">
-                                <option value="all">All Statuses</option>
-                                <option value="active_all">Active Orders</option>
-                                <option value="pending">Pending</option>
-                                <option value="confirmed">Confirmed</option>
-                                <option value="in_transit">In Transit</option>
-                                <option value="completed">Completed</option>
-                                <option value="void">Void</option>
-                            </select>
-                            <input type="text" id="admin-order-search" class="form-control"
-                                placeholder="Search by Order ID or Client..." style="width: 250px;">
-                            <button class="btn btn-primary" onclick="app.searchOrders()"><i
-                                    class="fa-solid fa-magnifying-glass"></i> Find</button>
-                            <button class="btn btn-secondary"
-                                onclick="app.downloadSelectedInvoices('.admin-order-select')"><i
-                                    class="fa-solid fa-file-pdf"></i> Download Selected</button>
-                            <button class="btn btn-secondary" onclick="app.downloadAllInvoices()"><i
-                                    class="fa-solid fa-file-pdf"></i> Export All</button>
-                        </div>
+                <div class="card search-sticky-bar" id="admin-orders-toolbar"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; position: sticky; top: var(--header-h, var(--main-header-height, 62px)); z-index: 990; background-color: var(--white); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); padding: 16px 20px;">
+                    <h3 class="card-title" style="margin-bottom: 0; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-boxes-stacked" style="color: var(--secondary);"></i> Manage System Orders
+                    </h3>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <select id="admin-order-status-filter" class="form-control" style="width: 160px;"
+                            onchange="app.searchOrders()">
+                            <option value="all">All Statuses</option>
+                            <option value="active_all">Active Orders</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="in_transit">In Transit</option>
+                            <option value="completed">Completed</option>
+                            <option value="void">Void</option>
+                        </select>
+                        <input type="text" id="admin-order-search" class="form-control"
+                            placeholder="Search by Order ID or Client..." style="width: 250px;">
+                        <button class="btn btn-primary" onclick="app.searchOrders()"><i
+                                class="fa-solid fa-magnifying-glass"></i> Find</button>
+                        <button class="btn btn-secondary"
+                            onclick="app.downloadSelectedInvoices('.admin-order-select')"><i
+                                class="fa-solid fa-file-pdf"></i> Download Selected</button>
+                        <button class="btn btn-secondary" onclick="app.downloadAllInvoices()"><i
+                                class="fa-solid fa-file-pdf"></i> Export All</button>
                     </div>
+                </div>
+
+                <div class="card" style="padding: 20px;">
                     <div class="table-responsive">
                         <table>
                             <thead>
@@ -2400,7 +2403,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=5.7"></script>
+    <script src="app.js?v=5.8"></script>
 </body>
 
 </html>
