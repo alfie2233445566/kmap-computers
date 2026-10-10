@@ -636,6 +636,7 @@ class KmapStoreApp {
         const signupForm = document.getElementById('signup-form');
         const tabSignIn = document.getElementById('tab-btn-signin');
         const tabSignUp = document.getElementById('tab-btn-signup');
+        const title = document.getElementById('auth-modal-title');
         const subtitle = document.getElementById('auth-modal-subtitle');
         const err = document.getElementById('login-error-msg');
         const googleLabel = document.getElementById('google-auth-btn-label');
@@ -644,36 +645,38 @@ class KmapStoreApp {
         if (tab === 'signup') {
             if (loginForm) loginForm.style.display = 'none';
             if (signupForm) signupForm.style.display = 'block';
-            if (subtitle) subtitle.innerText = 'Create a new customer account';
+            if (title) title.innerText = 'Create an Account';
+            if (subtitle) subtitle.innerText = 'Join Kmap Computers for quick checkout and order tracking';
             if (googleLabel) googleLabel.innerText = 'Sign up with Google';
             if (tabSignUp) {
-                tabSignUp.style.background = 'var(--white)';
-                tabSignUp.style.color = 'var(--primary)';
-                tabSignUp.style.border = '1px solid var(--border)';
-                tabSignUp.style.fontWeight = '700';
+                tabSignUp.classList.add('active');
+                tabSignUp.style.background = '';
+                tabSignUp.style.color = '';
+                tabSignUp.style.border = '';
             }
             if (tabSignIn) {
-                tabSignIn.style.background = 'transparent';
-                tabSignIn.style.color = 'var(--text-light)';
-                tabSignIn.style.border = 'none';
-                tabSignIn.style.fontWeight = '600';
+                tabSignIn.classList.remove('active');
+                tabSignIn.style.background = '';
+                tabSignIn.style.color = '';
+                tabSignIn.style.border = '';
             }
         } else {
             if (loginForm) loginForm.style.display = 'block';
             if (signupForm) signupForm.style.display = 'none';
-            if (subtitle) subtitle.innerText = 'Welcome! Sign in to your account';
-            if (googleLabel) googleLabel.innerText = 'Sign in with Google';
+            if (title) title.innerText = 'Welcome to Kmap';
+            if (subtitle) subtitle.innerText = 'Sign in to manage your orders and profile';
+            if (googleLabel) googleLabel.innerText = 'Continue with Google';
             if (tabSignIn) {
-                tabSignIn.style.background = 'var(--white)';
-                tabSignIn.style.color = 'var(--primary)';
-                tabSignIn.style.border = '1px solid var(--border)';
-                tabSignIn.style.fontWeight = '700';
+                tabSignIn.classList.add('active');
+                tabSignIn.style.background = '';
+                tabSignIn.style.color = '';
+                tabSignIn.style.border = '';
             }
             if (tabSignUp) {
-                tabSignUp.style.background = 'transparent';
-                tabSignUp.style.color = 'var(--text-light)';
-                tabSignUp.style.border = 'none';
-                tabSignUp.style.fontWeight = '600';
+                tabSignUp.classList.remove('active');
+                tabSignUp.style.background = '';
+                tabSignUp.style.color = '';
+                tabSignUp.style.border = '';
             }
         }
     }
