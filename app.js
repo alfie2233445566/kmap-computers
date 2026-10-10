@@ -628,6 +628,7 @@ class KmapStoreApp {
             modal.classList.add('active');
             this.updateScrollLock();
             this.showAuthTab(tab);
+            this.initGoogleAuth();
         }
     }
 
@@ -689,46 +690,58 @@ class KmapStoreApp {
     }
 
     initGoogleAuth() {
-        const clientId = window.KMAP_GOOGLE_CLIENT_ID || safeLocalStorage.getItem('kmap_google_client_id');
+        const clientId = window.KMAP_GOOGLE_CLIENT_ID || safeLocalStorage.getItem('kmap_google_client_id') || '222160997701-3gb6hejra6jim1hu76roejl7rcgllgom.apps.googleusercontent.com';
+        window.KMAP_GOOGLE_CLIENT_ID = clientId;
+
         if (window.google && window.google.accounts && window.google.accounts.id) {
             try {
-                if (clientId) {
-                    window.google.accounts.id.initialize({
-                        client_id: clientId,
-                        callback: (res) => this.handleGoogleCredentialResponse(res),
-                        auto_select: false,
-                        cancel_on_tap_outside: true
-                    });
+                window.google.accounts.id.initialize({
+                    client_id: clientId,
+                    callback: (res) => this.handleGoogleCredentialResponse(res),
+                    auto_select: false,
+                    cancel_on_tap_outside: true
+                });
 
-                    const renderSlot = document.getElementById('g_id_signin_slot');
-                    if (renderSlot) {
-                        renderSlot.style.display = 'flex';
-                        window.google.accounts.id.renderButton(renderSlot, {
-                            theme: 'outline',
-                            size: 'large',
-                            width: 380,
-                            text: 'continue_with',
-                            shape: 'rectangular',
-                            logo_alignment: 'left'
-                        });
-                        const fallbackBtn = document.getElementById('btn-google-auth');
-                        if (fallbackBtn) fallbackBtn.style.display = 'none';
-                    }
+                const renderSlot = document.getElementById('g_id_signin_slot');
+                if (renderSlot) {
+                    renderSlot.style.display = 'flex';
+                    renderSlot.innerHTML = '';
+                    window.google.accounts.id.renderButton(renderSlot, {
+                        theme: 'outline',
+                        size: 'large',
+                        width: 370,
+                        text: 'continue_with',
+                        shape: 'pill',
+                        logo_alignment: 'left'
+                    });
+                    const fallbackBtn = document.getElementById('btn-google-auth');
+                    if (fallbackBtn) fallbackBtn.style.display = 'none';
                 }
             } catch (e) {
                 console.warn('Google GSI initialization notice:', e);
+            }
+        } else {
+            if (!this._gsiRetryCount) this._gsiRetryCount = 0;
+            if (this._gsiRetryCount < 8) {
+                this._gsiRetryCount++;
+                setTimeout(() => this.initGoogleAuth(), 350);
             }
         }
     }
 
     async signInWithGoogle() {
-        const clientId = window.KMAP_GOOGLE_CLIENT_ID || safeLocalStorage.getItem('kmap_google_client_id');
-        if (window.google && window.google.accounts && window.google.accounts.id && clientId) {
+        const clientId = window.KMAP_GOOGLE_CLIENT_ID || safeLocalStorage.getItem('kmap_google_client_id') || '222160997701-3gb6hejra6jim1hu76roejl7rcgllgom.apps.googleusercontent.com';
+        if (window.google && window.google.accounts && window.google.accounts.id) {
             try {
+                window.google.accounts.id.initialize({
+                    client_id: clientId,
+                    callback: (res) => this.handleGoogleCredentialResponse(res),
+                    auto_select: false,
+                    cancel_on_tap_outside: true
+                });
                 window.google.accounts.id.prompt((notification) => {
                     if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                        console.log('Google prompt status:', notification.getNotDisplayedReason ? notification.getNotDisplayedReason() : 'prompt dismissed');
-                        this.openGoogleSetupOrDemoModal();
+                        console.log('Google prompt not displayed/skipped');
                     }
                 });
                 return;
@@ -736,7 +749,7 @@ class KmapStoreApp {
                 console.warn('Google prompt exception:', e);
             }
         }
-        this.openGoogleSetupOrDemoModal();
+        this.initGoogleAuth();
     }
 
     openGoogleSetupOrDemoModal() {
