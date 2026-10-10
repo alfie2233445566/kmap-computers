@@ -37,23 +37,26 @@ const safeLocalStorage = {
     }
 };
 
-const getSyncApiUrl = () => {
+const getApiBaseUrl = (path) => {
     try {
         const custom = safeLocalStorage.getItem('kmap_cloud_sync_url');
-        if (custom) return custom;
+        if (custom && path === '/api/sync') return custom;
     } catch (e) { }
 
-    // When running from file:/// or localhost without backend server, automatically use the live Vercel production API
     if (typeof window !== 'undefined' && window.location) {
         if (window.location.protocol === 'file:' ||
             window.location.hostname === 'localhost' ||
             window.location.hostname === '127.0.0.1' ||
             !window.location.hostname) {
-            return 'https://kmap-computers.vercel.app/api/sync';
+            return `https://kmap-computers.vercel.app${path}`;
         }
     }
-    return '/api/sync';
+    return path;
 };
+
+const getSyncApiUrl = () => getApiBaseUrl('/api/sync');
+const getAuthApiUrl = () => getApiBaseUrl('/api/auth');
+const getOtpApiUrl = () => getApiBaseUrl('/api/send-otp');
 
 // Queue for uploading to Vercel KV
 window.kvSyncQueue = {};
@@ -65,9 +68,15 @@ const triggerKVSync = () => {
     const payload = { updates: { ...window.kvSyncQueue } };
     window.kvSyncQueue = {}; // Clear queue
 
+    const headers = { 'Content-Type': 'application/json' };
+    const token = safeLocalStorage.getItem('kmap_auth_token');
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
     fetch(getSyncApiUrl(), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(payload)
     })
         .then(async (res) => {
@@ -75,7 +84,9 @@ const triggerKVSync = () => {
                 const errData = await res.json().catch(() => ({}));
                 console.error('KV Sync Failed:', res.status, errData);
                 if (window.app && typeof window.app.showToast === 'function') {
-                    if (res.status === 413) {
+                    if (res.status === 401) {
+                        window.app.showToast('🔒 Cloud write restricted: Admin login session required.', 'error');
+                    } else if (res.status === 413) {
                         window.app.showToast('⚠️ Cloud sync failed: Photos payload too large for KV storage!', 'error');
                     } else if (res.status === 500) {
                         window.app.showToast(`⚠️ Cloud sync failed: ${errData.error || 'Server error'}`, 'error');
@@ -124,7 +135,10 @@ class KmapStoreApp {
         const indicator = document.getElementById('sync-status-indicator');
         const syncUrl = getSyncApiUrl();
         try {
-            const res = await fetch(syncUrl);
+            const headers = {};
+            const token = safeLocalStorage.getItem('kmap_auth_token');
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            const res = await fetch(syncUrl, { headers });
             const isAdmin = this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role);
             if (res.ok) {
                 if (indicator) {
@@ -556,15 +570,37 @@ class KmapStoreApp {
     }
 
     initSession() {
+        const token = safeLocalStorage.getItem('kmap_auth_token');
         const savedUser = safeLocalStorage.getItem('kmap_current_user');
-        if (savedUser) {
+        if (token && savedUser) {
             try {
                 this.currentUser = JSON.parse(savedUser);
+                // Verify cryptographic session token with server
+                fetch(getAuthApiUrl(), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ action: 'verify' })
+                }).then(async res => {
+                    if (res.ok) {
+                        const data = await res.json().catch(() => ({}));
+                        if (data.user) {
+                            this.currentUser = data.user;
+                            safeLocalStorage.setItem('kmap_current_user', JSON.stringify(data.user));
+                            this.updateProfileHeader(data.user);
+                            this.renderSidebar();
+                        }
+                    } else if (res.status === 401) {
+                        console.warn('Session token expired or invalidated by server');
+                        this.logout();
+                    }
+                }).catch(() => {});
             } catch (e) {
                 this.currentUser = { username: 'guest', role: 'guest', name: 'Guest Viewer' };
             }
         } else {
             this.currentUser = { username: 'guest', role: 'guest', name: 'Guest Viewer' };
+            safeLocalStorage.removeItem('kmap_current_user');
+            safeLocalStorage.removeItem('kmap_auth_token');
         }
 
         this.closeLoginModal();
@@ -1691,12 +1727,7 @@ class KmapStoreApp {
 
         this.defaultProductsList = defaultProducts;
 
-        const defaultUsers = [
-            { id: 'USR-001', username: 'admin', email: 'admin@kmapcomputers.com', role: 'superadmin', name: 'Kwaku Aduse-poku', password: '120a46268023a0eee2ac955c6ddcb939bec5c756db98bffc391e7d741d952292' },
-            { id: 'USR-002', username: 'alfred', email: 'alfred@kmapcomputers.com', role: 'superadmin', name: 'Alfred', password: 'd456fd28999ab6ba5d59467f81220aae1adcbd841b6b4e6595688fd961dfa145', hiddenFromStaffList: true },
-            { id: 'USR-003', username: 'info', email: 'info@kmapcomputers.com', role: 'admin', name: 'Felix', password: 'd4d6b2cece42e0df40d9fdc25b0901101cf88a9423ed0a4f7e0cd8fa2d5b2c0f' },
-            { id: 'USR-004', username: 'sales', email: 'sales@kmapcomputers.com', role: 'admin', name: 'Victor Aduse-poku', password: '77d57cc3989d096d65e9d89f168d6e70971a482c7be707bb34c1511325882bb7' }
-        ];
+        const defaultUsers = [];
 
         const defaultOrders = [];
 
@@ -1872,45 +1903,9 @@ class KmapStoreApp {
         try {
             const currentUsers = JSON.parse(safeLocalStorage.getItem('kmap_users') || '[]');
             let cleanedUsers = currentUsers.filter(u => u.username !== '0241234567' && u.name !== 'Kwame Mensah' && u.username !== 'superadmin');
-
-            // Upsert the 4 production Hostinger email accounts into local/cloud storage with SHA-256 hashes
-            defaultUsers.forEach(defU => {
-                const existingIdx = cleanedUsers.findIndex(u =>
-                    (u.username && u.username.toLowerCase() === defU.username.toLowerCase()) ||
-                    (u.email && u.email.toLowerCase() === defU.email.toLowerCase())
-                );
-                if (existingIdx !== -1) {
-                    const existing = cleanedUsers[existingIdx];
-                    let passToStore = existing.password;
-                    // Automatically upgrade plaintext passwords to cryptographic hashes
-                    if (passToStore === 'onlyAdmin@2012' || passToStore === 'admin123' || passToStore === 'super123') {
-                        passToStore = '120a46268023a0eee2ac955c6ddcb939bec5c756db98bffc391e7d741d952292';
-                    } else if (passToStore === 'Heythere@247') {
-                        passToStore = 'd456fd28999ab6ba5d59467f81220aae1adcbd841b6b4e6595688fd961dfa145';
-                    } else if (passToStore === 'onlyInfo@2012') {
-                        passToStore = 'd4d6b2cece42e0df40d9fdc25b0901101cf88a9423ed0a4f7e0cd8fa2d5b2c0f';
-                    } else if (passToStore === 'onlySales@2012') {
-                        passToStore = '77d57cc3989d096d65e9d89f168d6e70971a482c7be707bb34c1511325882bb7';
-                    } else if (!passToStore) {
-                        passToStore = defU.password;
-                    }
-                    cleanedUsers[existingIdx] = {
-                        ...defU,
-                        ...existing,
-                        email: defU.email,
-                        role: defU.role,
-                        name: defU.name || existing.name,
-                        hiddenFromStaffList: !!defU.hiddenFromStaffList,
-                        password: passToStore
-                    };
-                } else {
-                    cleanedUsers.push(defU);
-                }
-            });
-
             safeLocalStorage.setItem('kmap_users', JSON.stringify(cleanedUsers));
         } catch (e) {
-            safeLocalStorage.setItem('kmap_users', JSON.stringify(defaultUsers));
+            safeLocalStorage.setItem('kmap_users', JSON.stringify([]));
         }
 
         this.db = {
@@ -1979,52 +1974,62 @@ class KmapStoreApp {
     }
 
     bindEvents() {
-        // Handle Unified Login Form
+        // Handle Unified Login Form via Server Authentication
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const usernameInput = document.getElementById('login-username').value.trim();
             const pass = document.getElementById('login-password').value.trim();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const err = document.getElementById('login-error-msg');
+            if (err) err.style.display = 'none';
 
-            const users = this.db.getUsers();
-            const inputLower = usernameInput.toLowerCase();
-            const inputHash = await this.hashPassword(pass);
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+            }
 
-            const foundUser = users.find(u => {
-                const uName = (u.username || '').toLowerCase();
-                const uEmail = (u.email || '').toLowerCase();
-                const emailPrefix = uEmail.includes('@') ? uEmail.split('@')[0] : '';
-                const matchesIdentifier = (uName === inputLower || uEmail === inputLower || emailPrefix === inputLower);
-                const matchesPass = (u.password === inputHash || u.password === pass);
-                return matchesIdentifier && matchesPass;
-            });
+            try {
+                const res = await fetch(getAuthApiUrl(), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'login', username: usernameInput, password: pass })
+                });
+                const data = await res.json().catch(() => ({}));
 
-            if (foundUser) {
-                // If stored password was plaintext, securely upgrade it to cryptographic SHA-256 hash
-                if (foundUser.password !== inputHash) {
-                    foundUser.password = inputHash;
-                    this.db.saveUsers(users);
-                }
-                this.currentUser = foundUser;
-                this.loadCart();
-                safeLocalStorage.setItem('kmap_current_user', JSON.stringify(foundUser));
-                this.closeLoginModal();
+                if (res.ok && data.success && data.user && data.token) {
+                    safeLocalStorage.setItem('kmap_auth_token', data.token);
+                    safeLocalStorage.setItem('kmap_current_user', JSON.stringify(data.user));
+                    this.currentUser = data.user;
+                    this.loadCart();
+                    this.closeLoginModal();
 
-                // Set Header Profile
-                this.updateProfileHeader(foundUser);
+                    // Set Header Profile
+                    this.updateProfileHeader(data.user);
+                    this.renderSidebar();
+                    this.syncDownstream();
 
-                this.db.addLog(`User ${foundUser.name || foundUser.username} (${foundUser.role}) authenticated successfully.`);
-                this.renderSidebar();
-
-                if (foundUser.role === 'client') {
-                    this.switchView('landing-page');
+                    if (data.user.role === 'client') {
+                        this.switchView('landing-page');
+                    } else {
+                        this.switchView('admin-dashboard');
+                    }
+                    this.showToast(`Welcome back, ${data.user.name || data.user.username}!`);
                 } else {
-                    this.switchView('admin-dashboard');
+                    if (err) {
+                        err.innerText = data.error || "Invalid credentials. Please check details.";
+                        err.style.display = 'block';
+                    }
                 }
-                this.showToast(`Welcome back, ${foundUser.name || foundUser.username}!`);
-            } else {
-                const err = document.getElementById('login-error-msg');
-                err.innerText = "Invalid credentials. Please check details.";
-                err.style.display = 'block';
+            } catch (netErr) {
+                if (err) {
+                    err.innerText = "Connection failed. Please check network.";
+                    err.style.display = 'block';
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Sign In';
+                }
             }
         });
 
@@ -2045,39 +2050,58 @@ class KmapStoreApp {
             });
         }
 
-        // Handle Signup Form Submit
+        // Handle Signup Form Submit via Server Registration
         document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('signup-name').value.trim();
             const username = document.getElementById('signup-username').value.trim();
             const pass = document.getElementById('signup-password').value.trim();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const err = document.getElementById('login-error-msg');
+            if (err) err.style.display = 'none';
 
-            const users = this.db.getUsers();
-            if (users.find(u => u.username === username)) {
-                const err = document.getElementById('login-error-msg');
-                err.innerText = "Phone number/username is already registered.";
-                err.style.display = 'block';
-                return;
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registering...';
             }
 
-            const passHash = await this.hashPassword(pass);
-            const newUser = { username, role: 'client', name, password: passHash, phone: username };
-            users.push(newUser);
-            this.db.saveUsers(users);
-            this.db.addLog(`New client account registered: ${username}`);
+            try {
+                const res = await fetch(getAuthApiUrl(), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'signup', name, username, password: pass })
+                });
+                const data = await res.json().catch(() => ({}));
 
-            // Automatically log in
-            this.currentUser = newUser;
-            this.loadCart();
-            safeLocalStorage.setItem('kmap_current_user', JSON.stringify(newUser));
-            this.closeLoginModal();
+                if (res.ok && data.success && data.user && data.token) {
+                    safeLocalStorage.setItem('kmap_auth_token', data.token);
+                    safeLocalStorage.setItem('kmap_current_user', JSON.stringify(data.user));
+                    this.currentUser = data.user;
+                    this.loadCart();
+                    this.closeLoginModal();
 
-            this.updateProfileHeader(newUser);
-
-            this.renderSidebar();
-            this.switchView('landing-page');
-            this.showToast(`Welcome, ${name}! Your account has been registered.`);
-            document.getElementById('signup-form').reset();
+                    this.updateProfileHeader(data.user);
+                    this.renderSidebar();
+                    this.switchView('landing-page');
+                    this.showToast(`Welcome, ${name}! Your account has been registered.`);
+                    document.getElementById('signup-form').reset();
+                } else {
+                    if (err) {
+                        err.innerText = data.error || "Signup failed. Please try again.";
+                        err.style.display = 'block';
+                    }
+                }
+            } catch (netErr) {
+                if (err) {
+                    err.innerText = "Connection error during signup.";
+                    err.style.display = 'block';
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Register';
+                }
+            }
         });
 
         // Handle Guest Browse Button
@@ -3086,6 +3110,15 @@ class KmapStoreApp {
         this.db.saveOrders(orders);
         this.db.saveProducts(products);
         this.db.addLog(`Placed pending order ${order.id} total: GH₵ ${order.total} via ${channel}`);
+
+        // Securely push order to cloud KV database via dedicated safe action
+        try {
+            fetch(getSyncApiUrl(), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'create_order', order })
+            }).catch(e => console.warn('Order cloud dispatch note:', e));
+        } catch (e) { }
 
         // Firmly clear cart and update all badges across the entire interface
         this.cart = [];
@@ -5569,42 +5602,31 @@ class KmapStoreApp {
         if (statusMsg) statusMsg.innerText = `Dispatching secure OTP to ${email}...`;
 
         try {
-            const apiUrl = (typeof window !== 'undefined' && (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
-                ? 'https://kmap-computers.vercel.app/api/send-otp'
-                : '/api/send-otp';
+            const res = await fetch(getOtpApiUrl(), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'send', email })
+            });
+            const data = await res.json().catch(() => ({}));
 
-            let data = null;
-            try {
-                const res = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'send', email })
-                });
-                data = await res.json();
-            } catch (netErr) {
-                console.warn('API send-otp unreachable, falling back to local cryptographic OTP engine:', netErr);
-            }
+            if (res.ok && data.success) {
+                this.activeOtpRequested = true;
+                this.startOtpTimer(data.expiresInSeconds || 300);
 
-            // Secure local fallback generator if offline or during testing
-            const fallbackCode = String(Math.floor(100000 + Math.random() * 900000));
-            const activeCode = (data && data.devCode) ? String(data.devCode) : fallbackCode;
-
-            this.activeOtp = {
-                code: activeCode,
-                email: email.toLowerCase(),
-                expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes strict
-            };
-
-            this.startOtpTimer(300);
-
-            if (data && data.emailSent) {
-                this.showToast(`Verification code sent to ${email}! Check your Hostinger inbox.`, 'success');
-                if (statusMsg) statusMsg.innerHTML = `<span style="color: var(--secondary); font-weight: 700;">✅ Code delivered to ${email}.</span> Check your inbox or webmail.`;
+                if (data.emailSent) {
+                    this.showToast(`Verification code sent to ${email}! Check your Hostinger inbox.`, 'success');
+                    if (statusMsg) statusMsg.innerHTML = `<span style="color: var(--secondary); font-weight: 700;">✅ Code delivered to ${email}.</span> Check your inbox or webmail.`;
+                } else {
+                    this.showToast(`Verification code generated for ${email}. (5-min strict timer active)`);
+                    if (statusMsg) {
+                        statusMsg.innerHTML = `<span>Code active for <strong>${email}</strong>. Expires in 5 minutes. Check inbox.</span>`;
+                    }
+                }
             } else {
-                this.showToast(`Security code generated for ${email}. (5-min strict timer active)`);
-                if (statusMsg) {
-                    statusMsg.innerHTML = `<span>Code active for <strong>${email}</strong>. Expires in 5 minutes.</span>` +
-                        (data && data.devCode ? `<br><small style="color:var(--primary); font-family:monospace; font-weight:700;">[Demo Mode OTP: ${data.devCode}]</small>` : '');
+                this.showToast(data.error || "Failed to dispatch OTP.", 'error');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send 6-Digit OTP to Email';
                 }
             }
         } catch (err) {
@@ -5670,60 +5692,43 @@ class KmapStoreApp {
 
         const email = (this.targetOtpEmail || (this.otpTargetUser ? this.otpTargetUser.email : (this.currentUser ? this.currentUser.email : ''))).toLowerCase();
 
-        // 1. Strict Timer & OTP Validation
-        if (!this.activeOtp || !this.activeOtp.code) {
-            this.showToast("No active OTP. Please click 'Send 6-Digit OTP to Email' first.", 'error');
-            return;
+        const submitBtn = document.getElementById('btn-confirm-pw-change');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying with Server...';
         }
 
-        if (Date.now() > this.activeOtp.expiresAt) {
-            this.showToast("OTP has expired (strict 5-minute window exceeded). Request a fresh code.", 'error');
-            return;
-        }
-
-        if (String(this.activeOtp.code).trim() !== String(otpInput).trim()) {
-            this.showToast("Invalid 6-digit verification code. Please check your email.", 'error');
-            return;
-        }
-
-        // 2. Cryptographic Hash of new password
-        const newHash = await this.hashPassword(newPw);
-
-        // 3. Attempt server-side verification & KV update
         try {
-            const apiUrl = (typeof window !== 'undefined' && (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
-                ? 'https://kmap-computers.vercel.app/api/send-otp'
-                : '/api/send-otp';
-
-            fetch(apiUrl, {
+            const res = await fetch(getOtpApiUrl(), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'verify', email, otp: otpInput, newPasswordHash: newHash })
-            }).catch(() => {});
-        } catch (e) {}
+                body: JSON.stringify({ action: 'verify', email, otp: otpInput, newPassword: newPw })
+            });
+            const data = await res.json().catch(() => ({}));
 
-        // 4. Override password in local database & invalidate old password permanently
-        const users = this.db.getUsers();
-        const user = users.find(u => (u.email && u.email.toLowerCase() === email) || u.username.toLowerCase() === email.split('@')[0]);
+            if (res.ok && data.success) {
+                if (data.token) safeLocalStorage.setItem('kmap_auth_token', data.token);
+                if (data.user) {
+                    safeLocalStorage.setItem('kmap_current_user', JSON.stringify(data.user));
+                    this.currentUser = data.user;
+                    this.updateProfileHeader(data.user);
+                }
 
-        if (user) {
-            user.password = newHash;
-            if (this.currentUser && (this.currentUser.username === user.username || (this.currentUser.email && this.currentUser.email.toLowerCase() === email))) {
-                this.currentUser.password = newHash;
-                safeLocalStorage.setItem('kmap_current_user', JSON.stringify(this.currentUser));
+                if (this.otpTimerInterval) clearInterval(this.otpTimerInterval);
+                this.activeOtpRequested = false;
+
+                this.showToast(data.message || "Password updated successfully!", 'success');
+                this.closeChangePasswordModal();
+            } else {
+                this.showToast(data.error || "Incorrect or expired verification code.", 'error');
             }
-            this.db.saveUsers(users);
-            this.db.addLog(`Security: Password overridden with email OTP for ${user.username} (${email}). Old password permanently destroyed.`);
-
-            // Invalidate OTP immediately
-            this.activeOtp = null;
-            if (this.otpTimerInterval) clearInterval(this.otpTimerInterval);
-
-            this.showToast("Success! Password updated with SHA-256 encryption. Old password permanently invalidated.", 'success');
-            this.closeChangePasswordModal();
-            this.forceCloudSyncAll(false);
-        } else {
-            this.showToast("Target account not found.", 'error');
+        } catch (netErr) {
+            this.showToast("Connection failed during verification.", 'error');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Confirm & Override Password';
+            }
         }
     }
 
@@ -5763,11 +5768,13 @@ class KmapStoreApp {
         this.currentUser = { username: 'guest', role: 'guest', name: 'Guest Viewer' };
         if (!preserveCart) this.cart = [];
         safeLocalStorage.removeItem('kmap_current_user');
+        safeLocalStorage.removeItem('kmap_auth_token');
 
         this.closeLoginModal();
         this.updateProfileHeader(this.currentUser);
         this.renderSidebar();
         this.loadCart();
+        this.syncDownstream();
         this.switchView('client-store');
     }
 
