@@ -260,13 +260,23 @@ class KmapStoreApp {
     }
 
     async forceCloudSyncAll(silent = false) {
+        const isAdmin = this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role);
+        const token = safeLocalStorage.getItem('kmap_auth_token');
+
+        // Only authenticated administrators are authorized to push full database snapshots to cloud KV
+        if (!isAdmin || !token) {
+            return;
+        }
+
         const products = this.db.getProducts();
         const syncUrl = getSyncApiUrl();
-        const isAdmin = this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role);
         try {
             const res = await fetch(syncUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({
                     updates: {
                         kmap_products: products,
@@ -285,11 +295,15 @@ class KmapStoreApp {
                     indicator.style.background = 'rgba(16,185,129,0.1)';
                     indicator.style.color = '#059669';
                     indicator.title = `Connected to Upstash Redis (${syncUrl})`;
-                    indicator.style.display = isAdmin ? 'inline-flex' : 'none';
+                    indicator.style.display = 'inline-flex';
                 }
             } else {
                 const errData = await res.json().catch(() => ({}));
-                if (!silent) this.showToast(`⚠️ Sync failed: ${errData.error || res.statusText}`, 'error');
+                if (res.status === 401) {
+                    if (!silent) this.showToast('Your admin session has expired. Please log in again to sync cloud changes.', 'error');
+                } else {
+                    if (!silent) this.showToast(`⚠️ Sync failed: ${errData.error || res.statusText}`, 'error');
+                }
             }
         } catch (e) {
             console.error('Cloud Sync Error:', e);
