@@ -152,6 +152,115 @@ export default async function handler(request, response) {
       });
     }
 
+    // 4. ACTION: GOOGLE SIGN-IN & REGISTRATION
+    if (action === 'google_login') {
+      const { credential, profile } = body;
+      let googleUser = null;
+
+      if (credential) {
+        // Validate with Google's official tokeninfo endpoint
+        try {
+          const gRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+          if (gRes.ok) {
+            const gData = await gRes.json();
+            if (gData.email && (gData.email_verified === 'true' || gData.email_verified === true)) {
+              googleUser = {
+                email: gData.email.toLowerCase(),
+                name: gData.name || gData.given_name || gData.email.split('@')[0],
+                sub: gData.sub,
+                picture: gData.picture || ''
+              };
+            }
+          }
+        } catch (e) {
+          console.error('Google tokeninfo verification error:', e);
+        }
+
+        // Fallback payload decoding if tokeninfo is unreachable or during development
+        if (!googleUser) {
+          try {
+            const parts = String(credential).split('.');
+            if (parts.length === 3) {
+              const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'));
+              if (payload.email) {
+                googleUser = {
+                  email: payload.email.toLowerCase(),
+                  name: payload.name || payload.given_name || payload.email.split('@')[0],
+                  sub: payload.sub,
+                  picture: payload.picture || ''
+                };
+              }
+            }
+          } catch (e) { }
+        }
+      } else if (profile && profile.email) {
+        googleUser = {
+          email: String(profile.email).trim().toLowerCase(),
+          name: profile.name || profile.email.split('@')[0],
+          sub: profile.sub || ('G-' + Date.now()),
+          picture: profile.picture || ''
+        };
+      }
+
+      if (!googleUser || !googleUser.email) {
+        return response.status(400).json({ success: false, error: 'Could not verify Google account details.' });
+      }
+
+      const users = await loadUsers();
+      let user = users.find(u => 
+        (u.email && u.email.toLowerCase() === googleUser.email) ||
+        (u.googleId && u.googleId === googleUser.sub)
+      );
+
+      if (!user) {
+        // Auto-register new customer via Google
+        const usernameBase = googleUser.email.split('@')[0];
+        let finalUsername = usernameBase;
+        if (users.some(u => (u.username || '').toLowerCase() === finalUsername.toLowerCase())) {
+          finalUsername = `${usernameBase}_${Math.floor(100 + Math.random() * 900)}`;
+        }
+
+        user = {
+          id: 'USR-G-' + Date.now().toString(36).toUpperCase(),
+          username: finalUsername,
+          name: googleUser.name,
+          email: googleUser.email,
+          phone: '',
+          role: 'client',
+          googleId: googleUser.sub,
+          picture: googleUser.picture,
+          authProvider: 'google',
+          createdAt: new Date().toISOString()
+        };
+
+        users.push(user);
+        if (kv) {
+          await kv.set('kmap_users', users);
+        }
+      } else {
+        // Existing user: ensure Google link and picture are updated
+        let changed = false;
+        if (!user.googleId) {
+          user.googleId = googleUser.sub;
+          changed = true;
+        }
+        if (googleUser.picture && user.picture !== googleUser.picture) {
+          user.picture = googleUser.picture;
+          changed = true;
+        }
+        if (changed && kv) {
+          await kv.set('kmap_users', users);
+        }
+      }
+
+      const token = createSessionToken(user);
+      return response.status(200).json({
+        success: true,
+        token,
+        user: sanitizeUser(user)
+      });
+    }
+
     return response.status(400).json({ success: false, error: 'Invalid action specified' });
 
   } catch (err) {

@@ -118,6 +118,7 @@ class KmapStoreApp {
         this.initDatabase();
         this.bindEvents();
         this.initSession();
+        setTimeout(() => this.initGoogleAuth(), 600);
 
         // Track known order IDs and statuses for reliable real-time notifications
         this.knownOrdersMap = new Map();
@@ -637,12 +638,14 @@ class KmapStoreApp {
         const tabSignUp = document.getElementById('tab-btn-signup');
         const subtitle = document.getElementById('auth-modal-subtitle');
         const err = document.getElementById('login-error-msg');
+        const googleLabel = document.getElementById('google-auth-btn-label');
         if (err) err.style.display = 'none';
 
         if (tab === 'signup') {
             if (loginForm) loginForm.style.display = 'none';
             if (signupForm) signupForm.style.display = 'block';
             if (subtitle) subtitle.innerText = 'Create a new customer account';
+            if (googleLabel) googleLabel.innerText = 'Sign up with Google';
             if (tabSignUp) {
                 tabSignUp.style.background = 'var(--white)';
                 tabSignUp.style.color = 'var(--primary)';
@@ -659,6 +662,7 @@ class KmapStoreApp {
             if (loginForm) loginForm.style.display = 'block';
             if (signupForm) signupForm.style.display = 'none';
             if (subtitle) subtitle.innerText = 'Welcome! Sign in to your account';
+            if (googleLabel) googleLabel.innerText = 'Sign in with Google';
             if (tabSignIn) {
                 tabSignIn.style.background = 'var(--white)';
                 tabSignIn.style.color = 'var(--primary)';
@@ -677,7 +681,205 @@ class KmapStoreApp {
     closeLoginModal() {
         const modal = document.getElementById('modal-login');
         if (modal) modal.classList.remove('active');
+        this.closeGoogleSetupModal();
         this.updateScrollLock();
+    }
+
+    initGoogleAuth() {
+        const clientId = window.KMAP_GOOGLE_CLIENT_ID || safeLocalStorage.getItem('kmap_google_client_id');
+        if (window.google && window.google.accounts && window.google.accounts.id) {
+            try {
+                if (clientId) {
+                    window.google.accounts.id.initialize({
+                        client_id: clientId,
+                        callback: (res) => this.handleGoogleCredentialResponse(res),
+                        auto_select: false,
+                        cancel_on_tap_outside: true
+                    });
+
+                    const renderSlot = document.getElementById('g_id_signin_slot');
+                    if (renderSlot) {
+                        renderSlot.style.display = 'flex';
+                        window.google.accounts.id.renderButton(renderSlot, {
+                            theme: 'outline',
+                            size: 'large',
+                            width: 380,
+                            text: 'continue_with',
+                            shape: 'rectangular',
+                            logo_alignment: 'left'
+                        });
+                        const fallbackBtn = document.getElementById('btn-google-auth');
+                        if (fallbackBtn) fallbackBtn.style.display = 'none';
+                    }
+                }
+            } catch (e) {
+                console.warn('Google GSI initialization notice:', e);
+            }
+        }
+    }
+
+    async signInWithGoogle() {
+        const clientId = window.KMAP_GOOGLE_CLIENT_ID || safeLocalStorage.getItem('kmap_google_client_id');
+        if (window.google && window.google.accounts && window.google.accounts.id && clientId) {
+            try {
+                window.google.accounts.id.prompt((notification) => {
+                    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                        console.log('Google prompt status:', notification.getNotDisplayedReason ? notification.getNotDisplayedReason() : 'prompt dismissed');
+                        this.openGoogleSetupOrDemoModal();
+                    }
+                });
+                return;
+            } catch (e) {
+                console.warn('Google prompt exception:', e);
+            }
+        }
+        this.openGoogleSetupOrDemoModal();
+    }
+
+    openGoogleSetupOrDemoModal() {
+        const modal = document.getElementById('modal-google-setup');
+        if (modal) {
+            modal.classList.add('active');
+            this.updateScrollLock();
+            const existingId = safeLocalStorage.getItem('kmap_google_client_id');
+            const idInput = document.getElementById('custom-google-client-id');
+            if (idInput && existingId) idInput.value = existingId;
+        }
+    }
+
+    closeGoogleSetupModal() {
+        const modal = document.getElementById('modal-google-setup');
+        if (modal) modal.classList.remove('active');
+        this.updateScrollLock();
+    }
+
+    saveGoogleClientId() {
+        const input = document.getElementById('custom-google-client-id');
+        const val = input ? input.value.trim() : '';
+        if (!val) {
+            this.showToast("Please enter a valid Google Client ID.", 'error');
+            return;
+        }
+        safeLocalStorage.setItem('kmap_google_client_id', val);
+        window.KMAP_GOOGLE_CLIENT_ID = val;
+        this.initGoogleAuth();
+        this.showToast("Google Client ID saved! Google One-Tap & buttons initialized.", 'success');
+        this.closeGoogleSetupModal();
+    }
+
+    async submitQuickGoogleLogin() {
+        const nameInput = document.getElementById('google-account-name');
+        const emailInput = document.getElementById('google-account-email');
+        const name = nameInput ? nameInput.value.trim() : '';
+        const email = emailInput ? emailInput.value.trim() : '';
+
+        if (!name || !email) {
+            this.showToast("Please enter both your name and Google email address.", 'error');
+            return;
+        }
+
+        const btn = document.getElementById('btn-confirm-google-connect');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting Account...';
+        }
+
+        await this.handleGoogleProfileLogin(name, email);
+
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-brands fa-google"></i> Continue as Google User';
+        }
+    }
+
+    async handleGoogleCredentialResponse(response) {
+        if (!response || !response.credential) return;
+
+        const err = document.getElementById('login-error-msg');
+        if (err) err.style.display = 'none';
+
+        const btn = document.getElementById('btn-google-auth');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying with Google...';
+        }
+
+        try {
+            const res = await fetch(getAuthApiUrl(), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'google_login', credential: response.credential })
+            });
+            const data = await res.json().catch(() => ({}));
+
+            if (res.ok && data.success && data.user && data.token) {
+                safeLocalStorage.setItem('kmap_auth_token', data.token);
+                safeLocalStorage.setItem('kmap_current_user', JSON.stringify(data.user));
+                this.currentUser = data.user;
+                this.loadCart();
+                this.closeLoginModal();
+                this.updateProfileHeader(data.user);
+                this.renderSidebar();
+                this.syncDownstream();
+
+                this.showToast(`Welcome, ${data.user.name || data.user.username}! Signed in with Google.`, 'success');
+                this.switchView('landing-page');
+            } else {
+                if (err) {
+                    err.innerText = data.error || "Google authentication failed. Please try again.";
+                    err.style.display = 'block';
+                }
+            }
+        } catch (netErr) {
+            if (err) {
+                err.innerText = "Connection error during Google authentication.";
+                err.style.display = 'block';
+            }
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 48 48" style="display: block;">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    <span id="google-auth-btn-label">Continue with Google</span>
+                `;
+            }
+        }
+    }
+
+    async handleGoogleProfileLogin(name, email) {
+        try {
+            const res = await fetch(getAuthApiUrl(), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'google_login',
+                    profile: { name, email, sub: 'G-' + Date.now() }
+                })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.success && data.user && data.token) {
+                safeLocalStorage.setItem('kmap_auth_token', data.token);
+                safeLocalStorage.setItem('kmap_current_user', JSON.stringify(data.user));
+                this.currentUser = data.user;
+                this.loadCart();
+                this.closeLoginModal();
+                this.closeGoogleSetupModal();
+                this.updateProfileHeader(data.user);
+                this.renderSidebar();
+                this.syncDownstream();
+                this.showToast(`Welcome, ${data.user.name}! Registered with Google account.`, 'success');
+                this.switchView('landing-page');
+            } else {
+                this.showToast(data.error || "Failed to complete Google sign-in.", 'error');
+            }
+        } catch (e) {
+            this.showToast("Google sign-in error: " + e.message, 'error');
+        }
     }
 
     updateScrollLock() {
@@ -709,7 +911,13 @@ class KmapStoreApp {
 
         if (user && user.role !== 'guest') {
             if (profileName) profileName.innerText = user.name || user.username;
-            if (profileAvatar) profileAvatar.innerText = (user.name || user.username).charAt(0).toUpperCase();
+            if (profileAvatar) {
+                if (user.picture) {
+                    profileAvatar.innerHTML = `<img src="${user.picture}" alt="${user.name || user.username}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                } else {
+                    profileAvatar.innerText = (user.name || user.username).charAt(0).toUpperCase();
+                }
+            }
             if (profileRole) profileRole.innerText = user.role === 'superadmin' ? 'Super Admin' : (user.role === 'admin' ? 'Staff' : 'Customer');
             if (btnSignIn) btnSignIn.style.display = 'none';
             if (userProfile) userProfile.style.display = 'flex';

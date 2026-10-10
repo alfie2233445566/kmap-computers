@@ -122,6 +122,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <!-- Chart.js for Sales Analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Identity Services (Sign in with Google) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- jsPDF for Report Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- SheetJS for Excel Report Generation (Bundled locally + CDN fallback) -->
@@ -171,6 +173,27 @@
                     style="flex: 1; height: 38px; font-size: 14px; font-weight: 600; border-radius: 4px; background: transparent; color: var(--text-light); border: none; cursor: pointer;">
                     Sign Up
                 </button>
+            </div>
+
+            <!-- Google One-Click Authentication Button & Divider -->
+            <div style="margin-bottom: 16px;">
+                <button type="button" id="btn-google-auth" onclick="app.signInWithGoogle()"
+                    style="width: 100%; height: 46px; border: 1px solid #dadce0; border-radius: var(--radius-sm); background: #ffffff; color: #3c4043; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+                    <svg width="20" height="20" viewBox="0 0 48 48" style="display: block;">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    <span id="google-auth-btn-label">Continue with Google</span>
+                </button>
+                <div id="g_id_signin_slot" style="display: none; justify-content: center; width: 100%; margin-top: 6px;"></div>
+
+                <div style="display: flex; align-items: center; margin: 16px 0 12px 0; color: var(--text-light); font-size: 11px; font-weight: 700; text-transform: uppercase;">
+                    <span style="flex: 1; border-bottom: 1px solid var(--border);"></span>
+                    <span style="padding: 0 12px; letter-spacing: 0.5px; color: var(--text-muted);">or continue with password</span>
+                    <span style="flex: 1; border-bottom: 1px solid var(--border);"></span>
+                </div>
             </div>
 
             <div id="login-error-msg"
@@ -2414,7 +2437,57 @@
         </div>
     </div>
 
-    <script src="app.js?v=6.0"></script>
+    <!-- 10. Modal for Google Sign-In Setup & Account Connection -->
+    <div id="modal-google-setup" class="modal-overlay">
+        <div class="modal-content" style="max-width: 440px; padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <svg width="24" height="24" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: #1f2937;">Sign in with Google</h3>
+                </div>
+                <button type="button" onclick="app.closeGoogleSetupModal()" class="btn btn-outline" style="padding: 4px 8px; font-size: 14px;">&times;</button>
+            </div>
+
+            <p style="font-size: 13px; color: var(--text-light); margin-bottom: 16px;">
+                Connect instantly with your Google account to track orders and checkout faster.
+            </p>
+
+            <form id="google-quick-connect-form" onsubmit="event.preventDefault(); app.submitQuickGoogleLogin();">
+                <div class="form-group">
+                    <label>Your Google Account Name</label>
+                    <input type="text" id="google-account-name" class="form-control" placeholder="e.g. Kwame Mensah" required>
+                </div>
+                <div class="form-group">
+                    <label>Your Google Email Address</label>
+                    <input type="email" id="google-account-email" class="form-control" placeholder="e.g. kwame@gmail.com" required>
+                </div>
+
+                <div style="margin: 16px 0 12px 0;">
+                    <button type="submit" id="btn-confirm-google-connect" class="btn btn-primary" style="width: 100%; height: 46px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fa-brands fa-google"></i> Continue as Google User
+                    </button>
+                </div>
+            </form>
+
+            <div style="border-top: 1px solid var(--border); padding-top: 14px; margin-top: 16px;">
+                <details style="font-size: 12px; color: var(--text-muted);">
+                    <summary style="cursor: pointer; font-weight: 600; color: var(--primary);">Configure Production Google OAuth Client ID</summary>
+                    <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
+                        <p style="margin: 0;">In your Google Cloud Console, create an OAuth 2.0 Client ID for Web with origin <code>https://kmap-computers.vercel.app</code>.</p>
+                        <input type="text" id="custom-google-client-id" class="form-control" style="font-size: 12px; font-family: monospace;" placeholder="Paste Google Client ID here...">
+                        <button type="button" class="btn btn-outline" style="height: 34px; font-size: 12px;" onclick="app.saveGoogleClientId()">Save Client ID</button>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js?v=6.1"></script>
 </body>
 
 </html>
