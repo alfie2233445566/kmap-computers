@@ -22,6 +22,8 @@
     --radius-md: 0px;
     --radius-lg: 0px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --header-h: 62px;
+    --main-header-height: 62px;
 }
 
 /* Global Reset */
@@ -2979,14 +2981,25 @@ html { scroll-behavior: smooth; }
     #page-subtitle { font-size: 10px !important; }
 }
 
-/* Store filter toolbar */
+/* Store filter toolbar & Search bars sticky underneath header */
 #view-client-store > div { flex-wrap: wrap; }
+#store-filter-card,
+.search-sticky-bar {
+    position: sticky;
+    top: var(--header-h, var(--main-header-height, 62px));
+    z-index: 990;
+    background-color: var(--white);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    transition: top 0.15s ease;
+}
 @media (max-width: 768px) {
-    #store-filter-card { padding: 12px; gap: 10px; }
+    #store-filter-card,
+    .search-sticky-bar { padding: 12px; gap: 10px; }
     #store-filter-card > div:first-child { min-width: 100% !important; width: 100% !important; }
 }
 @media (max-width: 480px) {
-    #store-filter-card { flex-direction: column; }
+    #store-filter-card,
+    .search-sticky-bar { flex-direction: column; }
     #store-filter-card > div { min-width: 100% !important; width: 100%; justify-content: space-between; }
     #client-category-select { flex: 1; min-width: 0; }
 }

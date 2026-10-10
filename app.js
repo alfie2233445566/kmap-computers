@@ -2452,6 +2452,7 @@ class KmapStoreApp {
         }
 
         this.updateCartBadges();
+        if (typeof syncHeaderHeight === 'function') syncHeaderHeight();
 
         switch (viewName) {
             case 'landing-page':
@@ -6324,12 +6325,22 @@ window.app = app;
 // ── Sync sticky header height to CSS variable so sub-toolbars offset correctly ──
 function syncHeaderHeight() {
     const hdr = document.querySelector('.main-header');
+    if (hdr && hdr.offsetHeight > 0) {
+        const h = hdr.offsetHeight;
+        document.documentElement.style.setProperty('--header-h', h + 'px');
+        document.documentElement.style.setProperty('--main-header-height', h + 'px');
+    }
+}
+if (typeof ResizeObserver !== 'undefined') {
+    const hdr = document.querySelector('.main-header');
     if (hdr) {
-        document.documentElement.style.setProperty('--header-h', hdr.offsetHeight + 'px');
+        new ResizeObserver(() => syncHeaderHeight()).observe(hdr);
     }
 }
 // Run on load and on any resize
 window.addEventListener('load', syncHeaderHeight);
 window.addEventListener('resize', syncHeaderHeight);
-// Also run after a short delay to catch late renders
+document.addEventListener('DOMContentLoaded', syncHeaderHeight);
+setTimeout(syncHeaderHeight, 100);
 setTimeout(syncHeaderHeight, 300);
+setTimeout(syncHeaderHeight, 800);
