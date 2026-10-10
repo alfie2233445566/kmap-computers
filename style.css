@@ -3453,8 +3453,7 @@ html { scroll-behavior: smooth; }
     }
 }
 
-/* Login card */
-.login-card { padding: 24px 24px 20px; }
+/* Login card responsive override */
 @media (max-width: 480px) {
     .login-card {
         padding: 20px 16px;

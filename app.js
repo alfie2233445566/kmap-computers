@@ -685,7 +685,6 @@ class KmapStoreApp {
     closeLoginModal() {
         const modal = document.getElementById('modal-login');
         if (modal) modal.classList.remove('active');
-        this.closeGoogleSetupModal();
         this.updateScrollLock();
     }
 
@@ -739,73 +738,13 @@ class KmapStoreApp {
                     auto_select: false,
                     cancel_on_tap_outside: true
                 });
-                window.google.accounts.id.prompt((notification) => {
-                    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                        console.log('Google prompt not displayed/skipped');
-                    }
-                });
+                window.google.accounts.id.prompt();
                 return;
             } catch (e) {
                 console.warn('Google prompt exception:', e);
             }
         }
         this.initGoogleAuth();
-    }
-
-    openGoogleSetupOrDemoModal() {
-        const modal = document.getElementById('modal-google-setup');
-        if (modal) {
-            modal.classList.add('active');
-            this.updateScrollLock();
-            const existingId = safeLocalStorage.getItem('kmap_google_client_id');
-            const idInput = document.getElementById('custom-google-client-id');
-            if (idInput && existingId) idInput.value = existingId;
-        }
-    }
-
-    closeGoogleSetupModal() {
-        const modal = document.getElementById('modal-google-setup');
-        if (modal) modal.classList.remove('active');
-        this.updateScrollLock();
-    }
-
-    saveGoogleClientId() {
-        const input = document.getElementById('custom-google-client-id');
-        const val = input ? input.value.trim() : '';
-        if (!val) {
-            this.showToast("Please enter a valid Google Client ID.", 'error');
-            return;
-        }
-        safeLocalStorage.setItem('kmap_google_client_id', val);
-        window.KMAP_GOOGLE_CLIENT_ID = val;
-        this.initGoogleAuth();
-        this.showToast("Google Client ID saved! Google One-Tap & buttons initialized.", 'success');
-        this.closeGoogleSetupModal();
-    }
-
-    async submitQuickGoogleLogin() {
-        const nameInput = document.getElementById('google-account-name');
-        const emailInput = document.getElementById('google-account-email');
-        const name = nameInput ? nameInput.value.trim() : '';
-        const email = emailInput ? emailInput.value.trim() : '';
-
-        if (!name || !email) {
-            this.showToast("Please enter both your name and Google email address.", 'error');
-            return;
-        }
-
-        const btn = document.getElementById('btn-confirm-google-connect');
-        if (btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting Account...';
-        }
-
-        await this.handleGoogleProfileLogin(name, email);
-
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-brands fa-google"></i> Continue as Google User';
-        }
     }
 
     async handleGoogleCredentialResponse(response) {
@@ -884,7 +823,6 @@ class KmapStoreApp {
                 this.currentUser = data.user;
                 this.loadCart();
                 this.closeLoginModal();
-                this.closeGoogleSetupModal();
                 this.updateProfileHeader(data.user);
                 this.renderSidebar();
                 this.syncDownstream();
