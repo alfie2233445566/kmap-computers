@@ -34,7 +34,12 @@ export default async function handler(request, response) {
   const kv = getKvClient();
 
   try {
-    const body = typeof request.body === 'string' ? JSON.parse(request.body) : (request.body || {});
+    let body = {};
+    try {
+      body = typeof request.body === 'string' ? JSON.parse(request.body) : (request.body || {});
+    } catch (e) {
+      body = {};
+    }
     const { action, email, otp, newPassword, newPasswordHash } = body;
 
     const normalizedEmail = (email || '').trim().toLowerCase();

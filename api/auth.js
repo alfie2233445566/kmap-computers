@@ -36,7 +36,12 @@ export default async function handler(request, response) {
   };
 
   try {
-    const body = typeof request.body === 'string' ? JSON.parse(request.body) : (request.body || {});
+    let body = {};
+    try {
+      body = typeof request.body === 'string' ? JSON.parse(request.body) : (request.body || {});
+    } catch (e) {
+      body = {};
+    }
     const action = body.action || (request.method === 'GET' ? 'verify' : null);
 
     // 1. ACTION: VERIFY SESSION TOKEN

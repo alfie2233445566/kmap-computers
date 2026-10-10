@@ -92,7 +92,12 @@ export default async function handler(request, response) {
     // POST: STRICTLY CONTROLLED DATABASE WRITES
     // ----------------------------------------------------
     if (request.method === 'POST') {
-      const body = typeof request.body === 'string' ? JSON.parse(request.body) : (request.body || {});
+      let body = {};
+      try {
+        body = typeof request.body === 'string' ? JSON.parse(request.body) : (request.body || {});
+      } catch (e) {
+        body = {};
+      }
       const action = body.action;
 
       // SUB-ACTION 1: Safe Customer Order Placement (No Admin Token Required)
