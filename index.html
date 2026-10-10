@@ -117,7 +117,7 @@
     }
     </script>
 
-    <link rel="stylesheet" href="style.css?v=6.3">
+    <link rel="stylesheet" href="style.css?v=6.4">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <!-- Chart.js for Sales Analytics -->
@@ -1018,9 +1018,9 @@
                 <div id="modal-services" class="modal-overlay"
                     onclick="if(event.target===this) app.closeServicesModal()">
                     <div class="card services-modal-card"
-                        style="max-width: 620px; margin: 30px auto; position: relative;">
+                        style="max-width: 620px; margin: 30px auto; position: relative; border-radius: 20px;">
                         <button type="button" onclick="app.closeServicesModal()" class="modal-close-btn"
-                            style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light);">&times;</button>
+                            style="position: absolute; top: 16px; right: 16px;" title="Close" aria-label="Close">&times;</button>
                         <div style="text-align: center; margin-bottom: 24px;">
                             <div style="font-size: 40px; color: #0d4cb5; margin-bottom: 8px;"><i
                                     class="fa-solid fa-screwdriver-wrench"></i></div>
@@ -2136,8 +2136,7 @@
                     <span id="inspect-product-category" class="badge badge-primary"
                         style="margin-top: 4px;">Laptops</span>
                 </div>
-                <button onclick="app.closeInspectModal()" class="btn btn-outline"
-                    style="padding: 6px 12px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                <button onclick="app.closeInspectModal()" class="modal-close-btn" title="Close" aria-label="Close">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -2281,8 +2280,7 @@
                     <h3 style="color: var(--primary); font-weight: 800; font-size: 22px;">Installment Schedule & Status
                     </h3>
                 </div>
-                <button onclick="app.closeHPDetailsModal()" class="btn btn-outline"
-                    style="padding: 6px 12px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                <button onclick="app.closeHPDetailsModal()" class="modal-close-btn" title="Close" aria-label="Close">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -2314,9 +2312,7 @@
     <!-- Modal for User Profile Details -->
     <div id="modal-user-profile" class="modal-overlay">
         <div class="modal-content" style="max-width: 450px; position: relative;">
-            <button onclick="app.closeUserProfileModal()"
-                style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 4px; display: flex; align-items: center; justify-content: center;"
-                aria-label="Close">
+            <button type="button" onclick="app.closeUserProfileModal()" class="modal-close-btn" style="position: absolute; top: 16px; right: 16px;" title="Close" aria-label="Close">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <h3
@@ -2364,7 +2360,7 @@
                 <h3 style="color: var(--primary); font-weight: 800; font-size: 20px; margin: 0; display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-shield-halved" style="color: var(--secondary);"></i> Secure Password Update
                 </h3>
-                <button type="button" class="btn btn-outline" onclick="app.closeChangePasswordModal()" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                <button type="button" class="modal-close-btn" onclick="app.closeChangePasswordModal()" title="Close" aria-label="Close">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -2439,7 +2435,7 @@
                     </svg>
                     <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: #1f2937;">Sign in with Google</h3>
                 </div>
-                <button type="button" onclick="app.closeGoogleSetupModal()" class="btn btn-outline" style="padding: 4px 8px; font-size: 14px;">&times;</button>
+                <button type="button" onclick="app.closeGoogleSetupModal()" class="modal-close-btn" title="Close" aria-label="Close">&times;</button>
             </div>
 
             <p style="font-size: 13px; color: var(--text-light); margin-bottom: 16px;">
@@ -2476,7 +2472,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=6.3"></script>
+    <script src="app.js?v=6.4"></script>
 </body>
 
 </html>
