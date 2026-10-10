@@ -353,12 +353,14 @@ class KmapStoreApp {
         } catch (e) {
             this.cart = [];
         }
+        this.updateCartBadges();
     }
 
     saveCart() {
         try {
             safeLocalStorage.setItem('kmap_cart', JSON.stringify(this.cart));
         } catch (e) { }
+        this.updateCartBadges();
     }
 
     loadFavorites() {
@@ -427,6 +429,13 @@ class KmapStoreApp {
         const count = Array.isArray(this.favorites) ? this.favorites.length : 0;
         document.querySelectorAll('.favorites-count').forEach(el => {
             el.innerText = count;
+        });
+    }
+
+    updateCartBadges() {
+        const totalQty = Array.isArray(this.cart) ? this.cart.reduce((sum, item) => sum + (Number(item.qty) || 0), 0) : 0;
+        document.querySelectorAll('.cart-count').forEach(el => {
+            el.innerText = totalQty;
         });
     }
 
@@ -2442,14 +2451,15 @@ class KmapStoreApp {
             }
         }
 
+        this.updateCartBadges();
+
         switch (viewName) {
             case 'landing-page':
                 const landingView = document.getElementById('view-landing-page');
                 if (landingView) landingView.style.display = 'block';
                 if (pageTitle) pageTitle.innerText = "KMAP COMPUTERS";
                 if (pageSubtitle) pageSubtitle.innerText = "Quality Laptops, Computers & Accessories | Sunyani";
-                const totalQty = this.cart ? this.cart.reduce((sum, item) => sum + item.qty, 0) : 0;
-                document.querySelectorAll('.cart-count').forEach(el => el.innerText = totalQty);
+                this.updateCartBadges();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 this.renderHomepageFeaturedLaptops();
                 this.updateFeaturedPrices();
@@ -2948,6 +2958,11 @@ class KmapStoreApp {
             return;
         }
 
+        if (!Array.isArray(this.cart) || this.cart.length === 0) {
+            this.showToast("Your cart is empty. Please add items to checkout.", 'error');
+            return;
+        }
+
         const claimMethodEl = document.getElementById(isMobile ? 'mobile-checkout-claim-method' : 'checkout-claim-method') || document.getElementById('mobile-checkout-claim-method');
         const addressEl = document.getElementById(isMobile ? 'mobile-checkout-address' : 'checkout-address') || document.getElementById('mobile-checkout-address');
 
@@ -2963,11 +2978,12 @@ class KmapStoreApp {
         const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
         const userPhone = this.currentUser.phone || this.currentUser.username;
 
-        const newOrder = {
+        // Hold order in provisional pending state — cart and stock remain 100% untouched until confirmed
+        this.pendingCheckout = {
             id: uniqueId,
             clientName: this.currentUser.name,
             phone: userPhone,
-            items: [...this.cart],
+            items: JSON.parse(JSON.stringify(this.cart)),
             total: subtotal,
             claimMethod: claimMethod,
             address: claimMethod === 'delivery' ? address : '',
@@ -2975,32 +2991,11 @@ class KmapStoreApp {
             status: 'pending'
         };
 
-        // Deduct inventory stock
-        const products = this.db.getProducts();
-        newOrder.items.forEach(cItem => {
-            const p = products.find(prod => prod.id === cItem.id);
-            if (p) p.stock = Math.max(0, p.stock - cItem.qty);
-        });
-
-        const orders = this.db.getOrders();
-        orders.unshift(newOrder);
-        this.db.saveOrders(orders);
-        this.db.saveProducts(products);
-        this.db.addLog(`Placed pending order ${uniqueId} total: GH₵ ${subtotal}`);
-
-        // Reset Cart
-        this.cart = [];
-        this.renderCart();
-
-        // Show support line payment instructions modal
-        const orderIdEl = document.getElementById('modal-order-id');
-        if (orderIdEl) orderIdEl.innerText = uniqueId;
-
         const callOverlay = document.getElementById('modal-checkout-call');
         if (callOverlay) {
             if (claimMethod === 'hire_purchase') {
                 callOverlay.querySelector('.modal-content').innerHTML = `
-                    <button onclick="app.cancelCheckout('${uniqueId}', false)" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 4px; display: flex; align-items: center; justify-content: center;" aria-label="Close">
+                    <button onclick="app.cancelPendingCheckout(true)" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 4px; display: flex; align-items: center; justify-content: center;" aria-label="Close">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                     <h3 style="color: var(--primary); font-weight: 800; font-size: 22px; margin-bottom: 12px;">
@@ -3013,26 +3008,26 @@ class KmapStoreApp {
                     </div>
                     
                     <p style="font-size: 14px; margin-bottom: 20px; color: var(--text-dark);">
-                        Your request for Hire Purchase has been logged. <strong>Note:</strong> Hire Purchase agreements must be completed physically at our shop. Please visit us with your ID and initial deposit.
+                        Please contact us via phone or WhatsApp to finalize your Hire Purchase agreement. Your cart items will remain saved until you call or message us.
                     </p>
                     
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <div style="display: flex; gap: 12px;">
-                            <a href="tel:+233208341561" onclick="app.closeModal()" class="btn btn-primary" style="text-decoration: none; height: 48px; color: #000000; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px;">
+                            <button type="button" onclick="app.confirmAndFinalizeOrder('call')" class="btn btn-primary" style="height: 48px; color: #000000; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px; cursor: pointer; border: none;">
                                 <i class="fa-solid fa-phone"></i> Call to Complete
-                            </a>
-                            <a href="https://wa.me/233208341561?text=Hi,%20I'd%20like%20to%20complete%20my%20hire%20purchase%20request%20${uniqueId}" target="_blank" onclick="app.closeModal()" class="btn btn-success" style="text-decoration: none; height: 48px; color: white; background-color: #25D366; border-color: #25D366; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px;">
+                            </button>
+                            <button type="button" onclick="app.confirmAndFinalizeOrder('whatsapp')" class="btn btn-success" style="height: 48px; color: white; background-color: #25D366; border-color: #25D366; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px; cursor: pointer; border: none;">
                                 <i class="fa-brands fa-whatsapp"></i> WhatsApp Us
-                            </a>
+                            </button>
                         </div>
-                        <button class="btn btn-danger" style="height: 40px; font-size: 13px;" onclick="app.cancelCheckout('${uniqueId}', false)">
-                            <i class="fa-solid fa-trash-can"></i> Cancel Request & Revert Cart
+                        <button type="button" class="btn btn-outline" style="height: 42px; font-size: 13px; font-weight: 600;" onclick="app.cancelPendingCheckout(true)">
+                            <i class="fa-solid fa-arrow-left"></i> Keep Items in Cart & Go Back
                         </button>
                     </div>
                 `;
             } else {
                 callOverlay.querySelector('.modal-content').innerHTML = `
-                    <button onclick="app.cancelCheckout('${uniqueId}', false)" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 4px; display: flex; align-items: center; justify-content: center;" aria-label="Close">
+                    <button onclick="app.cancelPendingCheckout(true)" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 4px; display: flex; align-items: center; justify-content: center;" aria-label="Close">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                     <h3 style="color: var(--secondary); font-weight: 800; font-size: 22px; margin-bottom: 12px;">
@@ -3045,20 +3040,20 @@ class KmapStoreApp {
                     </div>
                     
                     <p style="font-size: 14px; margin-bottom: 20px; color: var(--text-dark);">
-                        Please contact our support line directly to make your payment and receive order confirmation details afterwards.
+                        Click below to call or WhatsApp our line to make your payment and receive instant dispatch details. Your cart stays intact until you connect!
                     </p>
                     
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <div style="display: flex; gap: 12px;">
-                            <a href="tel:+233208341561" onclick="app.closeModal()" class="btn btn-primary" style="text-decoration: none; height: 48px; color: #000000; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px;">
+                            <button type="button" onclick="app.confirmAndFinalizeOrder('call')" class="btn btn-primary" style="height: 48px; color: #000000; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px; cursor: pointer; border: none;">
                                 <i class="fa-solid fa-phone"></i> Call to Complete
-                            </a>
-                            <a href="https://wa.me/233208341561?text=Hi,%20I'd%20like%20to%20complete%20my%20order%20${uniqueId}" target="_blank" onclick="app.closeModal()" class="btn btn-success" style="text-decoration: none; height: 48px; color: white; background-color: #25D366; border-color: #25D366; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px;">
+                            </button>
+                            <button type="button" onclick="app.confirmAndFinalizeOrder('whatsapp')" class="btn btn-success" style="height: 48px; color: white; background-color: #25D366; border-color: #25D366; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: 13px; padding: 0 4px; cursor: pointer; border: none;">
                                 <i class="fa-brands fa-whatsapp"></i> WhatsApp Us
-                            </a>
+                            </button>
                         </div>
-                        <button class="btn btn-danger" style="height: 40px; font-size: 13px;" onclick="app.cancelCheckout('${uniqueId}', false)">
-                            <i class="fa-solid fa-trash-can"></i> Cancel Order & Revert Cart
+                        <button type="button" class="btn btn-outline" style="height: 42px; font-size: 13px; font-weight: 600;" onclick="app.cancelPendingCheckout(true)">
+                            <i class="fa-solid fa-arrow-left"></i> Keep Items in Cart & Go Back
                         </button>
                     </div>
                 `;
@@ -3068,7 +3063,77 @@ class KmapStoreApp {
         }
     }
 
+    confirmAndFinalizeOrder(channel) {
+        if (!this.pendingCheckout) {
+            this.closeModal();
+            return;
+        }
+
+        const order = this.pendingCheckout;
+        this.pendingCheckout = null;
+
+        // Deduct inventory stock
+        const products = this.db.getProducts();
+        order.items.forEach(cItem => {
+            const p = products.find(prod => prod.id === cItem.id);
+            if (p) p.stock = Math.max(0, (Number(p.stock) || 0) - (Number(cItem.qty) || 0));
+        });
+
+        // Save order firmly
+        const orders = this.db.getOrders();
+        orders.unshift(order);
+        this.db.saveOrders(orders);
+        this.db.saveProducts(products);
+        this.db.addLog(`Placed pending order ${order.id} total: GH₵ ${order.total} via ${channel}`);
+
+        // Firmly clear cart and update all badges across the entire interface
+        this.cart = [];
+        this.saveCart();
+        this.renderCart();
+        this.updateCartBadges();
+        this.renderClientCatalog();
+
+        // Close checkout modal
+        const callOverlay = document.getElementById('modal-checkout-call');
+        if (callOverlay) callOverlay.classList.remove('active');
+        this.updateScrollLock();
+
+        // Launch external call or WhatsApp connection
+        const telNumber = '+233208341561';
+        if (channel === 'call') {
+            window.location.href = `tel:${telNumber}`;
+        } else if (channel === 'whatsapp') {
+            const claimLabel = (order.claimMethod || '').replace('_', ' ').toUpperCase();
+            const itemsSummary = (order.items || []).map(i => `${i.name} (x${i.qty})`).join(', ');
+            const msg = encodeURIComponent(
+                `Hello Kmap Computers, I would like to complete my ${order.claimMethod === 'hire_purchase' ? 'Hire Purchase request' : 'order'} ${order.id} (${claimLabel}). Total: GH₵ ${order.total}.\nItems: ${itemsSummary}`
+            );
+            window.open(`https://wa.me/233208341561?text=${msg}`, '_blank');
+        }
+
+        this.showToast(`Order ${order.id} placed! Connecting to Kmap support...`);
+        this.switchView('client-orders');
+    }
+
+    cancelPendingCheckout(showToast = true) {
+        this.pendingCheckout = null;
+        const callOverlay = document.getElementById('modal-checkout-call');
+        if (callOverlay) callOverlay.classList.remove('active');
+        this.updateScrollLock();
+        this.renderCart();
+        this.updateCartBadges();
+        if (showToast) {
+            this.showToast("Order not placed. All items are kept in your cart.");
+        }
+        this.switchView('client-cart');
+    }
+
     cancelCheckout(orderId, showToast = true) {
+        if (this.pendingCheckout && this.pendingCheckout.id === orderId) {
+            this.cancelPendingCheckout(showToast);
+            return;
+        }
+
         const orders = this.db.getOrders();
         const orderIndex = orders.findIndex(o => o.id === orderId);
 
@@ -3093,7 +3158,9 @@ class KmapStoreApp {
             this.db.saveProducts(products);
             this.db.addLog(`Cancelled checkout for order ${orderId}, restored cart & stock.`);
 
+            this.saveCart();
             this.renderCart();
+            this.updateCartBadges();
             this.renderClientCatalog();
             if (showToast) {
                 this.showToast("Checkout cancelled. Items restored to your cart.");
@@ -3106,9 +3173,13 @@ class KmapStoreApp {
     }
 
     closeModal() {
-        document.getElementById('modal-checkout-call').classList.remove('active');
+        if (this.pendingCheckout) {
+            this.cancelPendingCheckout(false);
+            return;
+        }
+        const callOverlay = document.getElementById('modal-checkout-call');
+        if (callOverlay) callOverlay.classList.remove('active');
         this.updateScrollLock();
-        this.switchView('client-orders');
     }
 
     // Promotions pricing utility

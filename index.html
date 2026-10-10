@@ -117,7 +117,7 @@
     }
     </script>
 
-    <link rel="stylesheet" href="style.css?v=5.5">
+    <link rel="stylesheet" href="style.css?v=5.6">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <!-- Chart.js for Sales Analytics -->
@@ -314,6 +314,16 @@
                         style="display: none; height: 38px; font-size: 13px; align-items: center; gap: 6px; padding: 0 12px; border-radius: var(--radius-sm);"
                         title="Toggle Management / Store">
                         <i class="fa-solid fa-gauge"></i> <span id="admin-toggle-text">Admin Panel</span>
+                    </button>
+
+                    <!-- Quick Sticky Cart Button (visible on all store and customer pages) -->
+                    <button type="button" class="btn btn-outline" id="topbar-cart-btn"
+                        onclick="app.switchView('client-cart')" title="View Shopping Cart"
+                        style="height: 38px; display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: var(--radius-sm); position: relative; font-weight: 600; font-size: 13px;">
+                        <i class="fa-solid fa-cart-shopping" style="color: var(--primary); font-size: 15px;"></i>
+                        <span>Cart</span>
+                        <span class="cart-count badge-count"
+                            style="background: var(--error); color: white; border-radius: 50%; font-size: 10px; font-weight: 700; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">0</span>
                     </button>
 
                     <!-- Sign In / Sign Up button for guests -->
@@ -2399,7 +2409,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=5.5"></script>
+    <script src="app.js?v=5.6"></script>
 </body>
 
 </html>
