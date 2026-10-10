@@ -375,10 +375,84 @@ class KmapStoreApp {
         });
     }
 
+    formatOrderItem(item) {
+        if (!item) return { name: 'Store Product', qty: 1, price: 0 };
+        const products = (this.db && this.db.getProducts) ? this.db.getProducts() : [];
+
+        if (typeof item === 'string') {
+            const prod = products.find(p => p.id === item);
+            return {
+                id: item,
+                name: prod ? prod.name : item,
+                qty: 1,
+                price: prod ? prod.price : 0
+            };
+        }
+
+        const prodId = item.id || item.productId || item.prodId || item.machineId || '';
+        const prod = products.find(p => p.id === prodId);
+
+        const name = item.name 
+            || item.title 
+            || item.productName 
+            || item.machine 
+            || (prod ? prod.name : '') 
+            || prodId 
+            || 'Store Product';
+
+        const qty = Number(item.qty || item.quantity || item.count || 1) || 1;
+        const price = Number(item.price !== undefined ? item.price : (prod ? prod.price : 0)) || 0;
+
+        return {
+            ...item,
+            id: prodId,
+            name,
+            qty,
+            price
+        };
+    }
+
+    formatOrderItemsSummary(items) {
+        if (!items) return 'Store Product';
+        if (!Array.isArray(items)) {
+            if (typeof items === 'string') return items;
+            return 'Store Product';
+        }
+        if (items.length === 0) return 'Store Product';
+
+        return items.map(raw => {
+            const item = this.formatOrderItem(raw);
+            return `${item.name} (x${item.qty})`;
+        }).join(', ');
+    }
+
     loadCart() {
         try {
             const saved = safeLocalStorage.getItem('kmap_cart');
-            this.cart = saved ? JSON.parse(saved) : [];
+            const parsed = saved ? JSON.parse(saved) : [];
+            const products = (this.db && this.db.getProducts) ? this.db.getProducts() : [];
+            this.cart = Array.isArray(parsed) ? parsed.map(item => {
+                if (!item) return null;
+                if (typeof item === 'string') {
+                    const prod = products.find(p => p.id === item);
+                    return {
+                        id: item,
+                        name: prod ? prod.name : item,
+                        price: prod ? this.getDiscountedPrice(prod) : 0,
+                        qty: 1,
+                        icon: prod ? prod.icon : '💻'
+                    };
+                }
+                const prodId = item.id || item.productId || '';
+                const prod = products.find(p => p.id === prodId);
+                return {
+                    id: prodId,
+                    name: item.name || item.title || (prod ? prod.name : 'Store Product'),
+                    price: Number(item.price !== undefined ? item.price : (prod ? this.getDiscountedPrice(prod) : 0)),
+                    qty: Number(item.qty || item.quantity || 1) || 1,
+                    icon: item.icon || (prod ? prod.icon : '💻')
+                };
+            }).filter(Boolean) : [];
         } catch (e) {
             this.cart = [];
         }
@@ -2110,7 +2184,26 @@ class KmapStoreApp {
             getOrders: () => {
                 try {
                     const o = JSON.parse(safeLocalStorage.getItem('kmap_orders'));
-                    return Array.isArray(o) ? o : [];
+                    if (!Array.isArray(o)) return [];
+                    const products = (this.db && this.db.getProducts) ? this.db.getProducts() : (defaultProducts || []);
+                    return o.map(order => {
+                        if (!order || typeof order !== 'object') return order;
+                        const rawItems = Array.isArray(order.items) ? order.items : [];
+                        const items = rawItems.map(raw => {
+                            if (!raw) return { name: 'Store Product', qty: 1, price: 0 };
+                            if (typeof raw === 'string') {
+                                const p = products.find(prod => prod.id === raw);
+                                return { id: raw, name: p ? p.name : raw, qty: 1, price: p ? p.price : 0 };
+                            }
+                            const prodId = raw.id || raw.productId || raw.machineId || '';
+                            const p = products.find(prod => prod.id === prodId);
+                            const name = raw.name || raw.title || raw.productName || raw.machine || (p ? p.name : '') || prodId || 'Store Product';
+                            const qty = Number(raw.qty || raw.quantity || raw.count || 1) || 1;
+                            const price = Number(raw.price !== undefined ? raw.price : (p ? p.price : 0)) || 0;
+                            return { ...raw, id: prodId, name, qty, price };
+                        });
+                        return { ...order, items };
+                    });
                 } catch (e) {
                     return [];
                 }
@@ -3179,12 +3272,24 @@ class KmapStoreApp {
         const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
         const userPhone = this.currentUser.phone || this.currentUser.username;
 
+        const products = this.db.getProducts();
+        const normalizedItems = (this.cart || []).map(item => {
+            const prod = products.find(p => p.id === item.id);
+            return {
+                id: item.id || (prod ? prod.id : ''),
+                name: item.name || item.title || (prod ? prod.name : 'Store Item'),
+                price: Number(item.price !== undefined ? item.price : (prod ? this.getDiscountedPrice(prod) : 0)),
+                qty: Number(item.qty || item.quantity || 1) || 1,
+                icon: item.icon || (prod ? prod.icon : '💻')
+            };
+        });
+
         // Hold order in provisional pending state — cart and stock remain 100% untouched until confirmed
         this.pendingCheckout = {
             id: uniqueId,
             clientName: this.currentUser.name,
             phone: userPhone,
-            items: JSON.parse(JSON.stringify(this.cart)),
+            items: normalizedItems,
             total: subtotal,
             claimMethod: claimMethod,
             address: claimMethod === 'delivery' ? address : '',
@@ -3314,7 +3419,7 @@ class KmapStoreApp {
             window.location.href = `tel:${telNumber}`;
         } else if (channel === 'whatsapp') {
             const claimLabel = (order.claimMethod || '').replace('_', ' ').toUpperCase();
-            const itemsSummary = (order.items || []).map(i => `${i.name} (x${i.qty})`).join(', ');
+            const itemsSummary = this.formatOrderItemsSummary(order.items);
             const msg = encodeURIComponent(
                 `Hello Kmap Computers, I would like to complete my ${order.claimMethod === 'hire_purchase' ? 'Hire Purchase request' : 'order'} ${order.id} (${claimLabel}). Total: GH₵ ${order.total}.\nItems: ${itemsSummary}`
             );
@@ -3790,7 +3895,10 @@ class KmapStoreApp {
         if (query) {
             clientOrders = clientOrders.filter(o => {
                 const matchesId = o.id.toLowerCase().includes(query);
-                const matchesMachine = o.items.some(item => item.name.toLowerCase().includes(query));
+                const matchesMachine = (o.items || []).some(raw => {
+                    const item = this.formatOrderItem(raw);
+                    return (item.name || '').toLowerCase().includes(query);
+                });
                 return matchesId || matchesMachine;
             });
         }
@@ -3803,7 +3911,7 @@ class KmapStoreApp {
         clientOrders.forEach(o => {
             const tr = document.createElement('tr');
             const dateStr = new Date(o.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            const itemsStr = o.items.map(i => `${i.name} (${i.qty})`).join(', ');
+            const itemsStr = this.formatOrderItemsSummary(o.items);
 
             let badgeClass = 'badge-pending';
             if (o.status === 'confirmed') badgeClass = 'badge-confirmed';
@@ -4007,7 +4115,7 @@ class KmapStoreApp {
         }
         orders.forEach(o => {
             const tr = document.createElement('tr');
-            const itemsStr = o.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+            const itemsStr = this.formatOrderItemsSummary(o.items);
             const dateStr = new Date(o.date).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
             let selectStyle = 'border: 1px solid var(--border);';
@@ -4100,7 +4208,8 @@ class KmapStoreApp {
 
         let y = nextY + 18;
         doc.setFont("helvetica", "normal");
-        o.items.forEach((item, idx) => {
+        (o.items || []).forEach((rawItem, idx) => {
+            const item = this.formatOrderItem(rawItem);
             const text = `${idx + 1}. ${item.name} (x${item.qty}) - GH₵ ${item.price.toLocaleString()} each`;
             doc.text(text, 14, y);
             y += 8;
@@ -4170,7 +4279,7 @@ class KmapStoreApp {
         let y = 48;
         filteredOrders.forEach((o, idx) => {
             const dateStr = new Date(o.date).toLocaleDateString();
-            const itemsStr = o.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+            const itemsStr = this.formatOrderItemsSummary(o.items);
             const text = `${idx + 1}. ID: ${o.id} | ${o.clientName} | ${dateStr} | ${o.status.toUpperCase()} | GH₵ ${o.total.toLocaleString()}`;
             doc.text(text, 14, y);
             y += 8;
@@ -4676,7 +4785,7 @@ class KmapStoreApp {
                 id: o.id,
                 clientName: o.clientName,
                 phone: o.phone || '',
-                items: (o.items || []).map(i => `${i.name} (x${i.quantity})`).join(', ') || 'Direct Purchase',
+                items: this.formatOrderItemsSummary(o.items),
                 type: (o.claimMethod || 'order').replace('_', ' ').toUpperCase(),
                 total: o.total
             })),

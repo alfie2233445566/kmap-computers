@@ -57,6 +57,24 @@ export default async function handler(request, response) {
             const parsed = typeof rawUsers === 'string' ? JSON.parse(rawUsers) : rawUsers;
             // Always sanitize users so password hashes are NEVER transmitted
             data[key] = Array.isArray(parsed) ? parsed.map(sanitizeUser) : [];
+          } else if (key === 'kmap_orders') {
+            const rawOrders = val || [];
+            const parsed = typeof rawOrders === 'string' ? JSON.parse(rawOrders) : rawOrders;
+            data[key] = Array.isArray(parsed) ? parsed.map(o => {
+              if (!o || typeof o !== 'object') return o;
+              const items = Array.isArray(o.items) ? o.items.map(i => {
+                if (!i) return { name: 'Item', qty: 1, price: 0 };
+                if (typeof i === 'string') return { id: i, name: i, qty: 1, price: 0 };
+                return {
+                  ...i,
+                  id: i.id || i.productId || '',
+                  name: i.name || i.title || i.productName || i.machine || i.id || 'Product',
+                  qty: Number(i.qty || i.quantity || i.count || 1) || 1,
+                  price: Number(i.price || 0) || 0
+                };
+              }) : [];
+              return { ...o, items };
+            }) : [];
           } else {
             data[key] = val || null;
           }
@@ -66,10 +84,27 @@ export default async function handler(request, response) {
         const rawOrders = await kv.get('kmap_orders');
         const orders = typeof rawOrders === 'string' ? JSON.parse(rawOrders) : (rawOrders || []);
         if (Array.isArray(orders)) {
-          data['kmap_orders'] = orders.filter(o => 
-            (o.clientPhone && o.clientPhone === session.username) || 
-            (o.clientName && o.clientName.toLowerCase() === (session.name || '').toLowerCase())
-          );
+          data['kmap_orders'] = orders
+            .filter(o => 
+              (o.clientPhone && o.clientPhone === session.username) || 
+              (o.phone && o.phone === session.username) ||
+              (o.clientName && o.clientName.toLowerCase() === (session.name || '').toLowerCase())
+            )
+            .map(o => {
+              if (!o || typeof o !== 'object') return o;
+              const items = Array.isArray(o.items) ? o.items.map(i => {
+                if (!i) return { name: 'Item', qty: 1, price: 0 };
+                if (typeof i === 'string') return { id: i, name: i, qty: 1, price: 0 };
+                return {
+                  ...i,
+                  id: i.id || i.productId || '',
+                  name: i.name || i.title || i.productName || i.machine || i.id || 'Product',
+                  qty: Number(i.qty || i.quantity || i.count || 1) || 1,
+                  price: Number(i.price || 0) || 0
+                };
+              }) : [];
+              return { ...o, items };
+            });
         } else {
           data['kmap_orders'] = [];
         }
@@ -106,6 +141,19 @@ export default async function handler(request, response) {
         if (!newOrder || !newOrder.id || !Array.isArray(newOrder.items)) {
           return response.status(400).json({ error: 'Invalid order structure' });
         }
+
+        // Normalize items array
+        newOrder.items = newOrder.items.map(i => {
+          if (!i) return { name: 'Item', qty: 1, price: 0 };
+          if (typeof i === 'string') return { id: i, name: i, qty: 1, price: 0 };
+          return {
+            ...i,
+            id: i.id || i.productId || '',
+            name: i.name || i.title || i.productName || i.machine || i.id || 'Product',
+            qty: Number(i.qty || i.quantity || i.count || 1) || 1,
+            price: Number(i.price || 0) || 0
+          };
+        });
 
         // Fetch current orders from KV
         const rawOrders = await kv.get('kmap_orders');
