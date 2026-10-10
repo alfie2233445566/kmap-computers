@@ -3032,8 +3032,12 @@ html { scroll-behavior: smooth; }
     th { font-size: 11px; padding: 8px 6px; }
 }
 
-/* Admin orders toolbar: stack on mobile */
-#admin-orders-toolbar {
+/* Sticky Admin & Client Management Toolbars */
+#admin-orders-toolbar,
+#admin-hp-toolbar,
+#admin-reports-toolbar,
+#admin-featured-toolbar,
+#client-favorites-toolbar {
     position: sticky;
     top: var(--header-h, var(--main-header-height, 62px));
     z-index: 990;
@@ -3041,10 +3045,17 @@ html { scroll-behavior: smooth; }
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 @media (max-width: 768px) {
-    #admin-orders-toolbar { flex-direction: column; align-items: flex-start; gap: 12px; }
-    #admin-orders-toolbar > div { width: 100%; flex-wrap: wrap; gap: 8px; }
-    #admin-order-search { width: 100% !important; min-width: 0; }
-    #admin-order-status-filter { width: 100% !important; }
+    #admin-orders-toolbar,
+    #admin-hp-toolbar,
+    #admin-featured-toolbar,
+    #client-favorites-toolbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+    #admin-orders-toolbar > div,
+    #admin-hp-toolbar > div,
+    #admin-featured-toolbar > div:last-child { width: 100%; flex-wrap: wrap; gap: 8px; }
+    #admin-order-search,
+    #admin-hp-search { width: 100% !important; min-width: 0; }
+    #admin-order-status-filter,
+    #admin-hp-status-filter { width: 100% !important; }
 }
 
 /* Client orders toolbar: stack on mobile */

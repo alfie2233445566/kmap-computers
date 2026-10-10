@@ -117,7 +117,7 @@
     }
     </script>
 
-    <link rel="stylesheet" href="style.css?v=5.8">
+    <link rel="stylesheet" href="style.css?v=5.9">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <!-- Chart.js for Sales Analytics -->
@@ -1154,8 +1154,8 @@
             <section id="view-client-favorites" class="app-view" style="display: none; width: 100%;">
                 <div
                     style="width: 100%; max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
-                    <div class="card"
-                        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div class="card search-sticky-bar" id="client-favorites-toolbar"
+                        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; position: sticky; top: var(--header-h, var(--main-header-height, 62px)); z-index: 990; background-color: var(--white); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); padding: 16px 20px;">
                         <div>
                             <h3 class="card-title"
                                 style="margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
@@ -1568,10 +1568,15 @@
 
             <!-- VIEW F: Sales Report & Generation -->
             <section id="view-admin-reports" class="app-view" style="display: none;">
-                <div class="card">
-                    <h3 class="card-title">Sales & Financial Reporting</h3>
+                <div class="card search-sticky-bar" id="admin-reports-toolbar"
+                    style="position: sticky; top: var(--header-h, var(--main-header-height, 62px)); z-index: 990; background-color: var(--white); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); padding: 18px 24px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <h3 class="card-title" style="margin-bottom: 0; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-chart-line" style="color: var(--secondary);"></i> Sales & Financial Reporting
+                        </h3>
+                    </div>
 
-                    <div class="report-header-controls">
+                    <div class="report-header-controls" style="margin-bottom: 0;">
                         <div class="form-group" style="margin-bottom: 0;">
                             <label>Preset Ranges</label>
                             <select id="report-preset" class="form-control" style="width: 200px;"
@@ -1622,8 +1627,10 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div style="border-top: 1px solid var(--border); padding-top: 24px;">
+                <div class="card">
+                    <div>
                         <h4 style="color: var(--primary); margin-bottom: 16px;" id="report-subtitle">Report Assessment
                         </h4>
                         <div class="analytics-summary">
@@ -1883,25 +1890,28 @@
 
             <!-- VIEW F: Admin Hire Purchase Management -->
             <section id="view-admin-hp" class="app-view" style="display: none;">
-                <div class="card">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
-                        <h3 class="card-title" style="margin-bottom: 0;">Hire Purchase Records</h3>
-                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                            <select id="admin-hp-status-filter" class="form-control" style="width: 150px;"
-                                onchange="app.renderHPList()">
-                                <option value="all">All Agreements</option>
-                                <option value="active">Active</option>
-                                <option value="overdue">Overdue</option>
-                                <option value="completed">Completed</option>
-                            </select>
-                            <input type="text" id="admin-hp-search" class="form-control"
-                                placeholder="Search client name, phone..." style="width: 250px;"
-                                oninput="app.renderHPList()">
-                            <button class="btn btn-secondary" onclick="app.openHPModal()"><i
-                                    class="fa-solid fa-plus"></i> New Hire Purchase</button>
-                        </div>
+                <div class="card search-sticky-bar" id="admin-hp-toolbar"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; position: sticky; top: var(--header-h, var(--main-header-height, 62px)); z-index: 990; background-color: var(--white); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); padding: 16px 20px;">
+                    <h3 class="card-title" style="margin-bottom: 0; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-file-contract" style="color: var(--secondary);"></i> Hire Purchase Records
+                    </h3>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <select id="admin-hp-status-filter" class="form-control" style="width: 150px;"
+                            onchange="app.renderHPList()">
+                            <option value="all">All Agreements</option>
+                            <option value="active">Active</option>
+                            <option value="overdue">Overdue</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                        <input type="text" id="admin-hp-search" class="form-control"
+                            placeholder="Search client name, phone..." style="width: 250px;"
+                            oninput="app.renderHPList()">
+                        <button class="btn btn-secondary" onclick="app.openHPModal()"><i
+                                class="fa-solid fa-plus"></i> New Hire Purchase</button>
                     </div>
+                </div>
+
+                <div class="card" style="padding: 20px;">
                     <div class="table-responsive">
                         <table>
                             <thead>
@@ -1927,7 +1937,8 @@
 
             <!-- VIEW G: Admin Featured Laptops Management (Strict 4 Slots Limit) -->
             <section id="view-admin-featured" class="app-view" style="display: none;">
-                <div class="card" style="margin-bottom: 24px;">
+                <div class="card search-sticky-bar" id="admin-featured-toolbar"
+                    style="margin-bottom: 24px; position: sticky; top: var(--header-h, var(--main-header-height, 62px)); z-index: 990; background-color: var(--white); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); padding: 18px 24px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
                         <div>
                             <h3 class="card-title" style="margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
@@ -2403,7 +2414,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=5.8"></script>
+    <script src="app.js?v=5.9"></script>
 </body>
 
 </html>
