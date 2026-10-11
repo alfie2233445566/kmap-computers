@@ -2910,6 +2910,10 @@ class KmapStoreApp {
                 document.getElementById('view-admin-hp').style.display = 'block';
                 pageTitle.innerText = "Hire Purchase Management";
                 pageSubtitle.innerText = "Monitor client payments, deposits, and installments breakdown";
+                const hpFilter = document.getElementById('admin-hp-status-filter');
+                if (hpFilter && !hpFilter.dataset.userFiltered) {
+                    hpFilter.value = 'active';
+                }
                 this.renderHPList();
                 this.checkHPNearDueAlerts();
                 break;
@@ -5489,8 +5493,13 @@ class KmapStoreApp {
 
     // Render HP list
     renderHPList() {
-        const filterStatus = document.getElementById('admin-hp-status-filter').value;
-        const query = document.getElementById('admin-hp-search').value.toLowerCase();
+        const filterEl = document.getElementById('admin-hp-status-filter');
+        if (filterEl && typeof event !== 'undefined' && event && event.type === 'change') {
+            filterEl.dataset.userFiltered = 'true';
+        }
+        const filterStatus = filterEl ? filterEl.value : 'active';
+        const searchEl = document.getElementById('admin-hp-search');
+        const query = searchEl ? searchEl.value.toLowerCase().trim() : '';
 
         const hps = this.db.getHP();
 
@@ -5543,10 +5552,14 @@ class KmapStoreApp {
             }
         });
 
-        document.getElementById('hp-stat-active').innerText = activeCount;
-        document.getElementById('hp-stat-balance').innerText = `GH₵ ${outstandingBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
-        document.getElementById('hp-stat-alerts').innerText = nearOverdueAlerts;
-        document.getElementById('hp-stat-completed').innerText = completedCount;
+        const elActive = document.getElementById('hp-stat-active');
+        if (elActive) elActive.innerText = activeCount;
+        const elBal = document.getElementById('hp-stat-balance');
+        if (elBal) elBal.innerText = `GH₵ ${outstandingBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+        const elAlerts = document.getElementById('hp-stat-alerts');
+        if (elAlerts) elAlerts.innerText = nearOverdueAlerts;
+        const elComp = document.getElementById('hp-stat-completed');
+        if (elComp) elComp.innerText = completedCount;
 
         const tbody = document.getElementById('admin-hp-tbody');
         if (!tbody) return;
