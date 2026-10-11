@@ -61,7 +61,7 @@ button, .btn, .nav-item, .card, .product-card, .stat-card, .inspect-thumb, .hamb
     color: var(--white);
     display: flex;
     flex-direction: column;
-    padding: 20px 16px;
+    padding: calc(env(safe-area-inset-top, 0px) + 20px) 16px calc(env(safe-area-inset-bottom, 0px) + 20px);
     position: fixed;
     height: 100vh;
     height: 100dvh;
@@ -69,7 +69,7 @@ button, .btn, .nav-item, .card, .product-card, .stat-card, .inspect-thumb, .hamb
     max-height: 100dvh;
     left: 0;
     top: 0;
-    z-index: 1000;
+    z-index: 1200;
     box-shadow: var(--shadow-lg);
     transition: var(--transition);
     transform: translateX(-100%);
@@ -110,6 +110,7 @@ body.sidebar-open {
 .sidebar-logo {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
     padding: 12px 8px;
     margin-bottom: 24px;
@@ -1020,7 +1021,7 @@ body.modal-open {
     height: 100vh;
     background: rgba(15, 23, 42, 0.5);
     backdrop-filter: blur(4px);
-    z-index: 999;
+    z-index: 1150;
 }
 
 .sidebar-backdrop.active {

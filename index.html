@@ -117,7 +117,7 @@
     }
     </script>
 
-    <link rel="stylesheet" href="style.css?v=7.1">
+    <link rel="stylesheet" href="style.css?v=7.6">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <!-- Chart.js for Sales Analytics -->
@@ -275,8 +275,14 @@
         <!-- Sidebar Navigation (Responsive dynamically updated on role) -->
         <aside class="sidebar">
             <div class="sidebar-logo">
-                <i class="fa-solid fa-laptop-code" style="color: var(--accent); font-size: 24px;"></i>
-                <h2>KMAP <span>COMPUTERS</span></h2>
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                    <i class="fa-solid fa-laptop-code" style="color: var(--accent); font-size: 24px;"></i>
+                    <h2>KMAP <span>COMPUTERS</span></h2>
+                </div>
+                <button class="btn btn-outline" onclick="app.closeSidebar()" aria-label="Close menu"
+                    style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; min-width: 34px; padding: 0; border-radius: 50%; color: var(--text-light); border-color: rgba(255, 255, 255, 0.2); background: transparent;">
+                    <i class="fa-solid fa-xmark" style="font-size: 16px;"></i>
+                </button>
             </div>
             <nav class="sidebar-nav" id="sidebar-nav-container">
                 <!-- Dynamic Navigation Buttons Injected Here -->
@@ -1407,7 +1413,7 @@
                 <div class="analytics-summary">
                     <div class="stat-card" onclick="app.switchView('admin-reports')" style="cursor: pointer;"
                         title="View Reports">
-                        <span class="stat-desc">Total Sales Revenue</span>
+                        <span class="stat-desc" id="stat-revenue-desc">Today's Sales Revenue</span>
                         <div class="stat-val" id="stat-revenue">GH&#8373; 0.00</div>
                     </div>
                     <div class="stat-card" onclick="app.showActiveOrders()" style="cursor: pointer;"
@@ -2425,7 +2431,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=7.5"></script>
+    <script src="app.js?v=7.6"></script>
 </body>
 
 </html>

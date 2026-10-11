@@ -4009,17 +4009,55 @@ class KmapStoreApp {
         const orders = this.db.getOrders();
         const products = this.db.getProducts();
 
-        // Stats calculations: include completed and confirmed orders in revenue
-        const completed = orders.filter(o => ['completed', 'confirmed'].includes(o.status));
-        const revenue = completed.reduce((sum, o) => sum + o.total, 0);
+        // Stats calculations: default revenue card to today's revenue (matching default reports preset)
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const todayEnd = new Date();
+        todayEnd.setHours(23, 59, 59, 999);
+
+        const todayOrders = orders.filter(o => {
+            const oDate = new Date(o.date);
+            return ['completed', 'confirmed'].includes(o.status) && !isNaN(oDate.getTime()) && oDate >= todayStart && oDate <= todayEnd;
+        });
+        let todayRevenue = todayOrders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
+
+        // Include Hire Purchase down payments or installments collected today
+        const hps = (this.db && typeof this.db.getHP === 'function') ? this.db.getHP() : [];
+        hps.forEach(hp => {
+            if (hp.startDate && hp.downPayment > 0) {
+                const startD = new Date(hp.startDate);
+                if (!isNaN(startD.getTime()) && startD >= todayStart && startD <= todayEnd) {
+                    todayRevenue += Number(hp.downPayment) || 0;
+                }
+            }
+            (hp.installments || []).forEach(inst => {
+                if (inst.status === 'paid' && inst.paidDate) {
+                    const paidD = new Date(inst.paidDate);
+                    if (!isNaN(paidD.getTime()) && paidD >= todayStart && paidD <= todayEnd) {
+                        todayRevenue += Number(inst.amount) || 0;
+                    }
+                }
+            });
+        });
+
         const active = orders.filter(o => ['pending', 'confirmed', 'in_transit'].includes(o.status)).length;
         const pending = orders.filter(o => o.status === 'pending').length;
         const lowStock = products.filter(p => p.stock <= 3).length;
 
-        document.getElementById('stat-revenue').innerText = `GH₵ ${revenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
-        document.getElementById('stat-active-orders').innerText = active;
-        document.getElementById('stat-pending-orders').innerText = pending;
-        document.getElementById('stat-low-stock').innerText = lowStock;
+        const statRevEl = document.getElementById('stat-revenue');
+        if (statRevEl) {
+            statRevEl.innerText = `GH₵ ${todayRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+        }
+        const statRevDescEl = document.getElementById('stat-revenue-desc');
+        if (statRevDescEl) {
+            statRevDescEl.innerText = "Today's Sales Revenue";
+        }
+        const statActiveEl = document.getElementById('stat-active-orders');
+        if (statActiveEl) statActiveEl.innerText = active;
+        const statPendingEl = document.getElementById('stat-pending-orders');
+        if (statPendingEl) statPendingEl.innerText = pending;
+        const statLowStockEl = document.getElementById('stat-low-stock');
+        if (statLowStockEl) statLowStockEl.innerText = lowStock;
 
         // Recent Orders Table
         const recentTbody = document.getElementById('recent-orders-tbody');
