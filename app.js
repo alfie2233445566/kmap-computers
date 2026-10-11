@@ -2799,6 +2799,10 @@ class KmapStoreApp {
                 document.getElementById('view-admin-orders').style.display = 'block';
                 pageTitle.innerText = "Order Hub";
                 pageSubtitle.innerText = "Manage, verify, and transit client order queues";
+                const adminOrderStatusFilter = document.getElementById('admin-order-status-filter');
+                if (adminOrderStatusFilter && !adminOrderStatusFilter.dataset.userFiltered) {
+                    adminOrderStatusFilter.value = 'active_all';
+                }
                 this.renderAdminOrders();
                 break;
             case 'admin-inventory':
@@ -2817,6 +2821,10 @@ class KmapStoreApp {
                 document.getElementById('view-admin-reports').style.display = 'block';
                 pageTitle.innerText = "Business Invoicing & Sales Reports";
                 pageSubtitle.innerText = "Download printable reports and summaries";
+                const reportPresetFilter = document.getElementById('report-preset');
+                if (reportPresetFilter && !reportPresetFilter.dataset.userFiltered) {
+                    reportPresetFilter.value = 'today';
+                }
                 this.handleReportPresetChange();
                 this.generateSalesReport();
                 break;
@@ -2950,10 +2958,7 @@ class KmapStoreApp {
                 <button class="nav-item" id="nav-btn-client-favorites" onclick="app.switchView('client-favorites')">
                     <i class="fa-solid fa-heart" style="color: #e53e3e;"></i> Saved Favorites (<span class="favorites-count">${this.favorites ? this.favorites.length : 0}</span>)
                 </button>
-                <div style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px 4px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;" onclick="app.switchView('admin-staff')">
-                    <span>Staff Management</span>
-                    <i class="fa-solid fa-chevron-right" style="font-size: 9px; opacity: 0.5;"></i>
-                </div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 16px 4px;">Administration</div>
                 <button class="nav-item" id="nav-btn-admin-dashboard" onclick="app.switchView('admin-dashboard')">
                     <i class="fa-solid fa-chart-line"></i> Dashboard
                 </button>
@@ -4157,6 +4162,8 @@ class KmapStoreApp {
     }
 
     searchOrders() {
+        const statusFilterEl = document.getElementById('admin-order-status-filter');
+        if (statusFilterEl) statusFilterEl.dataset.userFiltered = 'true';
         const query = document.getElementById('admin-order-search').value.toLowerCase().trim();
         this.renderAdminOrders(query);
     }
@@ -4674,7 +4681,9 @@ class KmapStoreApp {
 
     // ADMIN: Invoicing & Reporting assessment
     handleReportPresetChange() {
-        const preset = document.getElementById('report-preset').value;
+        const reportPresetEl = document.getElementById('report-preset');
+        if (reportPresetEl) reportPresetEl.dataset.userFiltered = 'true';
+        const preset = reportPresetEl ? reportPresetEl.value : 'today';
         const startGroup = document.getElementById('report-start-date-group');
         const endGroup = document.getElementById('report-end-date-group');
 

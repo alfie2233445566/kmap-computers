@@ -945,6 +945,7 @@ body.modal-open {
     grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
     gap: 20px;
     margin-bottom: 24px;
+    margin-top: 2px;
 }
 
 .stat-card {
@@ -3280,9 +3281,9 @@ body.landing-mode .sidebar {
    ============================================================ */
 
 /* App shell overflow guard */
-.app-view { width: 100%; box-sizing: border-box; padding: 0 20px 20px; }
+.app-view { width: 100%; box-sizing: border-box; padding: 22px 20px 24px; }
 /* Landing page overrides app-view padding */
-.landing-view-wrapper { padding: 0; }
+.landing-view-wrapper { padding: 0 !important; }
 body { overflow-x: clip; }
 /* overflow-x guard: body only — do NOT apply overflow-x:hidden to .main-content or #app-root as it breaks position:sticky */
 .app-view { max-width: 100vw; }
@@ -3291,8 +3292,8 @@ body { overflow-x: clip; }
 html { scroll-behavior: smooth; }
 
 /* Main content padding */
-@media (max-width: 992px) { .app-view { padding: 0 14px 14px; } }
-@media (max-width: 480px) { .app-view { padding: 0 10px 10px; } }
+@media (max-width: 992px) { .app-view { padding: 18px 14px 16px; } }
+@media (max-width: 480px) { .app-view { padding: 16px 10px 14px; } }
 
 /* Cards mobile padding */
 @media (max-width: 600px) { .card { padding: 16px; } }
