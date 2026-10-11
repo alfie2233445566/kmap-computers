@@ -2183,7 +2183,7 @@ class KmapStoreApp {
             safeLocalStorage.setItem('kmap_featured_laptops', JSON.stringify(defaultFeaturedLaptops), true);
         }
 
-        // Clean out any legacy seeded test orders, hire purchases, and test client accounts from local storage & cloud
+        // Clean out any legacy seeded test orders, hire purchases and test client accounts from local storage & cloud
         try {
             const currentOrders = JSON.parse(safeLocalStorage.getItem('kmap_orders') || '[]');
             const cleanedOrders = currentOrders.filter(o => o.id !== 'ORD-8932' && o.id !== 'ORD-7612' && o.clientName !== 'Kwame Mensah' && o.clientName !== 'Ama Serwaa');
@@ -2858,7 +2858,7 @@ class KmapStoreApp {
             case 'admin-orders':
                 document.getElementById('view-admin-orders').style.display = 'block';
                 pageTitle.innerText = "Order Hub";
-                pageSubtitle.innerText = "Manage, verify, and transit client order queues";
+                pageSubtitle.innerText = "Manage, verify and transit client order queues";
                 const adminOrderStatusFilter = document.getElementById('admin-order-status-filter');
                 if (adminOrderStatusFilter && !adminOrderStatusFilter.dataset.userFiltered) {
                     adminOrderStatusFilter.value = 'active_all';
@@ -2891,7 +2891,7 @@ class KmapStoreApp {
             case 'admin-staff':
                 document.getElementById('view-admin-staff').style.display = 'block';
                 pageTitle.innerText = "Staff Management";
-                pageSubtitle.innerText = "Manage employees, staff accounts, and administrator permissions";
+                pageSubtitle.innerText = "Manage employees, staff accounts and administrator permissions";
                 this.renderStaffList();
                 break;
             case 'admin-backups':
@@ -2909,7 +2909,7 @@ class KmapStoreApp {
             case 'admin-hp':
                 document.getElementById('view-admin-hp').style.display = 'block';
                 pageTitle.innerText = "Hire Purchase Management";
-                pageSubtitle.innerText = "Monitor client payments, deposits, and installments breakdown";
+                pageSubtitle.innerText = "Monitor client payments, deposits and installments breakdown";
                 const hpFilter = document.getElementById('admin-hp-status-filter');
                 if (hpFilter && !hpFilter.dataset.userFiltered) {
                     hpFilter.value = 'active';
@@ -5245,7 +5245,7 @@ class KmapStoreApp {
         if (!tbody) return;
         tbody.innerHTML = '';
 
-        // Exclude clients, guests, and Alfred from the visible accounts interface
+        // Exclude clients, guests and Alfred from the visible accounts interface
         const users = this.db.getUsers().filter(u => 
             u.role !== 'client' && 
             u.role !== 'guest' && 

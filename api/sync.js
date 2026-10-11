@@ -108,7 +108,7 @@ export default async function handler(request, response) {
         } else {
           data['kmap_orders'] = [];
         }
-        // Client NEVER gets logs, hire purchase applications of other clients, or staff list
+        // Client NEVER gets logs, hire purchase applications of other clients or staff list
         data['kmap_logs'] = [];
         data['kmap_hire_purchase'] = [];
         data['kmap_users'] = [];
