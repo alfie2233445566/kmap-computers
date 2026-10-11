@@ -16,9 +16,12 @@ const safeLocalStorage = {
             storage[key] = String(val);
         }
 
-        // Push to cloud if it's a watched key and sync is not skipped
+        // Push to cloud only if the user is an authenticated administrator
+        const token = safeLocalStorage.getItem('kmap_auth_token');
+        const currentUser = window.app && window.app.currentUser;
+        const isAdmin = currentUser && ['admin', 'superadmin'].includes(currentUser.role);
         const watchedKeys = ['kmap_products', 'kmap_users', 'kmap_orders', 'kmap_logs', 'kmap_promos', 'kmap_hire_purchase', 'kmap_featured_laptops', 'kmap_catalog_version'];
-        if (!skipSync && watchedKeys.includes(key)) {
+        if (isAdmin && token && !skipSync && watchedKeys.includes(key)) {
             window.lastLocalSaveTimestamp = window.lastLocalSaveTimestamp || {};
             window.lastLocalSaveTimestamp[key] = Date.now();
             try {
@@ -65,14 +68,23 @@ window.kvSyncTimeout = null;
 const triggerKVSync = () => {
     if (Object.keys(window.kvSyncQueue).length === 0) return;
 
+    // Cloud writes are strictly reserved for authenticated administrators
+    const currentUser = window.app && window.app.currentUser;
+    const isAdmin = currentUser && ['admin', 'superadmin'].includes(currentUser.role);
+    const token = safeLocalStorage.getItem('kmap_auth_token');
+
+    if (!isAdmin || !token) {
+        window.kvSyncQueue = {}; // Clear queue to avoid leak
+        return;
+    }
+
     const payload = { updates: { ...window.kvSyncQueue } };
     window.kvSyncQueue = {}; // Clear queue
 
-    const headers = { 'Content-Type': 'application/json' };
-    const token = safeLocalStorage.getItem('kmap_auth_token');
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-    }
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
 
     fetch(getSyncApiUrl(), {
         method: 'POST',
@@ -82,21 +94,10 @@ const triggerKVSync = () => {
         .then(async (res) => {
             if (!res.ok) {
                 const errData = await res.json().catch(() => ({}));
-                console.error('KV Sync Failed:', res.status, errData);
-                if (window.app && typeof window.app.showToast === 'function') {
-                    if (res.status === 401) {
-                        window.app.showToast('🔒 Cloud write restricted: Admin login session required.', 'error');
-                    } else if (res.status === 413) {
-                        window.app.showToast('⚠️ Cloud sync failed: Photos payload too large for KV storage!', 'error');
-                    } else if (res.status === 500) {
-                        window.app.showToast(`⚠️ Cloud sync failed: ${errData.error || 'Server error'}`, 'error');
-                    }
-                }
-            } else {
-                console.log('✓ KV Sync successful');
+                console.warn('Admin KV Sync notice:', res.status, errData);
             }
         })
-        .catch(err => console.error('KV Sync Network Error:', err));
+        .catch(() => {});
 };
 
 class KmapStoreApp {
@@ -333,7 +334,7 @@ class KmapStoreApp {
                     indicator.style.background = 'rgba(16,185,129,0.1)';
                     indicator.style.color = '#059669';
                     indicator.title = `Connected to Upstash Redis (${syncUrl})`;
-                    indicator.style.display = 'inline-flex';
+                    indicator.style.display = isAdmin ? 'inline-flex' : 'none';
                 }
                 if (!silent && syncBtns.length > 0) {
                     syncBtns.forEach(b => {
@@ -2740,6 +2741,12 @@ class KmapStoreApp {
 
     // Switch Application Views
     switchView(viewName, updateBrowserHistory = true) {
+        // Guard: restrict all admin views to authenticated administrators only
+        const isAdmin = this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role);
+        if (viewName && viewName.startsWith('admin-') && !isAdmin) {
+            viewName = 'landing-page';
+        }
+
         // Auto-close sidebar on view selection
         this.closeSidebar();
 
