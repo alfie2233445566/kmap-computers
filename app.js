@@ -263,8 +263,46 @@ class KmapStoreApp {
         const isAdmin = this.currentUser && ['admin', 'superadmin'].includes(this.currentUser.role);
         const token = safeLocalStorage.getItem('kmap_auth_token');
 
+        // Visual feedback for any buttons that triggered the sync
+        const syncBtns = typeof document !== 'undefined' ? document.querySelectorAll('button[onclick*="forceCloudSyncAll"]') : [];
+        if (!silent && syncBtns.length > 0) {
+            syncBtns.forEach(b => {
+                b.disabled = true;
+                if (!b.dataset.prevHtml) b.dataset.prevHtml = b.innerHTML;
+                b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing to Cloud...';
+            });
+        }
+
+        const restoreBtns = () => {
+            if (syncBtns.length > 0) {
+                setTimeout(() => {
+                    syncBtns.forEach(b => {
+                        b.disabled = false;
+                        if (b.dataset.prevHtml) {
+                            b.innerHTML = b.dataset.prevHtml;
+                            delete b.dataset.prevHtml;
+                        }
+                    });
+                }, 2200);
+            }
+        };
+
         // Only authenticated administrators are authorized to push full database snapshots to cloud KV
-        if (!isAdmin || !token) {
+        if (!isAdmin) {
+            restoreBtns();
+            if (!silent) {
+                this.showToast('🔒 Administrator access required to push updates to the cloud.', 'error');
+                this.openLoginModal();
+            }
+            return;
+        }
+
+        if (!token) {
+            restoreBtns();
+            if (!silent) {
+                this.showToast('🔒 Admin session credentials required. Please sign in to authenticate cloud sync.', 'warning');
+                this.openLoginModal();
+            }
             return;
         }
 
@@ -297,10 +335,23 @@ class KmapStoreApp {
                     indicator.title = `Connected to Upstash Redis (${syncUrl})`;
                     indicator.style.display = 'inline-flex';
                 }
+                if (!silent && syncBtns.length > 0) {
+                    syncBtns.forEach(b => {
+                        b.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #059669;"></i> Synced to Cloud!';
+                    });
+                }
+                if (!silent) {
+                    this.showToast(`✅ Successfully synced ${products.length} products and store data to cloud!`, 'success');
+                }
             } else {
                 const errData = await res.json().catch(() => ({}));
                 if (res.status === 401) {
-                    if (!silent) this.showToast('Your admin session has expired. Please log in again to sync cloud changes.', 'error');
+                    if (!silent) {
+                        this.showToast('🔒 Your admin session has expired. Please log in again to sync cloud changes.', 'error');
+                        this.openLoginModal();
+                    }
+                } else if (res.status === 503) {
+                    if (!silent) this.showToast('⚠️ Cloud database service is not configured or reachable.', 'error');
                 } else {
                     if (!silent) this.showToast(`⚠️ Sync failed: ${errData.error || res.statusText}`, 'error');
                 }
@@ -308,6 +359,8 @@ class KmapStoreApp {
         } catch (e) {
             console.error('Cloud Sync Error:', e);
             if (!silent) this.showToast(`⚠️ Network error: ${e.message || 'Cannot reach cloud endpoint'}`, 'error');
+        } finally {
+            restoreBtns();
         }
     }
 
